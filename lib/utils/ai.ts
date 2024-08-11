@@ -1,4 +1,4 @@
-import { ModelSettings } from "@/components/console/workflow-model-settings";
+import { ModelSettings } from "../../components/console/workflow-model-settings";
 import { modelToProviderId } from "@/data/workflow";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createAzure } from "@ai-sdk/azure";
