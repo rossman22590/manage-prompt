@@ -3,7 +3,8 @@ import { modelToProviderId } from "@/data/workflow";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
 import { UserKey } from "@prisma/client";
-import { generateText, streamText } from "ai";
+import { generateText, LanguageModel, streamText } from "ai";
+import { getUserKeyFor } from "./encryption";
 
 export const getCompletion = async (
   model: string,
