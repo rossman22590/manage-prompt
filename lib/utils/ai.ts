@@ -1,17 +1,15 @@
-import { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
+import { ModelSettings } from "@/components/console/workflow-model-settings";
 import { modelToProviderId } from "@/data/workflow";
 import { anthropic } from "@ai-sdk/anthropic";
-import { createAzure } from "@ai-sdk/azure";
 import { createOpenAI } from "@ai-sdk/openai";
 import { UserKey } from "@prisma/client";
-import { generateText, LanguageModel, streamText } from "ai";
-import { getUserKeyFor } from "./encryption";
+import { generateText, streamText } from "ai";
 
 export const getCompletion = async (
   model: string,
   content: string,
   settings?: ModelSettings,
-  userKeys: UserKey[] = [],
+  userKeys: UserKey[] = []
 ): Promise<{
   result: string | undefined;
   rawResult: any;
@@ -33,7 +31,7 @@ export const getCompletion = async (
     case "google/gemma-7b-it":
       const groq = createOpenAI({
         baseURL: "https://api.groq.com/openai/v1",
-        apiKey: process.env.GROQ_TOKEN,
+        apiKey: process.env.OPENAI_API_KEY,
       });
       completion = await generateText({
         model: groq(modelToProviderId[model] ?? model),
@@ -47,25 +45,13 @@ export const getCompletion = async (
       });
       break;
     default:
-      const userOpenApiKey = getUserKeyFor("openai", userKeys);
-      if (userOpenApiKey) {
-        const openai = createOpenAI({
-          apiKey: userOpenApiKey,
-        });
-        completion = await generateText({
-          model: openai(modelToProviderId[model] ?? model),
-          ...modelParams,
-        });
-      } else {
-        const azure = createAzure({
-          resourceName: process.env.AZURE_RESOURCE_NAME,
-          apiKey: process.env.AZURE_API_KEY,
-        });
-        completion = await generateText({
-          model: azure(modelToProviderId[model] ?? model) as LanguageModel,
-          ...modelParams,
-        });
-      }
+      const openai = createOpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+      completion = await generateText({
+        model: openai(modelToProviderId[model] ?? model),
+        ...modelParams,
+      });
   }
 
   if (!completion.text) throw new Error("No result returned from Provider");
@@ -82,7 +68,7 @@ export const getStreamingCompletion = async (
   content: string,
   settings?: ModelSettings,
   userKeys: UserKey[] = [],
-  onFinish?: (evt: any) => Promise<void>,
+  onFinish?: (evt: any) => Promise<void>
 ) => {
   const modelParams = {
     prompt: content,
@@ -101,7 +87,7 @@ export const getStreamingCompletion = async (
     case "google/gemma-7b-it":
       const groq = createOpenAI({
         baseURL: "https://api.groq.com/openai/v1",
-        apiKey: process.env.GROQ_TOKEN,
+        apiKey: process.env.OPENAI_API_KEY,
       });
       completion = await streamText({
         model: groq(modelToProviderId[model] ?? model),
@@ -117,27 +103,14 @@ export const getStreamingCompletion = async (
       });
       break;
     default:
-      const userOpenApiKey = getUserKeyFor("openai", userKeys);
-      if (userOpenApiKey) {
-        const openai = createOpenAI({
-          apiKey: userOpenApiKey,
-        });
-        completion = await streamText({
-          model: openai(modelToProviderId[model] ?? model),
-          ...modelParams,
-          onFinish,
-        });
-      } else {
-        const azure = createAzure({
-          resourceName: process.env.AZURE_RESOURCE_NAME,
-          apiKey: process.env.AZURE_API_KEY,
-        });
-        completion = await streamText({
-          model: azure(modelToProviderId[model] ?? model) as LanguageModel,
-          ...modelParams,
-          onFinish,
-        });
-      }
+      const openai = createOpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+      completion = await streamText({
+        model: openai(modelToProviderId[model] ?? model),
+        ...modelParams,
+        onFinish,
+      });
   }
 
   return completion.toTextStreamResponse({
