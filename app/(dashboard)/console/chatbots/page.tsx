@@ -1,7 +1,7 @@
 import PageSection from "@/components/core/page-section";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
-import { deleteChatBot } from "../actions";
+import { deleteChatBot } from "./actions";
 import { DeleteButton } from "@/components/form/button";
 import ChatView from "@/components/console/chatbot/chat-view";
 import { prisma } from "@/lib/utils/db";
