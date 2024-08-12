@@ -78,7 +78,7 @@ async function ChatDashboard({ params }: Props) {
       </PageSection>
 
       <PageSection>
-        <ChatView id={id} token={token} />
+        <ChatView token={token} />
       </PageSection>
     </>
   );
