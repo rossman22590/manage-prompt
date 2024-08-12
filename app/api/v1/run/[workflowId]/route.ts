@@ -1,5 +1,10 @@
 import { modelToProvider, WorkflowInput } from "@/data/workflow";
 import { getCompletion } from "@/lib/utils/ai";
+import {
+  ErrorCodes,
+  ErrorResponse,
+  UnauthorizedResponse,
+} from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { getUserKeyFor } from "@/lib/utils/encryption";
 import { validateRateLimit } from "@/lib/utils/ratelimit";
@@ -13,47 +18,15 @@ import {
   cacheWorkflowResult,
   getWorkflowCachedResult,
 } from "@/lib/utils/useWorkflow";
+import { waitUntil } from "@vercel/functions";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 export const maxDuration = 120;
 
-const UnauthorizedResponse = () =>
-  NextResponse.json(
-    {
-      error: "Unauthorized. Please provide a valid secret key.",
-      success: false,
-    },
-    {
-      status: 401,
-    }
-  );
-
-const ErrorResponse = (message: string, status = 400, code?: string) =>
-  NextResponse.json(
-    {
-      error: message,
-      success: false,
-      code,
-    },
-    {
-      status,
-    }
-  );
-
-enum ErrorCodes {
-  MissingInput = "missing_input",
-  WorkflowNotFound = "workflow_not_found",
-  WorkflowRunFailed = "workflow_run_failed",
-  InvalidBilling = "invalid_billing",
-  InternalServerError = "internal_server_error",
-  RequestBlocked = "request_blocked",
-  SpendLimitReached = "spend_limit_reached",
-}
-
 export async function POST(
   req: Request,
-  { params }: { params: { workflowId: string } }
+  { params }: { params: { workflowId: string } },
 ) {
   try {
     const authorization = req.headers.get("authorization");
@@ -104,7 +77,7 @@ export async function POST(
       return ErrorResponse(
         "Invalid billing. Please contact support.",
         402,
-        ErrorCodes.InvalidBilling
+        ErrorCodes.InvalidBilling,
       );
     }
 
@@ -113,13 +86,13 @@ export async function POST(
       organization?.credits === 0 &&
       (await hasExceededSpendLimit(
         organization?.spendLimit,
-        organization?.stripe?.customerId
+        organization?.stripe?.customerId,
       ))
     ) {
       return ErrorResponse(
         "Spend limit exceeded. Please increase your spend limit to continue using the service.",
         402,
-        ErrorCodes.SpendLimitReached
+        ErrorCodes.SpendLimitReached,
       );
     }
 
@@ -136,7 +109,7 @@ export async function POST(
     const body = (await req.json().catch(() => {})) ?? {};
     const cachedResult = await getWorkflowCachedResult(
       params.workflowId,
-      JSON.stringify(body)
+      JSON.stringify(body),
     );
 
     if (cachedResult) {
@@ -155,12 +128,12 @@ export async function POST(
         return ErrorResponse(
           `Missing input: ${input.name}`,
           400,
-          ErrorCodes.MissingInput
+          ErrorCodes.MissingInput,
         );
       }
       content = workflow.template.replace(
         `{{${input.name}}}`,
-        body[input.name]
+        body[input.name],
       );
     }
 
@@ -168,7 +141,7 @@ export async function POST(
       model,
       content,
       JSON.parse(JSON.stringify(workflow.modelSettings)),
-      organization.UserKeys
+      organization.UserKeys,
     );
 
     let { result, totalTokenCount } = response;
@@ -176,39 +149,41 @@ export async function POST(
       return ErrorResponse(
         "Failed to run workflow",
         500,
-        ErrorCodes.InternalServerError
+        ErrorCodes.InternalServerError,
       );
     }
 
     const isEligibleForByokDiscount = !!getUserKeyFor(
       modelToProvider[model],
-      organization.UserKeys
+      organization.UserKeys,
     );
     if (isEligibleForByokDiscount) {
       totalTokenCount = Math.floor(totalTokenCount * 0.3);
     }
 
-    await Promise.all([
-      reportUsage(
-        organization?.id,
-        organization?.stripe?.subscription as unknown as Stripe.Subscription,
-        totalTokenCount
-      ),
-      logEvent(EventName.RunWorkflow, {
-        workflow_id: workflow.id,
-        owner_id: key.ownerId,
-        model,
-        total_tokens: totalTokenCount,
-      }),
-      workflow.cacheControlTtl
-        ? cacheWorkflowResult(
-            params.workflowId,
-            JSON.stringify(body),
-            result,
-            workflow.cacheControlTtl
-          )
-        : null,
-    ]);
+    waitUntil(
+      Promise.all([
+        reportUsage(
+          organization?.id,
+          organization?.stripe?.subscription as unknown as Stripe.Subscription,
+          totalTokenCount,
+        ),
+        logEvent(EventName.RunWorkflow, {
+          workflow_id: workflow.id,
+          owner_id: key.ownerId,
+          model,
+          total_tokens: totalTokenCount,
+        }),
+        workflow.cacheControlTtl
+          ? cacheWorkflowResult(
+              params.workflowId,
+              JSON.stringify(body),
+              result,
+              workflow.cacheControlTtl,
+            )
+          : null,
+      ]),
+    );
 
     return NextResponse.json(
       { success: true, result },
@@ -217,14 +192,14 @@ export async function POST(
           "x-ratelimit-limit": limit.toString(),
           "x-ratelimit-remaining": remaining.toString(),
         },
-      }
+      },
     );
   } catch (error) {
     console.error(error);
     return ErrorResponse(
       "Failed to run workflow",
       500,
-      ErrorCodes.InternalServerError
+      ErrorCodes.InternalServerError,
     );
   }
 }
