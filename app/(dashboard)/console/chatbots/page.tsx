@@ -1,86 +1,87 @@
-import PageTitle from "@/components/layout/page-title";
-import { owner } from "@/lib/hooks/useOwner";
-import { prisma } from "@/lib/utils/db";
-import EmptyState from "@/components/core/empty-state";
-import { cn } from "@/lib/utils";
-import Link from "@/node_modules/next/link";
-import { Badge } from "@/components/ui/badge";
-import { ChevronRightIcon } from "@/node_modules/@heroicons/react/20/solid";
 import PageSection from "@/components/core/page-section";
+import PageTitle from "@/components/layout/page-title";
+import { buttonVariants } from "@/components/ui/button";
+import { deleteChatBot } from "../actions";
+import { DeleteButton } from "@/components/form/button";
+import ChatView from "@/components/console/chatbot/chat-view";
+import { prisma } from "@/lib/utils/db";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { owner } from "@/lib/hooks/useOwner";
+import { getAppBaseUrl } from "@/lib/utils/url";
 
-export default async function Chatbots() {
-  const { userId, orgId } = await owner();
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
-  const chatBots = await prisma.chatBot.findMany({
-    include: {
-      user: true,
-    },
+async function ChatDashboard({ params }: Props) {
+  const { userId } = await owner();
+  const { id } = params;
+
+  const chatBot = await prisma.chatBot.findUnique({
     where: {
-      ownerId: userId,
+      id,
     },
   });
 
+  if (!chatBot) {
+    return notFound();
+  }
+
+  const { token } = await fetch(getAppBaseUrl() + "/api/v1/chat/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.MANAGEPROMPT_SECRET_TOKEN!}`,
+    },
+    body: JSON.stringify({
+      chatbotId: id,
+      sessionId: userId,
+    }),
+  }).then((res) => res.json());
+
   return (
     <>
-      <PageTitle
-        title="Chatbots"
-        actionLabel="New"
-        actionLink="/console/chatbots/new"
-      />
+      <PageTitle title={chatBot.name} backUrl="/console/chatbots" />
 
-      <div className="-mt-6 max-w-7xl mx-auto">
-        {chatBots?.length ? (
-          <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
-            {chatBots.map((chatbot) => (
-              <div
-                key={chatbot.id}
-                className={cn(
-                  "relative flex justify-between space-x-3 rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700 bg-white dark:bg-gray-950",
-                )}
-              >
-                <Link
-                  href={`/console/chatbots/${chatbot.id}`}
-                  className="min-w-0 space-y-3"
-                  prefetch={false}
-                >
-                  <div className="flex items-center space-x-3">
-                    <h2 className="text-lg font-semibold">
-                      <span className="absolute inset-0" aria-hidden="true" />
-                      {chatbot.name} <span className="sr-only"></span>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">{chatbot.model}</Badge>
-                        <span className="hidden sm:block" aria-hidden="true">
-                          &middot;
-                        </span>
-                        <span className="hidden sm:block text-sm">
-                          {chatbot.user?.name}
-                        </span>
-                      </div>
-                    </h2>
-                  </div>
-                </Link>
-
-                <div className="sm:hidden">
-                  <ChevronRightIcon
-                    className="h-4 w-4 text-gray-400"
-                    aria-hidden="true"
-                  />
-                </div>
+      <PageSection topInset bottomMargin>
+        <div className="flex h-12 flex-col justify-center">
+          <div className="px-4 sm:px-6 lg:px-8 lg:-mx-4">
+            <div className="flex justify-between py-3">
+              <div className="isolate inline-flex sm:space-x-3">
+                <span className="inline-flex space-x-1">
+                  <Link
+                    href={`/console/chatbots/${id}/edit`}
+                    className={buttonVariants({ variant: "ghost" })}
+                  >
+                    Edit
+                  </Link>
+                </span>
               </div>
-            ))}
-          </div>
-        ) : null}
-      </div>
 
-      {!chatBots?.length ? (
-        <PageSection className="p-4">
-          <EmptyState
-            show
-            label="chatbot"
-            createLink={"/console/chatbots/new"}
-          />
-        </PageSection>
-      ) : null}
+              <span className="isolate inline-flex">
+                <form action={deleteChatBot}>
+                  <input
+                    className="hidden"
+                    type="text"
+                    name="id"
+                    defaultValue={id}
+                  />
+                  <DeleteButton />
+                </form>
+              </span>
+            </div>
+          </div>
+        </div>
+      </PageSection>
+
+      <PageSection>
+        <ChatView id={id} token={token} />
+      </PageSection>
     </>
   );
 }
+
+export default ChatDashboard;
