@@ -208,7 +208,7 @@ export async function updateUserKey(data: FormData) {
   const result = z
     .object({
       provider: z.string().min(3).max(10),
-      apiKey: z.string().min(3).max(128),
+      apiKey: z.string().min(3).max(158),
     })
     .safeParse({
       provider,
