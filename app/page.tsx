@@ -9,7 +9,7 @@ export const revalidate = 86400;
 
 const features = [
   {
-    name: "Advanced AI Tutoring",
+    name: "Advanced AI",
     description: "Leverage cutting-edge AI models to provide personalized learning experiences for your users.",
     icon: BrainIcon,
   },
@@ -34,27 +34,27 @@ const includedFeatures = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 text-gray-800 overflow-hidden">
       <Header />
 
       <main>
         {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <div className="relative h-full w-full">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900 via-purple-900 to-transparent opacity-50 animate-pulse"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-pink-700 via-pink-900 to-transparent opacity-30 animate-pulse" style={{ animationDelay: "-2s" }}></div>
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900 via-blue-900 to-transparent opacity-20 animate-pulse" style={{ animationDelay: "-4s" }}></div>
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-200 via-purple-100 to-transparent opacity-70 animate-pulse"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-pink-200 via-pink-100 to-transparent opacity-50 animate-pulse" style={{ animationDelay: "-2s" }}></div>
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-200 via-blue-100 to-transparent opacity-40 animate-pulse" style={{ animationDelay: "-4s" }}></div>
             </div>
           </div>
           <div className="relative z-10 text-center px-6 max-w-4xl">
             <AnimatedSection>
-              <h1 className="text-6xl sm:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+              <h1 className="text-6xl sm:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
                 AI Tutor API
               </h1>
             </AnimatedSection>
             <AnimatedSection delay={0.2}>
-              <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-300">
+              <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-600">
                 Revolutionize learning with AI-driven tutoring. Empower your applications with our cutting-edge AI Tutor API.
               </p>
             </AnimatedSection>
@@ -68,7 +68,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/documentation"
-                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-white border-white hover:bg-white hover:text-purple-900 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
+                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
                 >
                   Documentation
                 </Link>
@@ -76,19 +76,19 @@ export default function Home() {
             </AnimatedSection>
           </div>
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-            <ChevronDownIcon className="h-10 w-10 text-white opacity-50 animate-bounce" />
+            <ChevronDownIcon className="h-10 w-10 text-purple-600 opacity-70 animate-bounce" />
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900 to-black opacity-50"></div>
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white opacity-50"></div>
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-400">Powerful Features</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                  Build Intelligent Tutoring Systems
+                <h2 className="text-base font-semibold leading-7 text-purple-600">Powerful Features</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                  Build Intelligent Systems
                 </p>
               </div>
             </AnimatedSection>
@@ -96,12 +96,12 @@ export default function Home() {
               <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
                 {features.map((feature, index) => (
                   <AnimatedSection key={feature.name} delay={index * 0.2}>
-                    <div className="flex flex-col">
-                      <dt className="flex items-center gap-x-3 text-xl font-semibold leading-7 text-white">
-                        <feature.icon className="h-8 w-8 flex-none text-purple-400" aria-hidden="true" />
+                    <div className="flex flex-col bg-purple-50 rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200">
+                      <dt className="flex items-center gap-x-3 text-xl font-semibold leading-7 text-gray-900">
+                        <feature.icon className="h-8 w-8 flex-none text-purple-600" aria-hidden="true" />
                         {feature.name}
                       </dt>
-                      <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-300">
+                      <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
                         <p className="flex-auto">{feature.description}</p>
                       </dd>
                     </div>
@@ -113,47 +113,47 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-purple-900 to-black opacity-50"></div>
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-purple-50">
+          <div className="absolute inset-0 bg-gradient-to-t from-white to-purple-50 opacity-50"></div>
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl sm:text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">Simple, transparent pricing</h2>
-                <p className="mt-6 text-lg leading-8 text-gray-300">
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Simple, transparent pricing</h2>
+                <p className="mt-6 text-lg leading-8 text-gray-600">
                   Prices are per 1,000 tokens. You can think of tokens as pieces of words, where 1,000 tokens is about 750 words.
                 </p>
               </div>
             </AnimatedSection>
             <AnimatedSection delay={0.2}>
-              <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-gray-200 backdrop-blur-lg backdrop-filter sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
+              <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-purple-200 bg-white shadow-xl sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
                 <div className="p-8 sm:p-10 lg:flex-auto">
-                  <h3 className="text-3xl font-bold tracking-tight text-white">AI Tutor API Plan</h3>
-                  <p className="mt-6 text-base leading-7 text-gray-300">
+                  <h3 className="text-3xl font-bold tracking-tight text-gray-900">AI Tutor API Plan</h3>
+                  <p className="mt-6 text-base leading-7 text-gray-600">
                     Get access to our powerful AI Tutor API with all the features you need to create intelligent tutoring systems.
                   </p>
                   <div className="mt-10 flex items-center gap-x-4">
-                    <h4 className="flex-none text-sm font-semibold leading-6 text-purple-400">What's included</h4>
-                    <div className="h-px flex-auto bg-gray-700" />
+                    <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What's included</h4>
+                    <div className="h-px flex-auto bg-purple-200" />
                   </div>
                   <ul
                     role="list"
-                    className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-300 sm:grid-cols-2 sm:gap-6"
+                    className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6"
                   >
                     {includedFeatures.map((feature) => (
                       <li key={feature} className="flex gap-x-3 items-center">
-                        <CheckIcon className="h-6 w-5 flex-none text-purple-400" aria-hidden="true" />
+                        <CheckIcon className="h-6 w-5 flex-none text-purple-600" aria-hidden="true" />
                         {feature}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-                  <div className="rounded-2xl bg-gray-900 py-10 text-center ring-1 ring-inset ring-gray-700 lg:flex lg:flex-col lg:justify-center lg:py-16">
+                  <div className="rounded-2xl bg-purple-50 py-10 text-center ring-1 ring-inset ring-purple-200 lg:flex lg:flex-col lg:justify-center lg:py-16">
                     <div className="mx-auto max-w-xs px-8">
-                      <p className="text-base font-semibold text-gray-300">Billed Monthly</p>
+                      <p className="text-base font-semibold text-gray-600">Billed Monthly</p>
                       <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                        <span className="text-5xl font-bold tracking-tight text-white">$0.01</span>
-                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-300">/1K tokens</span>
+                        <span className="text-5xl font-bold tracking-tight text-gray-900">$0.01</span>
+                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/1K tokens</span>
                       </p>
                       <Link
                         href="https://aitutor-api.vercel.app/console/workflows"
