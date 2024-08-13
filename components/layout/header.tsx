@@ -5,7 +5,7 @@ import logo from "../../public/images/logo.png";
 const navigation = [
   {
     name: "Documentation",
-    href: "https://manageprompt.readme.io/reference/run-workflow",
+    href: "https:/myapps.ai",
   },
   {
     name: "Support",
