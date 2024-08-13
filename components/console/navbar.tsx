@@ -30,11 +30,11 @@ export default function NavBar({ isPublicPage = false }: Props) {
         href: "/console/workflows",
         current: path.startsWith("/console/workflows"),
       },
-      {
-        name: "Chatbots",
-        href: "/console/chatbots",
-        current: path.startsWith("/console/chatbots"),
-      },
+      // {
+      //   name: "Chatbots",
+      //   href: "/console/chatbots",
+      //   current: path.startsWith("/console/chatbots"),
+      // },
       {
         name: "Settings",
         href: "/console/settings",
