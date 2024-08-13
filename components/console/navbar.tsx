@@ -59,7 +59,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
               <Link href="/" className="ml-1" prefetch={false}>
                 <div className="flex items-center lg:px-0">
                   <Image
-                    src={logo}
+                    src="https://img.mytsi.org/i/DWai683.png"
                     alt="ManagePrompt"
                     width={32}
                     height={32}
@@ -67,7 +67,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
                   />
 
                   <div className="-m-1.5 p-1.5">
-                    <span className="sr-only">ManagePrompt</span>
+                    <span className="sr-only">AI Tutor API</span>
                     <p className="text-hero relative">
                       Manage<span className="font-semibold">Prompt</span>
                     </p>
