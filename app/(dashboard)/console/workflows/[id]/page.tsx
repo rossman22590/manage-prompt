@@ -161,13 +161,6 @@ export default async function WorkflowDetails({ params, searchParams }: Props) {
       </PageSection>
 
       <PageSection>
-        <CardHeader>
-          <h3 className="text-lg font-semibold">Usage (Last 24 hours)</h3>
-          <WorkflowUsageCharts usageData={usageData} />
-        </CardHeader>
-      </PageSection>
-
-      <PageSection>
         <WorkflowComposer
           workflow={workflow}
           apiSecretKey={apiSecretKey?.key}
