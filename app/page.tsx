@@ -132,7 +132,7 @@ export default function Home() {
                     Get access to our powerful AI Tutor API with all the features you need to create intelligent tutoring systems.
                   </p>
                   <div className="mt-10 flex items-center gap-x-4">
-                    <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What's included</h4>
+                    <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What&apos;s included</h4>
                     <div className="h-px flex-auto bg-purple-200" />
                   </div>
                   <ul
