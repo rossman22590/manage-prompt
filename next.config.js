@@ -13,8 +13,8 @@ module.exports = withSentryConfig(
 
     // Suppresses source map uploading logs during build
     silent: true,
-    org: "techulus-llc",
-    project: "manage-prompt",
+    org: "tsi-36",
+    project: "node",
   },
   {
     // For all available options, see:
