@@ -59,7 +59,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
               <Link href="/" className="ml-1" prefetch={false}>
                 <div className="flex items-center lg:px-0">
                   <Image
-                    src="https://img.mytsi.org/i/DWai683.png"
+                    src={logo}
                     alt="ManagePrompt"
                     width={32}
                     height={32}
