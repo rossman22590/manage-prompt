@@ -55,7 +55,7 @@ export default function Home() {
             </AnimatedSection>
             <AnimatedSection delay={0.2}>
               <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-600">
-                Revolutionize learning with AI-driven tutoring. Empower your applications with our cutting-edge AI Tutor API.
+                Revolutionize learning with AI-driven technology that powers AI Tutor. Empower your applications with our cutting-edge AI Tutor API.
               </p>
             </AnimatedSection>
             <AnimatedSection delay={0.4}>
