@@ -105,7 +105,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6">Solutions</h3>
+                {/* <h3 className="text-sm font-semibold leading-6">Solutions</h3>
                 <ul role="list" className="mt-6 space-y-1">
                   {navigation.solutions.map((item) => (
                     <li key={item.name}>
@@ -118,10 +118,10 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                       </Link>
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6">
+                {/* <h3 className="text-sm font-semibold leading-6">
                   Free AI Tools
                 </h3>
                 <ul role="list" className="mt-6 space-y-1">
@@ -136,13 +136,13 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                       </Link>
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6">Project</h3>
-                <ul role="list" className="mt-6 space-y-1">
+                {/* <h3 className="text-sm font-semibold leading-6">Project</h3> */}
+                {/* <ul role="list" className="mt-6 space-y-1">
                   {navigation.project.map((item) => (
                     <li key={item.name}>
                       <Link
@@ -156,7 +156,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                       </Link>
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
               <div className="mt-10 md:mt-0">
                 <h3 className="text-sm font-semibold leading-6">Legal</h3>
@@ -179,7 +179,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
         </div>
         <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">
           <p className="text-xs leading-5 text-gray-400">
-            &copy; {new Date().getFullYear()} Techulus. All rights reserved.
+            &copy; {new Date().getFullYear()} AI Tutor. All rights reserved.
           </p>
         </div>
       </div>
