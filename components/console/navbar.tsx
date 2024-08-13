@@ -69,7 +69,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
                   <div className="-m-1.5 p-1.5">
                     <span className="sr-only">AI Tutor API</span>
                     <p className="text-hero relative">
-                      AI Tutor<span className="font-semibold">API</span>
+                      AI Tutor <span className="font-semibold">API</span>
                     </p>
                   </div>
                 </div>
