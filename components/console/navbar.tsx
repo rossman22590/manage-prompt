@@ -105,7 +105,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
           leaveTo="transform  translate-y-[-100%] opacity-0"
         >
           <Link href="/" prefetch={false}>
-            <Image src={logo} alt="ManagePrompt" width={24} height={24} />
+            <Image src={logo} alt="AI Tutor API" width={24} height={24} />
           </Link>
         </Transition>
 
