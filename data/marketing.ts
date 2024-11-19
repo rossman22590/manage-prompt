@@ -1,6 +1,6 @@
 export const SITE_METADATA = {
   TITLE: "AI Tutor API",
-  TAGLINE: "Build, Deliver and Manage AI systems",
+  TAGLINE: "One API, Multiple LLMs: Claude, OpenAI, Groq, and More",
   DESCRIPTION:
-    "🚀 Launch your next AI project in just hours, not months! We handle seamless integration with top AI models, manage rate-limiting, authentication, analytics, caching, and spend management. Focus on creating the ultimate AI workflow while we take care of the tech magic! ✨💡",
+    "🚀 Supercharge your app with AI Tutor API! Seamlessly integrate Claude, OpenAI, Groq, and other top LLMs in hours, not months. We handle multi-model management, rate-limiting, authentication, analytics, caching, and spend control. Focus on building powerful AI workflows while we manage the complex infrastructure. Unlock the full potential of multiple LLMs with a single, unified API! ✨🧠",
 };
