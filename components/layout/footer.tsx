@@ -11,10 +11,10 @@ const navigation = {
   tools: [
     { name: "Proof Reading", href: "https://myapps.ai" },
     { name: "Summarise Text", href: "https://myapps.ai" },
-    { name: "Photo Colorizer", href: "https://myapps.ai" },
-    { name: "Realistic Image Creator", href: "https://myapps.ai" },
-    { name: "Image Upscale", href: "https://myapps.ai" },
-    { name: "Remove Background", href: "https://myapps.ai" },
+    { name: "Photo Colorizer", href: "https://pixio.myapps.ai" },
+    { name: "Realistic Image Creator", href: "https://pixio.myapps.ai" },
+    { name: "Image Upscale", href: "https://pixio.myapps.ai" },
+    { name: "Remove Background", href: "https://pixio.myapps.ai" },
   ],
   project: [
     { name: "Support", href: "https://myapps.ai" },
@@ -36,10 +36,9 @@ const navigation = {
     },
   ],
 };
-
 export function Footer({ isHome = false }: { isHome?: boolean }) {
   return (
-    <footer className={cn(isHome ? "mt-24" : "", "text-white")}>
+    <footer className={cn(isHome ? "mt-24" : "", "bg-white text-gray-600")}>
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
@@ -56,7 +55,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-gray-500 transition-colors duration-300"
                 >
                   <span className="sr-only">{item.name}</span>
                   <item.icon className="h-6 w-6" aria-hidden="true" />
@@ -67,13 +66,13 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6">Solutions</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-900">Solutions</h3>
                 <ul role="list" className="mt-6 space-y-1">
                   {navigation.solutions.map((item) => (
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm leading-6 text-gray-400 hover:text-white"
+                        className="text-sm leading-6 text-gray-600 hover:text-gray-900 transition-colors duration-300"
                         prefetch={false}
                       >
                         {item.name}
@@ -83,7 +82,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6">
+                <h3 className="text-sm font-semibold leading-6 text-gray-900">
                   Free AI Tools
                 </h3>
                 <ul role="list" className="mt-6 space-y-1">
@@ -91,7 +90,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm leading-6 text-gray-400 hover:text-white"
+                        className="text-sm leading-6 text-gray-600 hover:text-gray-900 transition-colors duration-300"
                         prefetch={false}
                       >
                         {item.name}
@@ -103,13 +102,13 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6">Project</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-900">Project</h3>
                 <ul role="list" className="mt-6 space-y-1">
                   {navigation.project.map((item) => (
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm leading-6 text-gray-400 hover:text-white"
+                        className="text-sm leading-6 text-gray-600 hover:text-gray-900 transition-colors duration-300"
                         prefetch={false}
                       >
                         {item.name}
@@ -119,13 +118,13 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6">Legal</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-900">Legal</h3>
                 <ul role="list" className="mt-6 space-y-1">
                   {navigation.legal.map((item) => (
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm leading-6 text-gray-400 hover:text-white"
+                        className="text-sm leading-6 text-gray-600 hover:text-gray-900 transition-colors duration-300"
                         prefetch={false}
                       >
                         {item.name}
@@ -137,8 +136,8 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
             </div>
           </div>
         </div>
-        <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">
-          <p className="text-xs leading-5 text-gray-400">
+        <div className="mt-16 border-t border-gray-200 pt-8 sm:mt-20 lg:mt-24">
+          <p className="text-xs leading-5 text-gray-500">
             &copy; {new Date().getFullYear()} AI Tutor. All rights reserved.
           </p>
         </div>
