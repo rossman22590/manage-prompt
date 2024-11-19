@@ -15,7 +15,7 @@ const navigation = [
 
 export function Header() {
   return (
-    <header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white">
+    <header className="absolute inset-x-0 top-0 z-50">
       <nav
         className="flex items-center justify-between p-6 lg:px-8"
         aria-label="Global"
@@ -31,7 +31,7 @@ export function Header() {
 
           <Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
             <span className="sr-only">AI Tutor API</span>
-            <p className="relative">
+            <p className="relative text-white">
               AI Tutor<span className="font-semibold">API</span>
             </p>
           </Link>
@@ -43,7 +43,7 @@ export function Header() {
               rel="noopener noreferrer"
               key={item.name}
               href={item.href}
-              className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
+              className="text-sm font-semibold leading-6 text-white hover:text-gray-300 transition-colors"
             >
               {item.name}
             </a>
@@ -52,7 +52,7 @@ export function Header() {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <Link
             href="/console/workflows"
-            className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
+            className="text-sm font-semibold leading-6 text-white hover:text-gray-300 transition-colors"
             prefetch={false}
           >
             Console <span aria-hidden="true">&rarr;</span>
