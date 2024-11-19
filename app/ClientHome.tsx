@@ -262,8 +262,9 @@ export default function ClientHome({ description, stars }: { description: string
           <div className="mx-auto max-w-2xl sm:text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Simple, transparent pricing</h2>
             <p className="mt-6 text-lg leading-8 text-gray-300">
-              Choose the AI Tutor API plan that's right for you. All plans include a 14-day free trial.
-            </p>
+  Choose the AI Tutor API plan that&apos;s right for you. All plans include a 14-day free trial.
+</p>
+
           </div>
           <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-3">
             {pricingTiers.map((tier, index) => (
