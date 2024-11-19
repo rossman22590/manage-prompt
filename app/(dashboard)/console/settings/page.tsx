@@ -19,7 +19,6 @@ import {
   getUpcomingInvoice,
   isSubscriptionCancelled,
 } from "@/lib/utils/stripe";
-import { CheckBadgeIcon } from "@heroicons/react/20/solid";
 import { notFound } from "next/navigation";
 import Stripe from "stripe";
 import {
@@ -27,12 +26,10 @@ import {
   redirectToBilling,
   removeSpendLimit,
   revokeSecretKey,
-  revokeUserKey,
   updateKeyName,
   updateRateLimit,
   updateSpendLimit,
-  updateUserKey,
-  updateUserName,
+  updateUserName
 } from "./actions";
 
 export default async function Settings() {
@@ -312,7 +309,7 @@ export default async function Settings() {
         </div>
       </PageSection>
 
-      <PageSection className="overflow-y-scroll">
+      {/* <PageSection className="overflow-y-scroll">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none p-6">
           <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
             Bring your own key (beta)
@@ -353,7 +350,7 @@ export default async function Settings() {
             </div>
           </dl>
         </div>
-      </PageSection>
+      </PageSection> */}
     </>
   );
 }
