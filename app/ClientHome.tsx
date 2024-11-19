@@ -2,6 +2,7 @@
 'use client'
 
 import { buttonVariants } from "@/components/ui/button";
+import screenshotImage from "@/public/images/promo.png";
 import {
   BeakerIcon,
   BoltIcon,
@@ -13,6 +14,7 @@ import {
   LightBulbIcon
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 
 const features = [
@@ -176,11 +178,44 @@ export default function ClientHome({ description, stars }: { description: string
         </div>
       </motion.div>
 
+      {/* Screenshot Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 1 }}
+        className="bg-white py-24 sm:py-32"
+      >
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-base font-semibold leading-7 text-purple-600">Intuitive Interface</h2>
+            <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Manage Multiple LLMs with Ease
+            </p>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              Our user-friendly dashboard lets you effortlessly manage and monitor your LLM integrations.
+            </p>
+          </div>
+          <motion.div
+            className="mt-16 relative"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Image
+              src={screenshotImage}
+              alt="AI Tutor API Dashboard"
+              className="rounded-xl shadow-2xl ring-1 ring-gray-900/10"
+            />
+            <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-900/10"></div>
+          </motion.div>
+        </div>
+      </motion.div>
+
       {/* Features Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 1 }}
+        transition={{ duration: 0.5, delay: 1.2 }}
         className="bg-white py-24 sm:py-32"
       >
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -220,7 +255,7 @@ export default function ClientHome({ description, stars }: { description: string
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 1.2 }}
+        transition={{ duration: 0.5, delay: 1.4 }}
         className="bg-gray-900 py-24 sm:py-32"
       >
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
