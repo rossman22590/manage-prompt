@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { AIModel, AIModelToLabel } from "@/data/workflow";
-import { getWorkflowUsage } from "@/lib/utils/tinybird";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { Workflow } from "@prisma/client";
 import classNames from "classnames";
@@ -22,9 +21,7 @@ interface Props {
   };
 }
 
-export async function WorkflowItem({ workflow }: Props) {
-  const usage = await getWorkflowUsage(workflow.id);
-
+export function WorkflowItem({ workflow }: Props) {
   return (
     <div className="relative flex items-center space-x-4 p-4 bg-seconday rounded-lg border border-gray-200 hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700 bg-white dark:bg-gray-950">
       <div className="min-w-0 flex-auto">
@@ -54,20 +51,6 @@ export async function WorkflowItem({ workflow }: Props) {
               <span className="absolute inset-0" />
             </a>
           </h2>
-        </div>
-        <div className="mt-3 flex items-center gap-x-2.5 text-xs leading-5">
-          <p className="truncate">
-            {Number(usage.tokens).toLocaleString()} tokens
-          </p>
-          <svg
-            viewBox="0 0 2 2"
-            className="h-0.5 w-0.5 flex-none fill-gray-300"
-          >
-            <circle r={1} cx={1} cy={1} />
-          </svg>
-          <p className="whitespace-nowrap">
-            {Number(usage.runs).toLocaleString()} runs
-          </p>
         </div>
       </div>
       <Badge

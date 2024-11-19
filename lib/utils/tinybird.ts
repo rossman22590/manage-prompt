@@ -10,17 +10,12 @@ export async function logEvent(eventName: string, payload: any) {
 
 export type WorkflowRunStat = {
   hour: number | string;
-  total: number;
-  tokens: number;
 };
 
 // Replace Tinybird-based implementation with a stub
-export async function getWorkflowUsage(id: number | string): Promise<{
-  runs: number;
-  tokens: number;
-}> {
+export async function getWorkflowUsage(id: number | string): Promise<{}> {
   console.log(`[Stub] getWorkflowUsage called for id: ${id}`);
-  return { runs: 0, tokens: 0 };
+  return {};
 }
 
 // Replace Tinybird-based implementation with a stub
@@ -36,6 +31,6 @@ export async function getWorkflowRunStats(
   });
 
   return last24Hours
-    .map((hour) => ({ hour, total: 0, tokens: 0 }))
+    .map((hour) => ({ hour }))
     .reverse();
 }
