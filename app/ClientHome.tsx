@@ -262,7 +262,7 @@ export default function ClientHome({ description, stars }: { description: string
           <div className="mx-auto max-w-2xl sm:text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Simple, transparent pricing</h2>
             <p className="mt-6 text-lg leading-8 text-gray-300">
-  Choose the AI Tutor API plan that's right for you. All plans include a 14-day free trial.
+  Choose the AI Tutor API plan that is right for you. All plans include a 14-day free trial.
 </p>
 
           </div>
