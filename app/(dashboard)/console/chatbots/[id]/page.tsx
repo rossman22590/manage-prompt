@@ -36,16 +36,42 @@ async function ChatDashboard({ params }: Props) {
     return notFound();
   }
 
-  const { token } = await fetch(`${getAppBaseUrl()}/api/v1/chat/token`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.MANAGEPROMPT_SECRET_TOKEN!}`,
-    },
-    body: JSON.stringify({
-      chatbotId: id,
-      sessionId: userId,
-    }),
-  }).then((res) => res.json());
+  let token;
+  try {
+    const response = await fetch(`${getAppBaseUrl()}/api/v1/chat/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.MANAGEPROMPT_SECRET_TOKEN!}`,
+      },
+      body: JSON.stringify({
+        chatbotId: id,
+        sessionId: userId,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseText = await response.text();
+    console.log("Raw response:", responseText);
+
+    try {
+      const data = JSON.parse(responseText);
+      token = data.token;
+    } catch (parseError) {
+      console.error("Error parsing JSON:", parseError);
+      console.error("Received data:", responseText);
+      throw new Error("Invalid JSON response");
+    }
+  } catch (error) {
+    console.error("Error fetching token:", error);
+    // Handle the error appropriately, maybe set a default token or show an error message
+    token = null;
+  }
+
+  // Rest of the component code...
 
   return (
     <>

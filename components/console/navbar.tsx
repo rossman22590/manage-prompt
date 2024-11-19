@@ -30,11 +30,11 @@ export default function NavBar({ isPublicPage = false }: Props) {
         href: "/console/workflows",
         current: path.startsWith("/console/workflows"),
       },
-      {
-        name: "Chatbots",
-        href: "/console/chatbots",
-        current: path.startsWith("/console/chatbots"),
-      },
+      // {
+      //   name: "Chatbots",
+      //   href: "/console/chatbots",
+      //   current: path.startsWith("/console/chatbots"),
+      // },
       {
         name: "Settings",
         href: "/console/settings",
@@ -67,9 +67,9 @@ export default function NavBar({ isPublicPage = false }: Props) {
                   />
 
                   <div className="-m-1.5 p-1.5">
-                    <span className="sr-only">ManagePrompt</span>
+                    <span className="sr-only">Ai Tutor API</span>
                     <p className="relative">
-                      Manage<span className="font-semibold">Prompt</span>
+                      AI Tutor<span className="font-semibold">API</span>
                     </p>
                   </div>
                 </div>

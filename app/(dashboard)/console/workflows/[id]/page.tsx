@@ -1,12 +1,10 @@
 import { WorkflowComposer } from "@/components/console/workflow/workflow-composer";
 import { WorkflowRunItem } from "@/components/console/workflow/workflow-run-item";
-import { WorkflowUsageCharts } from "@/components/console/workflow/workflow-usage-charts";
 import PageSection from "@/components/core/page-section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
-import { CardHeader } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
@@ -19,7 +17,6 @@ import { AIModel, AIModelToLabel } from "@/data/workflow";
 import { owner } from "@/lib/hooks/useOwner";
 import { cn } from "@/lib/utils";
 import { prisma } from "@/lib/utils/db";
-import { getWorkflowRunStats } from "@/lib/utils/tinybird";
 import { getWorkflowAndRuns, LIMIT } from "@/lib/utils/useWorkflow";
 import { PauseCircleIcon, PlayCircleIcon } from "@heroicons/react/20/solid";
 import { DownloadIcon } from "@radix-ui/react-icons";
@@ -27,6 +24,48 @@ import { Terminal } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { deleteWorkflow, toggleWorkflowState } from "../actions";
+
+async function getWorkflowRunStats(workflowId: number): Promise<any[]> {
+  const now = new Date();
+  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  const stats = await prisma.workflowRun.groupBy({
+    by: ['createdAt'],
+    where: {
+      workflowId: workflowId,
+      createdAt: {
+        gte: twentyFourHoursAgo,
+        lte: now,
+      },
+    },
+    _count: {
+      id: true,
+    },
+  });
+
+  // Process the results to group by hour
+  const hourlyStats = stats.reduce((acc, stat) => {
+    const hour = new Date(stat.createdAt).getHours();
+    if (!acc[hour]) {
+      acc[hour] = { total: 0 };
+    }
+    acc[hour].total += stat._count.id;
+    return acc;
+  }, {} as Record<number, { total: number }>);
+
+  // Fill in missing hours with zero values
+  const filledStats = Array.from({ length: 24 }, (_, i) => {
+    const d = new Date(now);
+    d.setHours(d.getUTCHours() - i);
+    const hour = d.getHours();
+    return {
+      hour,
+      total: hourlyStats[hour]?.total || 0,
+    };
+  }).reverse();
+
+  return filledStats;
+}
 
 interface Props {
   params: {
@@ -160,12 +199,12 @@ export default async function WorkflowDetails({ params, searchParams }: Props) {
         </div>
       </PageSection>
 
-      <PageSection>
+      {/* <PageSection>
         <CardHeader>
           <h3 className="text-lg font-semibold">Usage (Last 24 hours)</h3>
           <WorkflowUsageCharts usageData={usageData} />
         </CardHeader>
-      </PageSection>
+      </PageSection> */}
 
       <PageSection>
         <WorkflowComposer

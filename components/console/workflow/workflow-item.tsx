@@ -57,7 +57,7 @@ export async function WorkflowItem({ workflow }: Props) {
         </div>
         <div className="mt-3 flex items-center gap-x-2.5 text-xs leading-5">
           <p className="truncate">
-            {Number(usage?.tokens ?? 0).toLocaleString()} tokens
+            {Number(usage.tokens).toLocaleString()} tokens
           </p>
           <svg
             viewBox="0 0 2 2"
@@ -66,20 +66,20 @@ export async function WorkflowItem({ workflow }: Props) {
             <circle r={1} cx={1} cy={1} />
           </svg>
           <p className="whitespace-nowrap">
-            {Number(usage?.runs ?? 0).toLocaleString()} runs
+            {Number(usage.runs).toLocaleString()} runs
           </p>
         </div>
       </div>
       <Badge
         variant={
           AIModelToLabel[workflow.model as AIModel]
-            .toLowerCase()
+            ?.toLowerCase()
             .includes("deprecated")
             ? "destructive"
             : "outline"
         }
       >
-        {AIModelToLabel[workflow.model as AIModel]}
+        {AIModelToLabel[workflow.model as AIModel] || "Unknown Model"}
       </Badge>
       <ChevronRightIcon aria-hidden="true" className="h-5 w-5 flex-none" />
     </div>

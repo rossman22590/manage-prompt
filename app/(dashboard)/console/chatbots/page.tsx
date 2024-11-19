@@ -9,15 +9,11 @@ import { ChevronRightIcon } from "@/node_modules/@heroicons/react/20/solid";
 import Link from "@/node_modules/next/link";
 
 export default async function Chatbots() {
-  const { userId } = await owner();
+  const { userId, orgId } = await owner();
 
-  const chatbots = await prisma.chatBot.findMany({
+  const chatBots = await prisma.chatBot.findMany({
     include: {
-      _count: {
-        select: {
-          ChatBotUserSession: true,
-        },
-      },
+      user: true,
     },
     where: {
       ownerId: userId,
@@ -33,9 +29,9 @@ export default async function Chatbots() {
       />
 
       <div className="-mt-6 max-w-7xl mx-auto">
-        {chatbots?.length ? (
+        {chatBots?.length ? (
           <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
-            {chatbots.map((chatbot) => (
+            {chatBots.map((chatbot) => (
               <div
                 key={chatbot.id}
                 className={cn(
@@ -50,22 +46,21 @@ export default async function Chatbots() {
                   <div className="flex items-center space-x-3">
                     <h2 className="text-lg font-semibold">
                       <span className="absolute inset-0" aria-hidden="true" />
-                      <span>{chatbot.name}</span>
+                      {chatbot.name} <span className="sr-only"></span>
                       <div className="flex items-center space-x-2">
                         <Badge variant="outline">{chatbot.model}</Badge>
-                        <span className="block" aria-hidden="true">
+                        <span className="hidden sm:block" aria-hidden="true">
                           &middot;
                         </span>
-                        <span className="block text-sm">
-                          {chatbot._count?.ChatBotUserSession ?? 0} user
-                          {chatbot._count?.ChatBotUserSession === 1 ? "" : "s"}
+                        <span className="hidden sm:block text-sm">
+                          {chatbot.user?.name}
                         </span>
                       </div>
                     </h2>
                   </div>
                 </Link>
 
-                <div className="sm:hidden mt-1.5">
+                <div className="sm:hidden">
                   <ChevronRightIcon
                     className="h-4 w-4 text-gray-400"
                     aria-hidden="true"
@@ -77,7 +72,7 @@ export default async function Chatbots() {
         ) : null}
       </div>
 
-      {!chatbots?.length ? (
+      {!chatBots?.length ? (
         <PageSection className="p-4">
           <EmptyState
             show

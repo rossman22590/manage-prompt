@@ -1,8 +1,8 @@
 export const AIModelToLabel = {
   "gpt-3.5-turbo": "GPT-3.5 Turbo",
-  "gpt-3.5-turbo-0125": "GPT-3.5 Turbo 0125 (Deprecated)",
-  "gpt-4-1106-preview": "GPT-4 1106 (Deprecated)",
-  "gpt-4-0125-preview": "GPT-4 0125 (Deprecated)",
+  // "gpt-3.5-turbo-0125": "GPT-3.5 Turbo 0125 (Deprecated)",
+  // "gpt-4-1106-preview": "GPT-4 1106 (Deprecated)",
+  // "gpt-4-0125-preview": "GPT-4 0125 (Deprecated)",
   "gpt-4": "GPT-4",
   "gpt-4o": "GPT-4o",
   "gpt-4o-mini": "GPT-4o mini",
@@ -27,9 +27,9 @@ export const modelToProvider: Record<
   "openai" | "groq" | "anthropic"
 > = {
   "gpt-3.5-turbo": "openai",
-  "gpt-3.5-turbo-0125": "openai",
-  "gpt-4-1106-preview": "openai",
-  "gpt-4-0125-preview": "openai",
+  // "gpt-3.5-turbo-0125": "openai",
+  // "gpt-4-1106-preview": "openai",
+  // "gpt-4-0125-preview": "openai",
   "gpt-4": "openai",
   "gpt-4o": "openai",
   "gpt-4o-mini": "openai",
