@@ -94,16 +94,16 @@ export default function NavBar({ isPublicPage = false }: Props) {
                 <div className="flex items-center lg:px-0">
                   <Image
                     src={logo}
-                    alt="ManagePrompt"
+                    alt="AI Tutor API"
                     width={32}
                     height={32}
                     className="mr-2"
                   />
 
                   <div className="-m-1.5 p-1.5">
-                    <span className="sr-only">ManagePrompt</span>
+                    <span className="sr-only">AI Tutor API Console</span>
                     <p className="relative">
-                      Manage<span className="font-semibold">Prompt</span>
+                      AI Tutor<span className="font-semibold">API</span>
                     </p>
                   </div>
                 </div>
