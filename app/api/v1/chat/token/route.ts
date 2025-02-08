@@ -1,3 +1,5 @@
+// app/api/v1/chat/token/route.ts
+
 import {
   ErrorCodes,
   ErrorResponse,
@@ -15,87 +17,64 @@ const ChatTokenRequestSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  try {
-    const authorization = req.headers.get("authorization");
-    if (!authorization) {
-      return UnauthorizedResponse();
-    }
+  const authorization = req.headers.get("authorization");
+  if (!authorization) {
+    return UnauthorizedResponse();
+  }
 
-    const token = authorization.split("Bearer ")[1];
-    if (!token) {
-      return UnauthorizedResponse();
-    }
+  const token = authorization.split("Bearer ")[1];
+  if (!token || token !== process.env.MANAGEPROMPT_SECRET_TOKEN) {
+    return UnauthorizedResponse();
+  }
 
-    const key = await prisma.secretKey.findUnique({
-      where: {
-        key: token,
-      },
-      cacheStrategy: {
-        ttl: 300,
-      },
-    });
-    if (!key) {
-      return UnauthorizedResponse();
-    }
+  const body = await req.json();
+  const { chatbotId, sessionId } = body;
 
-    const body = await req.json();
-    const { chatbotId, sessionId } = body;
+  const validationResult = ChatTokenRequestSchema.safeParse({
+    chatbotId,
+    sessionId,
+  });
 
-    const validationResult = ChatTokenRequestSchema.safeParse({
-      chatbotId,
-      sessionId,
-    });
-
-    if (!validationResult.success) {
-      return ErrorResponse(
-        fromZodError(validationResult.error).message,
-        400,
-        ErrorCodes.MissingInput,
-      );
-    }
-
-    const chatbot = await prisma.chatBot.findUnique({
-      where: {
-        id: chatbotId,
-        ownerId: key.ownerId,
-      },
-    });
-    if (!chatbot) {
-      return ErrorResponse("Chatbot not found", 404, ErrorCodes.ChatbotNotFound);
-    }
-
-    const sessionToken = await prisma.chatBotUserSession.findUnique({
-      where: {
-        chatbotId_sessionId: {
-          chatbotId,
-          sessionId,
-        },
-      },
-    });
-
-    if (sessionToken) {
-      return NextResponse.json({ success: true, token: sessionToken.id });
-    }
-
-    const newSessionToken = await prisma.chatBotUserSession.create({
-      data: {
-        chatbotId,
-        sessionId,
-        ownerId: key.ownerId,
-      },
-    });
-
-    return NextResponse.json({ success: true, token: newSessionToken.id });
-  } catch (error) {
-    console.error("Error in chat token generation:", error);
+  if (!validationResult.success) {
     return ErrorResponse(
-      "Failed to create token, please try again or contact support.",
-      500,
-      ErrorCodes.InternalServerError,
+      fromZodError(validationResult.error).message,
+      400,
+      ErrorCodes.MissingInput,
     );
   }
-}
 
+  const chatbot = await prisma.chatBot.findUnique({
+    where: {
+      id: chatbotId,
+    },
+  });
+  if (!chatbot) {
+    return ErrorResponse("Chatbot not found", 404, ErrorCodes.ChatbotNotFound);
+  }
+
+  const sessionToken = await prisma.chatBotUserSession.findUnique({
+    where: {
+      chatbotId_sessionId: {
+        chatbotId,
+        sessionId,
+      },
+    },
+  });
+
+  if (sessionToken) {
+    return NextResponse.json({ success: true, token: sessionToken.id });
+  }
+
+  const newSessionToken = await prisma.chatBotUserSession.create({
+    data: {
+      chatbotId,
+      sessionId,
+      ownerId: chatbot.ownerId,
+    },
+  });
+
+  return NextResponse.json({ success: true, token: newSessionToken.id });
+}
 
 // import {
 //   ErrorCodes,
