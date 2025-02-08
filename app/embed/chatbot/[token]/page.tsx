@@ -34,6 +34,7 @@ export default async function ChatbotEmbed(
   return <ChatView token={token} secretKey={secretKey.key} isEmbed />;
 }
 
+
 // import ChatView from "@/components/console/chatbot/chat-view";
 
 // export default async function ChatbotEmbed(
