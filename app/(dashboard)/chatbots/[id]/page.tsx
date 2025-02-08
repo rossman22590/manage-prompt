@@ -14,14 +14,16 @@ import { notFound } from "next/navigation";
 import { deleteChatBot } from "../actions";
 
 type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{
+    id: string;
+  }>;
 };
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
-export default async function ChatDashboard({ params }: Props) {
+async function ChatDashboard(props: Props) {
+  const params = await props.params;
   const { userId } = await owner();
   const { id } = params;
 
@@ -35,48 +37,16 @@ export default async function ChatDashboard({ params }: Props) {
     return notFound();
   }
 
-  const secretKey = await prisma.secretKey.findFirst({
-    where: {
-      ownerId: userId,
+  const { token } = await fetch(`${getAppBaseUrl()}/api/v1/chat/token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.MANAGEPROMPT_SECRET_TOKEN!}`,
     },
-    select: {
-      key: true,
-    },
-  });
-
-  if (!secretKey) {
-    console.error("No secret key found for the current user");
-    return <div>Error: No secret key found. Please contact support.</div>;
-  }
-
-  let token;
-  try {
-    const response = await fetch(`${getAppBaseUrl()}/api/v1/chat/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${secretKey.key}`,
-      },
-      body: JSON.stringify({
-        chatbotId: id,
-        sessionId: userId,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    token = data.token;
-  } catch (error) {
-    console.error("Failed to generate token:", error);
-    return <div>Error: Failed to generate token. Please try again later.</div>;
-  }
-
-  if (!token) {
-    return <div>Error: No token generated. Please try again later.</div>;
-  }
+    body: JSON.stringify({
+      chatbotId: id,
+      sessionId: userId,
+    }),
+  }).then((res) => res.json());
 
   return (
     <>
@@ -154,7 +124,7 @@ export default async function ChatDashboard({ params }: Props) {
             </p>
 
             <code className="block p-4 bg-secondary text-primary">
-              {`<iframe src="${getAppBaseUrl()}/embed/chatbot/${token}"></iframe>`}
+              {`<iframe src="${getAppBaseUrl()}/embed/chatbot/{token}"></iframe>`}
             </code>
 
             <p className="py-1">
@@ -172,6 +142,8 @@ export default async function ChatDashboard({ params }: Props) {
     </>
   );
 }
+
+export default ChatDashboard;
 
 // import ChatDeploy from "@/components/console/chatbot/chat-deploy";
 // import ChatView from "@/components/console/chatbot/chat-view";
