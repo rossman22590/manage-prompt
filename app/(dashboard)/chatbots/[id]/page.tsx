@@ -130,7 +130,7 @@ async function ChatDashboard({ params }: Props) {
         </TabsList>
         <TabsContent value="review">
           <PageSection>
-            <ChatView token={token} secretKey={secretKey.key} />
+            <ChatView token={token} />
           </PageSection>
         </TabsContent>
         <TabsContent value="deploy">
@@ -175,6 +175,8 @@ async function ChatDashboard({ params }: Props) {
 }
 
 export default ChatDashboard;
+
+
 
 // import ChatDeploy from "@/components/console/chatbot/chat-deploy";
 // import ChatView from "@/components/console/chatbot/chat-view";
