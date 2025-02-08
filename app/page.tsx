@@ -4,19 +4,29 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { buttonVariants } from "@/components/ui/button";
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, MinusCircle, Network, PlusCircle, ShieldCheckIcon, Sparkles, Terminal, Workflow, Zap } from "lucide-react";
+import { BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, MinusCircle, Network, PlusCircle, ShieldCheckIcon, Sparkles, Terminal, Workflow, Zap } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from 'react';
+import {
+  AiOutlineOpenAI
+} from "react-icons/ai";
 import {
   DiRubyRough
 } from "react-icons/di";
 import {
   RiCodeSSlashLine,
   RiJavascriptLine,
+  RiMistFill,
   RiNextjsFill,
   RiNodejsLine,
   RiReactjsLine
 } from "react-icons/ri";
+import {
+  SiAnthropic,
+  SiGoogle,
+  SiMeta,
+  SiMixcloud
+} from "react-icons/si";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -25,6 +35,16 @@ type Feature = {
   description: string;
   icon: React.ElementType;
 };
+
+
+const modelIcons = [
+  { name: "OpenAI", Icon: AiOutlineOpenAI },
+  { name: "Google", Icon: SiGoogle  },
+  { name: "Meta", Icon: SiMeta },
+  { name: "Anthropic", Icon: SiAnthropic  },
+  { name: "Mixtral", Icon: SiMixcloud },
+  { name: "And more...", Icon: RiMistFill   },
+];
 
 
 const techIcons = [
@@ -271,45 +291,38 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Multi LLM API Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600">Multi LLM API</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                  One API, Multiple Language Models
-                </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
-                  Access a wide range of language models through a single, unified API. Simplify your workflow and leverage the power of multiple AI models.
-                </p>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
-              <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  { name: "OpenAI", icon: BrainIcon },
-                  { name: "Google", icon: Network },
-                  { name: "Meta", icon: Bot },
-                  { name: "Anthropic", icon: Zap },
-                  { name: "Mixtral", icon: Workflow },
-                  { name: "And more...", icon: CodeIcon },
-                ].map((model, index) => (
-                  <motion.div
-                    key={model.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <model.icon className="h-12 w-12 text-purple-600 mb-4" />
-                    <h3 className="text-lg font-semibold">{model.name}</h3>
-                  </motion.div>
-                ))}
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
+      {/* Multi LLM API Section */}
+<section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+  <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+    <AnimatedSection>
+      <div className="mx-auto max-w-2xl lg:text-center">
+        <h2 className="text-base font-semibold leading-7 text-purple-600">Multi LLM API</h2>
+        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+          One API, Multiple Language Models
+        </p>
+        <p className="mt-6 text-lg leading-8 text-gray-600">
+          Access a wide range of language models through a single, unified API. Simplify your workflow and leverage the power of multiple AI models.
+        </p>
+      </div>
+    </AnimatedSection>
+    <AnimatedSection delay={0.2}>
+      <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {modelIcons.map((model, index) => (
+          <motion.div
+            key={model.name}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+          >
+            <model.Icon className="h-12 w-12 text-purple-600 mb-4" />
+            <h3 className="text-lg font-semibold">{model.name}</h3>
+          </motion.div>
+        ))}
+      </div>
+    </AnimatedSection>
+  </div>
+</section>
 
         {/* AI Workflows Section */}
         <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-b from-white to-purple-50">
@@ -473,7 +486,7 @@ export default function Home() {
               <div className="mx-auto max-w-2xl sm:text-center">
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Simple, transparent pricing</h2>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
-                  Prices are per 1,000 tokens. You can think of tokens as pieces of words, where 1,000 tokens is about 750 words.
+                  Prices are per 10 Million  tokens.
                 </p>
               </div>
             </AnimatedSection>
@@ -505,8 +518,8 @@ export default function Home() {
                     <div className="mx-auto max-w-xs px-8">
                       <p className="text-base font-semibold text-gray-600">Billed Monthly</p>
                       <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                        <span className="text-5xl font-bold tracking-tight text-gray-900">$0.01</span>
-                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/1K tokens</span>
+                        <span className="text-5xl font-bold tracking-tight text-gray-900">$150</span>
+                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/10M tokens</span>
                       </p>
                       <Link
                         href="https://aitutor-api.vercel.app/console/workflows"
