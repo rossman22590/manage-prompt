@@ -161,7 +161,7 @@ function ChatView({ token, secretKey, isEmbed }: { token: string; secretKey: str
               rel="noopener noreferrer"
               href="https://manageprompt.com"
             >
-              ⚡ by ManagePrompt
+              ⚡ by AI Tutor API
             </a>
           ) : null}
         </div>
