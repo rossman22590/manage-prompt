@@ -5,11 +5,11 @@ import logo from "../../public/images/logo.png";
 const navigation = [
   {
     name: "Documentation",
-    href: "https://manageprompt.readme.io/reference/run-workflow",
+    href: "https://support.myapps.ai",
   },
   {
     name: "Support",
-    href: "https://techulus.atlassian.net/servicedesk/customer/portal/5",
+    href: "https://support.myapps.ai",
   },
 ];
 
