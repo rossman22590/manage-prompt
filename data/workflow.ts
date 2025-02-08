@@ -1,10 +1,10 @@
 export type AIProvider = "openai" | "groq" | "anthropic" | "xai";
 
 export const AIModelToLabel = {
-  "gpt-4": "GPT-4",
+  // "gpt-4": "GPT-4",
   "gpt-4o": "GPT-4o",
   "gpt-4o-mini": "GPT-4o mini",
-  "o1-mini": "o1 Mini",
+  // "o1-mini": "o1 Mini",
   "meta-llama/Llama-2-70b-chat-hf": "Meta Llama 2 70b",
   "mistralai/Mixtral-8x7B-Instruct-v0.1": "Mixtral 8x7B",
   "google/gemma-7b-it": "Google Gemma 7B",
@@ -20,10 +20,10 @@ export const modelToProviderId: Record<string | AIModel, string> = {
 };
 
 export const modelToProvider: Record<string | AIModel, AIProvider> = {
-  "gpt-4": "openai",
+  // "gpt-4": "openai",
   "gpt-4o": "openai",
   "gpt-4o-mini": "openai",
-  "o1-mini": "openai",
+  // "o1-mini": "openai",
   "meta-llama/Llama-2-70b-chat-hf": "groq",
   "mistralai/Mixtral-8x7B-Instruct-v0.1": "groq",
   "google/gemma-7b-it": "groq",
