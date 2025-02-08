@@ -21,7 +21,16 @@ export async function POST(req: NextRequest) {
   }
 
   const token = authorization.split("Bearer ")[1];
-  if (!token || token !== process.env.MANAGEPROMPT_SECRET_TOKEN) {
+  if (!token) {
+    return UnauthorizedResponse();
+  }
+
+  // Verify the token against your stored secret keys
+  const secretKey = await prisma.secretKey.findUnique({
+    where: { key: token },
+  });
+
+  if (!secretKey) {
     return UnauthorizedResponse();
   }
 
@@ -44,6 +53,7 @@ export async function POST(req: NextRequest) {
   const chatbot = await prisma.chatBot.findUnique({
     where: {
       id: chatbotId,
+      ownerId: secretKey.ownerId,
     },
   });
   if (!chatbot) {
@@ -67,12 +77,13 @@ export async function POST(req: NextRequest) {
     data: {
       chatbotId,
       sessionId,
-      ownerId: chatbot.ownerId,
+      ownerId: secretKey.ownerId,
     },
   });
 
   return NextResponse.json({ success: true, token: newSessionToken.id });
 }
+
 
 // import {
 //   ErrorCodes,
