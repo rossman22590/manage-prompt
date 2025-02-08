@@ -1,13 +1,49 @@
-import AnimatedSection from "@/components/AnimatedSection";
+"use client"
+
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { buttonVariants } from "@/components/ui/button";
-import { BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, ShieldCheckIcon } from "lucide-react";
+import { AnimatePresence, motion } from 'framer-motion';
+import { Bot, BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, MinusCircle, Network, PlusCircle, ShieldCheckIcon, Sparkles, Terminal, Workflow, Zap } from "lucide-react";
 import Link from "next/link";
+import React, { useState } from 'react';
+import {
+  DiRubyRough
+} from "react-icons/di";
+import {
+  RiCodeSSlashLine,
+  RiJavascriptLine,
+  RiNextjsFill,
+  RiNodejsLine,
+  RiReactjsLine
+} from "react-icons/ri";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-export const revalidate = 86400;
+type Feature = {
+  name: string;
+  description: string;
+  icon: React.ElementType;
+};
 
-const features = [
+
+const techIcons = [
+  { name: "React", Icon: RiReactjsLine, color: "#CF9FFF" },
+  { name: "Node.js", Icon: RiNodejsLine, color: "#CF9FFF" },
+  { name: "Python", Icon: RiNextjsFill , color: "#CF9FFF" },
+  { name: "Ruby", Icon: DiRubyRough , color: "#CF9FFF" }, // Using Gatsby icon as a placeholder for Ruby
+  { name: "JavaScript", Icon: RiJavascriptLine, color: "#CF9FFF" },
+  { name: "C#", Icon: RiCodeSSlashLine, color: "#CF9FFF" },
+];
+
+type FAQItem = {
+  question: string;
+  answer: string;
+};
+
+type CodeLanguage = 'python' | 'javascript' | 'curl';
+
+const features: Feature[] = [
   {
     name: "Advanced AI",
     description: "Leverage cutting-edge AI models to provide personalized learning experiences for your users.",
@@ -25,14 +61,128 @@ const features = [
   },
 ];
 
-const includedFeatures = [
+const includedFeatures: string[] = [
   "Unlimited workflows",
   "Unlimited chatbots",
   "Models by OpenAI, Meta, Google, Mixtral and Anthropic",
   "Email support",
 ];
 
+const faqItems: FAQItem[] = [
+  {
+    question: "What is AI Tutor API?",
+    answer: "AI Tutor API is a powerful, multi-model language learning platform that allows developers to integrate advanced AI tutoring capabilities into their applications."
+  },
+  {
+    question: "Which language models are supported?",
+    answer: "We support a wide range of models including those from OpenAI, Google, Meta, Anthropic, Mixtral, and more. Our API provides a unified interface to access all these models."
+  },
+  {
+    question: "How does pricing work?",
+    answer: "Our pricing is based on the number of tokens processed. We charge $0.01 per 1,000 tokens, which is approximately 750 words. We offer a pay-as-you-go model with no long-term commitments."
+  },
+  {
+    question: "Is there a free trial available?",
+    answer: "Yes, we offer a free trial with a limited number of tokens so you can test our API and see how it fits your needs. Sign up on our website to start your free trial."
+  },
+  {
+    question: "How can I integrate AI Tutor API into my application?",
+    answer: "We provide comprehensive documentation and SDKs for popular programming languages. Our API is RESTful and easy to integrate. Check our documentation for detailed integration guides."
+  }
+];
+
+const codeExamples: Record<CodeLanguage, string> = {
+  python: `
+import requests
+
+API_KEY = "your_api_key_here"
+API_URL = "https://api.aitutor.com/v1/generate"
+
+prompt = "Explain the concept of quantum entanglement"
+
+response = requests.post(API_URL, 
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    json={"prompt": prompt, "max_tokens": 150}
+)
+
+if response.status_code == 200:
+    print(response.json()['generated_text'])
+else:
+    print("Error:", response.status_code, response.text)
+  `,
+  javascript: `
+const axios = require('axios');
+
+const API_KEY = 'your_api_key_here';
+const API_URL = 'https://api.aitutor.com/v1/generate';
+
+const prompt = 'Explain the concept of quantum entanglement';
+
+axios.post(API_URL, 
+  { prompt: prompt, max_tokens: 150 },
+  { headers: { 'Authorization': \`Bearer \${API_KEY}\` } }
+)
+.then(response => {
+  console.log(response.data.generated_text);
+})
+.catch(error => {
+  console.error('Error:', error.response.status, error.response.data);
+});
+  `,
+  curl: `
+curl -X POST https://api.aitutor.com/v1/generate \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer your_api_key_here" \\
+  -d '{
+    "prompt": "Explain the concept of quantum entanglement",
+    "max_tokens": 150
+  }'
+  `
+};
+
+const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay }}
+  >
+    {children}
+  </motion.div>
+);
+
+const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; toggleOpen: () => void }> = ({ item, isOpen, toggleOpen }) => (
+  <div className="mb-4">
+    <button
+      onClick={toggleOpen}
+      className="flex justify-between items-center w-full p-4 bg-purple-50 rounded-lg focus:outline-none"
+    >
+      <span className="text-lg font-semibold text-gray-900">{item.question}</span>
+      {isOpen ? <MinusCircle className="h-5 w-5 text-purple-600" /> : <PlusCircle className="h-5 w-5 text-purple-600" />}
+    </button>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+          className="p-4 bg-white"
+        >
+          <p className="text-gray-600">{item.answer}</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
 export default function Home() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<CodeLanguage>('python');
+
+  const toggleFaq = (index: number) => {
+    setOpenFaq(prevOpen => prevOpen === index ? null : index);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 text-gray-800 overflow-hidden">
       <Header />
@@ -40,49 +190,58 @@ export default function Home() {
       <main>
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Background animation */}
           <div className="absolute inset-0 z-0">
             <div className="relative h-full w-full">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-200 via-purple-100 to-transparent opacity-70 animate-pulse"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-pink-200 via-pink-100 to-transparent opacity-50 animate-pulse" style={{ animationDelay: "-2s" }}></div>
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-200 via-blue-100 to-transparent opacity-40 animate-pulse" style={{ animationDelay: "-4s" }}></div>
+              {['purple', 'pink', 'blue'].map((color, index) => (
+                <div 
+                  key={color}
+                  className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-${color}-200 via-${color}-100 to-transparent opacity-${70 - index * 15} animate-pulse`}
+                  style={{ animationDelay: `${-index * 2}s` }}
+                />
+              ))}
             </div>
           </div>
-          <div className="relative z-10 text-center px-6 max-w-4xl">
-            <AnimatedSection>
-              <h1 className="text-6xl sm:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">
+
+          {/* Content */}
+          <AnimatedSection>
+            <div className="relative z-10 text-center px-6 max-w-4xl">
+              <h1 className="text-6xl sm:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 animate-gradient-x">
                 AI Tutor API
               </h1>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
               <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-600">
                 Revolutionize learning with AI-driven technology that powers AI Tutor. Empower your applications with our cutting-edge AI Tutor API.
               </p>
-            </AnimatedSection>
-            <AnimatedSection delay={0.4}>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
                   href="https://aitutor-api.vercel.app/console/workflows"
-                  className={buttonVariants({ variant: "default", size: "lg", className: "bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
+                  className={buttonVariants({ variant: "default", size: "lg", className: "bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Get started
                 </Link>
                 <Link
                   href="/documentation"
-                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
+                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Documentation
                 </Link>
               </div>
-            </AnimatedSection>
-          </div>
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
-            <ChevronDownIcon className="h-10 w-10 text-purple-600 opacity-70 animate-bounce" />
-          </div>
+            </div>
+          </AnimatedSection>
+
+          {/* Scroll indicator */}
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          >
+            <ChevronDownIcon className="h-10 w-10 text-purple-600 opacity-70" />
+          </motion.div>
         </section>
 
         {/* Features Section */}
         <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white opacity-50" />
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
@@ -96,7 +255,7 @@ export default function Home() {
               <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
                 {features.map((feature, index) => (
                   <AnimatedSection key={feature.name} delay={index * 0.2}>
-                    <div className="flex flex-col bg-purple-50 rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200">
+                    <div className="flex flex-col bg-purple-50 rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200 transform hover:scale-105">
                       <dt className="flex items-center gap-x-3 text-xl font-semibold leading-7 text-gray-900">
                         <feature.icon className="h-8 w-8 flex-none text-purple-600" aria-hidden="true" />
                         {feature.name}
@@ -109,6 +268,200 @@ export default function Home() {
                 ))}
               </dl>
             </div>
+          </div>
+        </section>
+
+        {/* Multi LLM API Section */}
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+            <AnimatedSection>
+              <div className="mx-auto max-w-2xl lg:text-center">
+                <h2 className="text-base font-semibold leading-7 text-purple-600">Multi LLM API</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                  One API, Multiple Language Models
+                </p>
+                <p className="mt-6 text-lg leading-8 text-gray-600">
+                  Access a wide range of language models through a single, unified API. Simplify your workflow and leverage the power of multiple AI models.
+                </p>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+              <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  { name: "OpenAI", icon: BrainIcon },
+                  { name: "Google", icon: Network },
+                  { name: "Meta", icon: Bot },
+                  { name: "Anthropic", icon: Zap },
+                  { name: "Mixtral", icon: Workflow },
+                  { name: "And more...", icon: CodeIcon },
+                ].map((model, index) => (
+                  <motion.div
+                    key={model.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <model.icon className="h-12 w-12 text-purple-600 mb-4" />
+                    <h3 className="text-lg font-semibold">{model.name}</h3>
+                  </motion.div>
+                ))}
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+
+        {/* AI Workflows Section */}
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-b from-white to-purple-50">
+          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+            <AnimatedSection>
+              <div className="mx-auto max-w-2xl lg:text-center">
+                <h2 className="text-base font-semibold leading-7 text-purple-600">AI Workflows</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                  Streamline Your AI Processes
+                </p>
+                <p className="mt-6 text-lg leading-8 text-gray-600">
+                  Create powerful AI workflows that combine multiple language models and custom logic to solve complex problems.
+                </p>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+              <div className="mt-16 relative">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-gradient-to-r from-purple-50 via-white to-purple-50 px-6 text-lg font-semibold leading-6 text-gray-900">
+                    Workflow Example
+                  </span>
+                </div>
+              </div>
+              <div className="mt-8 flex flex-col items-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden"
+                >
+                  <div className="px-6 py-8">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Advanced Question Answering Workflow</h3>
+                    <div className="space-y-6">
+                      {[
+                        { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "🔐" },
+                        { step: 2, title: "Create Workflow", description: "Design your AI tutoring process flow", icon: "🔀" },
+                        { step: 3, title: "Choose Variables", description: "Define input parameters for your workflow", icon: "🔢" },
+                        { step: 4, title: "Craft Prompt", description: "Write effective prompts for AI models", icon: "✍️" },
+                        { step: 5, title: "Select Model", description: "Choose from various AI models (e.g., GPT-4, Gemini, Claude)", icon: "🤖" },
+                        { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "🚀" },
+                      ].map((item, index) => (
+                        <div key={item.step} className="flex items-start">
+                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center">
+                            <span className="text-lg">{item.icon}</span>
+                          </div>
+                          <div className="ml-4 flex-1">
+                            <h4 className="text-lg font-medium text-gray-900">{item.title}</h4>
+                            <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                          </div>
+                          {index < 5 && (
+                            <div className="ml-4 flex-shrink-0 h-full">
+                              <div className="w-px h-full bg-gray-200 mx-auto"></div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.4}>
+              <div className="mt-16 text-center">
+                <Link
+                  href="/documentation#workflows"
+                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
+                >
+                  Learn More About Workflows
+                </Link>
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+
+        {/* API Usage Section */}
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
+          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+            <AnimatedSection>
+              <div className="mx-auto max-w-2xl lg:text-center">
+                <h2 className="text-base font-semibold leading-7 text-purple-600">API Usage</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                  Integrate AI Tutor in Minutes
+                </p>
+                <p className="mt-6 text-lg leading-8 text-gray-600">
+                  Our API is designed for easy integration. Here's a quick example of how to use it in different languages.
+                </p>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+              <div className="mt-16">
+                <div className="flex justify-center space-x-4 mb-8">
+                  {(Object.keys(codeExamples) as CodeLanguage[]).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setActiveTab(lang)}
+                      className={`px-4 py-2 rounded-lg ${activeTab === lang ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                    >
+                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                <div className="bg-gray-900 rounded-lg overflow-hidden">
+                  <SyntaxHighlighter language={activeTab} style={tomorrow} showLineNumbers>
+                    {codeExamples[activeTab]}
+                  </SyntaxHighlighter>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+
+        {/* API Features Section */}
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+            <AnimatedSection>
+              <div className="mx-auto max-w-2xl lg:text-center">
+                <h2 className="text-base font-semibold leading-7 text-purple-600">API Features</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                  Powerful Capabilities at Your Fingertips
+                </p>
+                <p className="mt-6 text-lg leading-8 text-gray-600">
+                  Explore the advanced features of our AI Tutor API that set it apart from the rest.
+                </p>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+              <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  { name: "Multi-Model Support", description: "Access various AI models through a single API", icon: BrainIcon },
+                  { name: "Real-time Responses", description: "Get instant AI-generated answers for your applications", icon: Zap },
+                  { name: "Custom Workflows", description: "Create and deploy complex AI workflows with ease", icon: Workflow },
+                  { name: "Contextual Understanding", description: "AI that comprehends and maintains context in conversations", icon: Sparkles },
+                  { name: "Language Agnostic", description: "Integrate with any programming language of your choice", icon: Terminal },
+                  { name: "Scalable Infrastructure", description: "Built to handle millions of requests effortlessly", icon: Network },
+                ].map((feature, index) => (
+                  <motion.div
+                    key={feature.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    <feature.icon className="h-12 w-12 text-purple-600 mb-4" />
+                    <h3 className="text-lg font-semibold text-center">{feature.name}</h3>
+                    <p className="mt-2 text-sm text-gray-600 text-center">{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </AnimatedSection>
           </div>
         </section>
 
@@ -168,12 +521,87 @@ export default function Home() {
             </AnimatedSection>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
+          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+            <AnimatedSection>
+              <div className="mx-auto max-w-2xl lg:text-center">
+                <h2 className="text-base font-semibold leading-7 text-purple-600">FAQ</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                  Frequently Asked Questions
+                </p>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+              <div className="mt-16 max-w-3xl mx-auto">
+                {faqItems.map((item, index) => (
+                  <FAQItem
+                    key={index}
+                    item={item}
+                    isOpen={openFaq === index}
+                    toggleOpen={() => toggleFaq(index)}
+                  />
+                ))}
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+
+        {/* Integration Section */}
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+          <AnimatedSection>
+            <div className="mx-auto max-w-2xl lg:text-center">
+              <h2 className="text-base font-semibold leading-7 text-purple-600">Easy Integration</h2>
+              <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                Integrate with Your Favorite Tools
+              </p>
+              <p className="mt-6 text-lg leading-8 text-gray-600">
+                Our API seamlessly integrates with a wide range of development tools and platforms, making it easy to incorporate AI into your existing workflows.
+              </p>
+            </div>
+          </AnimatedSection>
+          <AnimatedSection delay={0.2}>
+            <div className="mt-16 flex flex-wrap justify-center gap-8">
+              {techIcons.map((tech, index) => (
+                <motion.div
+                  key={tech.name}
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="flex flex-col items-center justify-center w-32 h-32 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110"
+                  style={{
+                    background: `linear-gradient(135deg, #fff, ${tech.color})`,
+                  }}
+                >
+                  <tech.Icon className="text-4xl mb-2" style={{ color: "#000" }} />
+                  <span className="text-sm font-semibold text-gray-800">{tech.name}</span>
+                </motion.div>
+              ))}
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
       </main>
 
       <Footer />
+
+      <style jsx global>{`
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+        }
+        .animate-gradient-x {
+          animation: gradient-x 15s ease infinite;
+          background-size: 200% 200%;
+        }
+      `}</style>
     </div>
   );
 }
+
+
 // import { Footer } from "@/components/layout/footer";
 // import { Header } from "@/components/layout/header";
 // import { buttonVariants } from "@/components/ui/button";
