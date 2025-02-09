@@ -1,6 +1,6 @@
 {
-  "name": "ManagePrompt",
-  "short_name": "ManagePrompt",
+  "name": "AI Tutor API",
+  "short_name": "AI Tutor API",
   "theme_color": "#000",
   "background_color": "#000",
   "display": "standalone",

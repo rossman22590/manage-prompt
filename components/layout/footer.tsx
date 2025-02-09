@@ -9,8 +9,8 @@ const navigation = {
     { name: "Chatbots", href: "/chatbots" },
   ],
   legal: [
-    { name: "Privacy", href: "/privacy" },
-    { name: "Terms", href: "/terms" },
+    { name: "Privacy", href: "/#" },
+    { name: "Terms", href: "/#" },
   ],
   social: [
     {

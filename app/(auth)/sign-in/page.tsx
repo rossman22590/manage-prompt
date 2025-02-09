@@ -43,7 +43,7 @@ export default function SignInForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="john.doe@manageprompt.com"
+                placeholder="john.doe@myapps.ai"
                 name="email"
                 required
               />
