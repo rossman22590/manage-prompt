@@ -1,4 +1,4 @@
-export type AIProvider = "openai" | "groq" | "anthropic" | "xai" | "perplexity";
+export type AIProvider = "openai" | "groq" | "anthropic" | "xai" | "perplexity" | "google";
 
 export const AIModelToLabel = {
   // OpenAI models
@@ -39,6 +39,14 @@ export const AIModelToLabel = {
   "sonar-reasoning": "Perplexity Sonar Reasoning",
   "sonar-pro": "Perplexity Sonar Pro",
   "sonar": "Perplexity Sonar",
+  // Google Generative AI models
+  "gemini-1.5-pro-latest": "Gemini 1.5 Pro",
+  "gemini-1.5-pro": "Gemini 1.5 Pro",
+  "gemini-1.5-flash": "Gemini 1.5 Flash",
+  "gemini-1.5-flash-latest": "Gemini 1.5 Flash",
+  "gemini-1.5-flash-8b": "Gemini 1.5 Flash 8B",
+  "gemini-1.5-flash-8b-latest": "Gemini 1.5 Flash 8B",
+  "gemini-2.0-flash-001": "Gemini 2.0 Flash",
 } as const;
 
 export type AIModel = keyof typeof AIModelToLabel;
@@ -79,6 +87,14 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "sonar-reasoning": "sonar-reasoning",
   "sonar-pro": "sonar-pro",
   "sonar": "sonar",
+  // Google Generative AI models
+  "gemini-1.5-pro-latest": "gemini-1.5-pro-latest",
+  "gemini-1.5-pro": "gemini-1.5-pro",
+  "gemini-1.5-flash": "gemini-1.5-flash",
+  "gemini-1.5-flash-latest": "gemini-1.5-flash-latest",
+  "gemini-1.5-flash-8b": "gemini-1.5-flash-8b",
+  "gemini-1.5-flash-8b-latest": "gemini-1.5-flash-8b-latest",
+  "gemini-2.0-flash-001": "gemini-2.0-flash-001",
 };
 
 export const modelToProvider: Record<string | AIModel, AIProvider> = {
@@ -120,6 +136,14 @@ export const modelToProvider: Record<string | AIModel, AIProvider> = {
   "sonar-reasoning": "perplexity",
   "sonar-pro": "perplexity",
   "sonar": "perplexity",
+  // Google Generative AI models
+  "gemini-1.5-pro-latest": "google",
+  "gemini-1.5-pro": "google",
+  "gemini-1.5-flash": "google",
+  "gemini-1.5-flash-latest": "google",
+  "gemini-1.5-flash-8b": "google",
+  "gemini-1.5-flash-8b-latest": "google",
+  "gemini-2.0-flash-001": "google",
 };
 
 export const AIModels = Object.keys(AIModelToLabel) as Array<AIModel>;

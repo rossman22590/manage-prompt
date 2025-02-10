@@ -1,6 +1,7 @@
 import type { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
 import { modelToProvider, modelToProviderId } from "@/data/workflow";
 import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import { createXai } from "@ai-sdk/xai";
@@ -70,6 +71,13 @@ export const getCompletion = async (
         },
       });
       console.log("Perplexity raw response:", completion);
+      break;
+    }
+    case "google": {
+      completion = await generateText({
+        model: google(modelToProviderId[model] ?? model),
+        ...modelParams,
+      });
       break;
     }
     default: {
@@ -160,6 +168,14 @@ export const getStreamingCompletion = async (
       });
       break;
     }
+    case "google": {
+      completion = streamText({
+        model: google(modelToProviderId[model] ?? model),
+        ...modelParams,
+        onFinish,
+      });
+      break;
+    }
     default: {
       const userOpenApiKey = new ByokService().get("openai", userKeys);
       const openai = createOpenAI({
@@ -181,6 +197,7 @@ export const getStreamingCompletion = async (
     },
   });
 };
+
 
 
 // import type { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
