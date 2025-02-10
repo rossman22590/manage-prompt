@@ -148,7 +148,7 @@ async function ChatDashboard(props: Props) {
               <Link
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://manageprompt.readme.io/reference/chatbot-get-token"
+                href="https://support.myapps.ai/introduction"
                 className="text-primary underline"
               >
                 here.
