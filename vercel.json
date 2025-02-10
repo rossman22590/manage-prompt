@@ -1,8 +1,7 @@
 {
-  "crons": [
-    {
-      "path": "/api/ai-tools/clean",
-      "schedule": "0 * * * *"
+  "functions": {
+    "pages/api/**/*.ts": {
+      "maxDuration": 60
     }
-  ]
+  }
 }
