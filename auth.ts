@@ -31,11 +31,11 @@ const authOptions = {
             body: JSON.stringify({
               from: provider.from,
               to: email,
-              subject: `Sign in to ${host}`,
+              subject: `Sign in to AI Tutor API}`,
               html: `
                 <body style="background-color: #f6f9fc; font-family: Arial, sans-serif; padding: 20px;">
                   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">Sign in to ${host}</h1>
+                    <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;">Sign in to AI Tutor API</h1>
                     <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
                       Click the button below to sign in to your account. If you didn't request this email, you can safely ignore it.
                     </p>
