@@ -19,6 +19,7 @@ export type WorkflowRunWithUser = WorkflowRun & {
   user: {
     name: string | null;
   };
+  branchId: string | null;
 };
 
 interface Props {
@@ -30,7 +31,9 @@ export function WorkflowRunItem({ workflowRun }: Props) {
     workflowRun;
 
   // Extract citations from rawResult
-  const citations = rawResult?.citations || [];
+  const citations = typeof rawResult === 'object' && rawResult !== null
+    ? (rawResult as any).citations || []
+    : [];
 
   return (
     <li
@@ -123,6 +126,7 @@ export function WorkflowRunItem({ workflowRun }: Props) {
     </li>
   );
 }
+
 // "use client";
 
 // import MarkdownView from "@/components/markdown/markdown-view";
