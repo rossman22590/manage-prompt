@@ -31,7 +31,7 @@ const authOptions = {
             body: JSON.stringify({
               from: provider.from,
               to: email,
-              subject: `Sign in to AI Tutor API}`,
+              subject: `Sign in to AI Tutor API`,
               html: `
                 <body style="background-color: #f6f9fc; font-family: Arial, sans-serif; padding: 20px;">
                   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
