@@ -14,6 +14,7 @@
     "@ai-sdk/anthropic": "^1.1.6",
     "@ai-sdk/azure": "^1.1.9",
     "@ai-sdk/openai": "^1.1.9",
+    "@ai-sdk/perplexity": "^0.0.7",
     "@ai-sdk/xai": "^1.1.8",
     "@auth/prisma-adapter": "^2.4.2",
     "@headlessui/react": "^1.7.18",
