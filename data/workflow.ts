@@ -27,7 +27,10 @@ export const AIModelToLabel = {
   "llama3-8b-8192": "Llama 3 8B 8192",
   "mixtral-8x7b-32768": "Mixtral 8x7B 32768",
   // Anthropic models
-  "claude-3-5-sonnet-20240620": "Claude 3.5 Sonnet",
+  "claude-3-opus-20240229": "Claude 3 Opus",
+  "claude-3-sonnet-20240229": "Claude 3 Sonnet",
+  "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet",
+  "claude-3-5-haiku-20241022": "Claude 3.5 Haiku",
   // Xai models
   "grok-2-latest": "Grok 2",
   "grok-beta": "Grok Beta",
@@ -66,6 +69,11 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "llama3-70b-8192": "llama3-70b-8192",
   "llama3-8b-8192": "llama3-8b-8192",
   "mixtral-8x7b-32768": "mixtral-8x7b-32768",
+  // Anthropic models
+  "claude-3-opus-20240229": "claude-3-opus-20240229",
+  "claude-3-sonnet-20240229": "claude-3-sonnet-20240229",
+  "claude-3-5-sonnet-20241022": "claude-3-5-sonnet-20241022",
+  "claude-3-5-haiku-20241022": "claude-3-5-haiku-20241022",
   // Perplexity models
   "sonar-reasoning-pro": "sonar-reasoning-pro",
   "sonar-reasoning": "sonar-reasoning",
@@ -100,7 +108,10 @@ export const modelToProvider: Record<string | AIModel, AIProvider> = {
   "llama3-8b-8192": "groq",
   "mixtral-8x7b-32768": "groq",
   // Anthropic models
-  "claude-3-5-sonnet-20240620": "anthropic",
+  "claude-3-opus-20240229": "anthropic",
+  "claude-3-sonnet-20240229": "anthropic",
+  "claude-3-5-sonnet-20241022": "anthropic",
+  "claude-3-5-haiku-20241022": "anthropic",
   // Xai models
   "grok-2-latest": "xai",
   "grok-beta": "xai",
@@ -153,7 +164,6 @@ export const WorkflowTestCondition: Record<string, string> = {
   isLessThan: "is less than",
   isValidJson: "is valid JSON",
 } as const;
-
 
 
 // export type AIProvider = "openai" | "groq" | "anthropic" | "xai";
