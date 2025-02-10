@@ -390,7 +390,7 @@ export default function Home() {
             <AnimatedSection delay={0.4}>
               <div className="mt-16 text-center">
                 <Link
-                  href="/documentation#workflows"
+                  href="https://support.myapps.ai/introduction"
                   className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Learn More About Workflows
