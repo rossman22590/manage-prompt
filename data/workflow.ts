@@ -11,7 +11,7 @@ export const AIModelToLabel = {
   "o1-mini": "o1 Mini",
   "o1-preview": "o1 Preview",
   "o3-mini": "o3 Mini",
-  // Groq models
+  // Groq models 
   "mistralai/Mixtral-8x7B-Instruct-v0.1": "Mixtral 8x7B",
   "google/gemma-7b-it": "Google Gemma 7B",
   "deepseek-r1-distill-llama-70b": "DeepSeek R1 Distill Llama 70B",
