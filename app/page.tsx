@@ -234,7 +234,7 @@ export default function Home() {
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
-                  href="https://aitutor-api.vercel.app/console/workflows"
+                  href="https://aitutor-api.vercel.app/workflows"
                   className={buttonVariants({ variant: "default", size: "lg", className: "bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Get started
