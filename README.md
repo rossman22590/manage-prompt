@@ -19,7 +19,7 @@
 
 If you want to learn more about this project or have any questions, send us an email at [hello+manageprompt@techulus.com](mailto:hello+manageprompt@techulus.com)
 
-## Built with 🛠️
+## Built with 🛠️ 
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
