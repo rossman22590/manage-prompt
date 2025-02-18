@@ -159,7 +159,7 @@ function ChatView({ token, secretKey, isEmbed }: { token: string; secretKey: str
               className="text-xs text-hero absolute bottom-2 text-primary left-[50%] transform -translate-x-1/2"
               target="_blank"
               rel="noopener noreferrer"
-              href="https://manageprompt.com"
+              href="https://aitutor-api.vercel.app"
             >
               ⚡ by AI Tutor API
             </a>

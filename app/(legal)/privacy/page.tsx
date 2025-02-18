@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
           <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
 
           <p className="mt-3">
-            At manageprompt.com, accessible from https://manageprompt.com/, one
+            At manageprompt.com, accessible from https://aitutor-api.vercel.app, one
             of our main priorities is the privacy of our visitors. This Privacy
             Policy document contains types of information that is collected and
             recorded by manageprompt.com and how we use it.

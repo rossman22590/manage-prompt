@@ -12,25 +12,25 @@ const aiToolsRoutes = [
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: "https://manageprompt.com",
+      url: "https://aitutor-api.vercel.app",
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://manageprompt.com/sign-in",
+      url: "https://aitutor-api.vercel.app/sign-in",
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://manageprompt.com/sign-up",
+      url: "https://aitutor-api.vercel.app/sign-up",
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://manageprompt.com/ai-tools",
+      url: "https://aitutor-api.vercel.app/ai-tools",
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
@@ -48,7 +48,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         | "never";
       priority?: number;
     }>((route: string) => ({
-      url: `https://manageprompt.com/ai-tools/${route}`,
+      url: `https://aitutor-api.vercel.app/ai-tools/${route}`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,

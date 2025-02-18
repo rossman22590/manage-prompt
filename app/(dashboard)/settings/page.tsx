@@ -228,7 +228,7 @@ export default async function Settings() {
             These keys should be kept secret and not shared publicly. You can
             read more about our API and rate limting{" "}
             <a
-              href="https://manageprompt.readme.io"
+              href="https://support.myapps.ai/aitutor-api/aitutor-api-info"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary font-semibold"

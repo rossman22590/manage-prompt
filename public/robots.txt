@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://manageprompt.com
+Host: https://aitutor-api.vercel.app
 
 # Sitemaps
-Sitemap: https://manageprompt.com/sitemap.xml
+Sitemap: https://aitutor-api.vercel.app/sitemap.xml

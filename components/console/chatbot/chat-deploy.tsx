@@ -34,7 +34,7 @@ export default function ChatDeploy() {
         className={buttonVariants({ variant: "default" })}
         target="_blank"
         rel="noopener noreferrer"
-        href="https://manageprompt.readme.io/reference/chatbot-get-token"
+        href="https://support.myapps.ai/aitutor-api/get-token-workflow"
       >
         View Deployment Instructions
       </Link>
