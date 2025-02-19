@@ -262,7 +262,7 @@ export function WorkflowForm({
                   />
                   <p className="mt-3 text-sm leading-6 text-primary">
                     Write the edit instruction, you can insert variables using
-                    this syntax <span>{"{{ variable }}"}</span>.
+                    this syntax <span>{"{{variable}}"}</span>.
                   </p>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export function WorkflowForm({
                 />
                 <p className="mt-3 text-sm leading-6 text-primary">
                   Write the prompt template, you can insert variables using this
-                  syntax <span>{"{{ variable }}"}</span>.
+                  syntax <span>{"{{variable}}"}</span>.
                 </p>
               </div>
             </div>
