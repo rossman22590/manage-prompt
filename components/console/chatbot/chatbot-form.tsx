@@ -79,7 +79,8 @@ export function ChatbotForm({ chatbot, action }: Props) {
                   <SelectValue placeholder="Model" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gpt-4o">gpt-4o</SelectItem>
+                <SelectItem value="gpt-4o">gpt-4o</SelectItem>
+                <SelectItem value="o3-mini">o3-mini</SelectItem>
                 </SelectContent>
               </Select>
             </div>
