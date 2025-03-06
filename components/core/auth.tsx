@@ -29,7 +29,7 @@ export const UserButton = () => {
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Link
-            href="https://techulus.atlassian.net/servicedesk/customer/portal/5"
+            href="https://support.myapps.ai/aitutor-api/aitutor-api-info"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full"
