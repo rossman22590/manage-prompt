@@ -30,7 +30,7 @@ export const AIModelToLabel = {
   "claude-3-opus-20240229": "Claude 3 Opus",
   "claude-3-sonnet-20240229": "Claude 3 Sonnet",
   "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet",
-  "claude-3-7-sonnet-latest": "Claude 3.7 Sonnet",
+  "claude-3-7-sonnet-20250219": "Claude 3.7 Sonnet",
   "claude-3-5-haiku-20241022": "Claude 3.5 Haiku",
   // Xai models
   "grok-2-latest": "Grok 2",
@@ -82,7 +82,7 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "claude-3-opus-20240229": "claude-3-opus-20240229",
   // "claude-3-sonnet-20240229": "claude-3-sonnet-20240229",
   "claude-3-5-sonnet-20241022": "claude-3-5-sonnet-20241022",
-  "claude-3-7-sonnet-latest": "Claude 3.7 Sonnet",
+  "claude-3-7-sonnet-20250219": "Claude 3.7 Sonnet",
   "claude-3-5-haiku-20241022": "claude-3-5-haiku-20241022",
   // Perplexity models
   "sonar-reasoning-pro": "sonar-reasoning-pro",
