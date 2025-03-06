@@ -6,7 +6,8 @@ import {
   WorkflowTestCondition,
 } from "@/data/workflow";
 import { z } from "zod";
-import { WebpageParser } from "./webpage-parser";
+// import { WebpageParser } from "./webpage-parser";
+import { WebpageParser } from "./firecrawl-parser";
 
 export const MAX_GLOBAL_RATE_LIMIT_RPS = 100;
 export const MAX_RATE_LIMIT_RPS = 50;
