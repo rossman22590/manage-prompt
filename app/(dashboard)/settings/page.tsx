@@ -107,7 +107,12 @@ export default async function Settings() {
             </div>
             {!subscription ? (
               <div className="text-gray-900 dark:text-gray-200">
-                <a href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" className="text-primary-600 hover:text-primary-500 font-medium">
+                <a 
+                  href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" 
+                  className="text-primary-600 hover:text-primary-500 font-medium"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Upgrade
                 </a>
               </div>
@@ -166,6 +171,8 @@ export default async function Settings() {
                 <a 
                   href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" 
                   className="text-primary-600 hover:text-primary-500 font-medium"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {isSubscriptionCancelled(subscription) ? "Upgrade" : "Manage"}
                 </a>
@@ -207,6 +214,7 @@ export default async function Settings() {
     </div>
   </div>
 </PageSection>
+
 
 
       {/* <PageSection topInset>
