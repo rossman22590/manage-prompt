@@ -22,7 +22,7 @@ export const getCompletion = async (
   const modelParams = {
     prompt: content,
     temperature: settings?.temperature ?? 0.5,
-    maxTokens: settings?.maxTokens ?? 7024,
+    maxTokens: settings?.maxTokens ?? 4096,
     topP: settings?.topP ?? 1,
     frequencyPenalty: settings?.frequencyPenalty ?? 0,
     presencePenalty: settings?.presencePenalty ?? 0,

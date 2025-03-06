@@ -79,7 +79,7 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "mixtral-8x7b-32768": "mixtral-8x7b-32768",
   // Anthropic models
   "claude-3-opus-20240229": "claude-3-opus-20240229",
-  "claude-3-sonnet-20240229": "claude-3-sonnet-20240229",
+  // "claude-3-sonnet-20240229": "claude-3-sonnet-20240229",
   "claude-3-5-sonnet-20241022": "claude-3-5-sonnet-20241022",
   "claude-3-5-haiku-20241022": "claude-3-5-haiku-20241022",
   // Perplexity models
@@ -125,7 +125,7 @@ export const modelToProvider: Record<string | AIModel, AIProvider> = {
   "mixtral-8x7b-32768": "groq",
   // Anthropic models
   "claude-3-opus-20240229": "anthropic",
-  "claude-3-sonnet-20240229": "anthropic",
+  // "claude-3-sonnet-20240229": "anthropic",
   "claude-3-5-sonnet-20241022": "anthropic",
   "claude-3-5-haiku-20241022": "anthropic",
   // Xai models
