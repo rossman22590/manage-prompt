@@ -107,13 +107,8 @@ export default async function Settings() {
             </div>
             {!subscription ? (
               <div className="text-gray-900 dark:text-gray-200">
-                <a href="https://buy.stripe.com/eVabKL21r9ivdXy4gw">
-                  <button
-                    className="text-primary-600 hover:text-primary-500 font-medium"
-                    type="button"
-                  >
-                    Upgrade
-                  </button>
+                <a href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" className="text-primary-600 hover:text-primary-500 font-medium">
+                  Upgrade
                 </a>
               </div>
             ) : null}
@@ -168,13 +163,11 @@ export default async function Settings() {
                 </div>
               </div>
               <div className="text-gray-900 dark:text-gray-200">
-                <a href="https://buy.stripe.com/eVabKL21r9ivdXy4gw">
-                  <button
-                    className="text-primary-600 hover:text-primary-500 font-medium"
-                    type="button"
-                  >
-                    {isSubscriptionCancelled(subscription) ? "Upgrade" : "Manage"}
-                  </button>
+                <a 
+                  href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" 
+                  className="text-primary-600 hover:text-primary-500 font-medium"
+                >
+                  {isSubscriptionCancelled(subscription) ? "Upgrade" : "Manage"}
                 </a>
               </div>
             </dd>
