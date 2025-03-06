@@ -23,7 +23,6 @@ import { notFound } from "next/navigation";
 import type Stripe from "stripe";
 import {
   createSecretKey,
-  redirectToBilling,
   removeSpendLimit,
   revokeSecretKey,
   updateKeyName,
@@ -87,8 +86,137 @@ export default async function Settings() {
   return (
     <>
       <PageTitle title="Settings" />
-
       <PageSection topInset>
+  <div className="mx-auto max-w-2xl space-y-16 lg:mx-0 lg:max-w-none p-6">
+    <div>
+      <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
+        Account
+      </h2>
+      <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+        Manage your account settings and billing information.
+      </p>
+
+      <dl className="mt-6 space-y-4 divide-y border-t text-sm leading-6">
+        <div className="pt-2 sm:flex">
+          <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
+            Credits
+          </dt>
+          <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+            <div className="text-gray-900 dark:text-gray-200">
+              {organization?.credits.toLocaleString() ?? 0} credits left
+            </div>
+            {!subscription ? (
+              <div className="text-gray-900 dark:text-gray-200">
+                <a href="https://buy.stripe.com/eVabKL21r9ivdXy4gw">
+                  <button
+                    className="text-primary-600 hover:text-primary-500 font-medium"
+                    type="button"
+                  >
+                    Upgrade
+                  </button>
+                </a>
+              </div>
+            ) : null}
+          </dd>
+        </div>
+
+        <div className="pt-2 sm:flex">
+          <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
+            Billing
+          </dt>
+          {subscription ? (
+            <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+              <div className="text-gray-900 dark:text-gray-200">
+                <Badge variant="default">
+                  {subscription?.status.toUpperCase()}
+                </Badge>
+                {invoice?.amount_remaining && invoice?.period_end ? (
+                  <p className="mt-2">
+                    <span className="font-bold">Next Invoice:</span>
+                    <span className="ml-2">
+                      USD {(invoice.amount_remaining / 100).toFixed(2)} on{" "}
+                      {DateTime.fromSeconds(
+                        invoice.period_end
+                      ).toDateString()}
+                    </span>
+                  </p>
+                ) : null}
+                <div className="mt-2 flex items-center">
+                  <span className="font-semibold">
+                    Monthly Spend Limit (USD):
+                  </span>
+                  <span className="ml-2">
+                    <EditableValue
+                      id={ownerId}
+                      name="spendLimit"
+                      type="number"
+                      value={organization?.spendLimit ?? "-"}
+                      action={updateSpendLimit}
+                    />
+                  </span>
+                  {organization?.spendLimit ? (
+                    <form action={removeSpendLimit}>
+                      <input type="hidden" name="id" value={ownerId} />
+                      <ActionButton
+                        className="p-0 m-0 h-5"
+                        variant="link"
+                        label="Remove"
+                        loadingLabel="Removing..."
+                      />
+                    </form>
+                  ) : null}
+                </div>
+              </div>
+              <div className="text-gray-900 dark:text-gray-200">
+                <a href="https://buy.stripe.com/eVabKL21r9ivdXy4gw">
+                  <button
+                    className="text-primary-600 hover:text-primary-500 font-medium"
+                    type="button"
+                  >
+                    {isSubscriptionCancelled(subscription) ? "Upgrade" : "Manage"}
+                  </button>
+                </a>
+              </div>
+            </dd>
+          ) : null}
+        </div>
+
+        <div className="pt-2 sm:flex">
+          <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
+            Name
+          </dt>
+          <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+            <div className="text-gray-900 dark:text-gray-200">
+              <EditableValue
+                id={userId}
+                name="userName"
+                type="text"
+                value={user?.name ?? ""}
+                action={updateUserName}
+              />
+            </div>
+          </dd>
+        </div>
+
+        {user?.email ? (
+          <div className="pt-2 sm:flex">
+            <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
+              Email address
+            </dt>
+            <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+              <div className="text-gray-900 dark:text-gray-200">
+                {user?.email}
+              </div>
+            </dd>
+          </div>
+        ) : null}
+      </dl>
+    </div>
+  </div>
+</PageSection>
+
+
+      {/* <PageSection topInset>
         <div className="mx-auto max-w-2xl space-y-16 lg:mx-0 lg:max-w-none p-6">
           <div>
             <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
@@ -217,7 +345,7 @@ export default async function Settings() {
             </dl>
           </div>
         </div>
-      </PageSection>
+      </PageSection> */}
 
       <PageSection className="overflow-y-scroll">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none p-6">
