@@ -41,8 +41,8 @@ export const AIModelToLabel = {
   "sonar-pro": "Perplexity Sonar Pro",
   "sonar": "Perplexity Sonar",
   // Google Generative AI models
-  "gemini-1.5-pro-latest": "Gemini 1.5 Pro",
-  "gemini-1.5-pro": "Gemini 1.5 Pro",
+  // "gemini-1.5-pro-latest": "Gemini 1.5 Pro",
+  // "gemini-1.5-pro": "Gemini 1.5 Pro",
   "gemini-1.5-flash": "Gemini 1.5 Flash",
   "gemini-1.5-flash-latest": "Gemini 1.5 Flash",
   "gemini-1.5-flash-8b": "Gemini 1.5 Flash 8B",
@@ -90,8 +90,8 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "sonar-pro": "sonar-pro",
   "sonar": "sonar",
   // Google Generative AI models
-  "gemini-1.5-pro-latest": "gemini-1.5-pro-latest",
-  "gemini-1.5-pro": "gemini-1.5-pro",
+  // "gemini-1.5-pro-latest": "gemini-1.5-pro-latest",
+  // "gemini-1.5-pro": "gemini-1.5-pro",
   "gemini-1.5-flash": "gemini-1.5-flash",
   "gemini-1.5-flash-latest": "gemini-1.5-flash-latest",
   "gemini-1.5-flash-8b": "gemini-1.5-flash-8b",
