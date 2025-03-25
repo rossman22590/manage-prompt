@@ -28,7 +28,7 @@ export const AIModelToLabel = {
   "mixtral-8x7b-32768": "Mixtral 8x7B 32768",
   // Anthropic models
   "claude-3-opus-20240229": "Claude 3 Opus",
-  "claude-3-sonnet-20240229": "Claude 3 Sonnet",
+  // "claude-3-sonnet-20240229": "Claude 3 Sonnet",
   "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet",
   "claude-3-7-sonnet-20250219": "claude-3-7-sonnet-20250219",
   "claude-3-5-haiku-20241022": "Claude 3.5 Haiku",
