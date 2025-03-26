@@ -66,7 +66,7 @@ export const getCompletion = async (
         frequencyPenalty: modelParams.frequencyPenalty > 0 ? modelParams.frequencyPenalty : 1,
         providerOptions: {
           perplexity: {
-            return_images: true,
+            return_images: false,
           },
         },
       });
@@ -162,7 +162,7 @@ export const getStreamingCompletion = async (
         onFinish,
         providerOptions: {
           perplexity: {
-            return_images: true,
+            return_images: false,
           },
         },
       });
@@ -232,7 +232,7 @@ export const getStreamingCompletion = async (
 //   let completion = null;
 //   switch (model) {
 //     case "mistralai/Mixtral-8x7B-Instruct-v0.1":
-//     case "meta-llama/Llama-2-70b-chat-hf":
+//     case "meta-llama/-2-70b-chat-hf":
 //     case "google/gemma-7b-it": {
 //       const groq = createOpenAI({
 //         baseURL: "https://api.groq.com/openai/v1",
