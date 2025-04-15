@@ -3,6 +3,7 @@ export type AIProvider = "openai" | "groq" | "anthropic" | "xai" | "perplexity" 
 export const AIModelToLabel = {
   // OpenAI models
   "gpt-4o": "GPT-4o",
+  "gpt-4.1": "GPT-4.1",
   "gpt-4o-mini": "GPT-4o mini",
   "gpt-4-turbo": "GPT-4 Turbo",
   "gpt-4": "GPT-4",
@@ -106,6 +107,7 @@ export const modelToProvider: Record<string | AIModel, AIProvider> = {
   "o1-mini": "openai",
   "o1-preview": "openai",
   "o3-mini": "openai",
+  "gpt-4.1": "openai",
   // Groq models
   "mistralai/Mixtral-8x7B-Instruct-v0.1": "groq",
   "google/gemma-7b-it": "groq",
