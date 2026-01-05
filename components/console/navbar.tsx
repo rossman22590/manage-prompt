@@ -73,7 +73,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
     <>
       <nav
         className={cn(
-          "flex-shrink-0 text-black dark:text-white",
+          "sticky top-0 z-20 flex-shrink-0 text-black dark:text-white bg-background",
           isPublicPage && "border-b",
         )}
       >
@@ -111,39 +111,12 @@ export default function NavBar({ isPublicPage = false }: Props) {
 
       <div
         className={cn(
-          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b bg-background px-4 lg:px-8",
-          isSticky ? "pt-[1px] shadow-md" : "",
+          "sticky top-16 z-10 -mb-px flex w-full self-start border-b bg-background px-4 lg:px-8",
           isPublicPage ? "hidden" : "",
         )}
         ref={ref}
       >
-        <Transition show={isSticky}>
-          <Link
-            className={cn(
-              "absolute hidden self-center md:block top-[10px]",
-              "data-[enter]:data-[leave]:transition-all ease-in-out duration-300",
-              "data-[enterFrom]:data-[leaveTo]:transform translate-y-[-100%] opacity-0",
-              "data-[enterTo]:data-[leaveFrom]:transform translate-y-0 opacity-100",
-            )}
-            href="/"
-            prefetch={false}
-          >
-            <Image
-              className="rounded-md"
-              src={logo}
-              alt="AI Tutor API"
-              width={24}
-              height={24}
-            />
-          </Link>
-        </Transition>
-
-        <div
-          className={cn(
-            "hidden-scrollbar flex space-x-1 overflow-y-scroll transition duration-300 ease-in-out",
-            isSticky ? "md:translate-x-[40px]" : "md:translate-x-0",
-          )}
-        >
+        <div className="flex w-full min-w-0 space-x-1 overflow-x-auto overflow-y-hidden">
           {tabs.map((tab) => (
             <Link
               key={tab.name}

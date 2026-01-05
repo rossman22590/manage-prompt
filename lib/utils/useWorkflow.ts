@@ -28,16 +28,26 @@ export async function getWorkflowsForOwner({
 
   if (search) {
     dbQuery.where!.name = {
-      search,
+      contains: search,
+      mode: "insensitive",
+    };
+  }
+
+  const countWhere: Prisma.WorkflowWhereInput = {
+    ownerId,
+  };
+
+  if (search) {
+    countWhere.name = {
+      contains: search,
+      mode: "insensitive",
     };
   }
 
   const [workflows, count] = await prisma.$transaction([
     prisma.workflow.findMany(dbQuery),
     prisma.workflow.count({
-      where: {
-        ownerId,
-      },
+      where: countWhere,
     }),
   ]);
 

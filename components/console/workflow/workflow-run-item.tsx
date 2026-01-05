@@ -60,26 +60,20 @@ export function WorkflowRunItem({ workflowRun }: Props) {
       key={workflowRun.id}
       className="relative overflow-x-scroll px-6 py-5 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary"
     >
-      <div className="flex justify-between space-x-3">
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-gray-900 dark:text-gray-100 space-x-2">
-            <span>{user?.name ?? "API"}</span>
-
-            <span aria-hidden="true">&middot;</span>
-            <span className="text-gray-600 dark:text-gray-400 font-normal">
-              <GitBranchIcon className="w-4 h-4 mr-1 inline" />{" "}
-              {branchId ?? "main"}
+      <div className="flex justify-between items-center space-x-3 mb-8">
+        <div className="min-w-0 flex-1 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300">
+            {user?.name ?? "API"}
+          </span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+            <GitBranchIcon className="w-3 h-3 mr-1.5" />
+            {branchId ?? "main"}
+          </span>
+          {totalTokenCount ? (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+              {totalTokenCount} tokens
             </span>
-
-            {totalTokenCount ? (
-              <>
-                <span aria-hidden="true">&middot;</span>
-                <span className="text-gray-600 dark:text-gray-400 font-normal">
-                  {totalTokenCount} tokens
-                </span>
-              </>
-            ) : null}
-          </p>
+          ) : null}
         </div>
         <time
           dateTime={createdAt.toISOString()}
@@ -88,7 +82,7 @@ export function WorkflowRunItem({ workflowRun }: Props) {
           {DateTime.fromJSDate(createdAt).toNiceFormat()}
         </time>
       </div>
-      <div className="mt-1 text-gray-600 dark:text-gray-200">
+      <div className="mt-6 text-gray-600 dark:text-gray-200">
         <MarkdownView content={result} />
       </div>
 

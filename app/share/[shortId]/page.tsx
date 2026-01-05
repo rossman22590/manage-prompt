@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { Download } from "lucide-react";
 import { PublicWorkflowRunner } from "@/components/console/workflow/public-workflow-runner";
 import PageSection from "@/components/core/page-section";
 import { prisma } from "@/lib/utils/db";
@@ -184,25 +185,33 @@ export default async function PublicSharePage(props: Props) {
             <p className="text-sm sm:text-base font-medium text-center sm:text-left">
               ✨ This workflow is made using the <span className="font-bold">AI Tutor API</span> and you can make your own now!
             </p>
-            <a
-              href="/workflows"
-              className="inline-flex items-center px-6 py-2.5 bg-white text-pink-600 font-semibold rounded-full hover:bg-pink-50 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap"
-            >
-              Create Your Own
-            </a>
+            <div className="flex items-center gap-3">
+              <a
+                href={`/share/${workflow.shortId}/export`}
+                download
+                className="inline-flex items-center px-6 py-2.5 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full hover:bg-white/20 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap border border-white/20"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download Workflow
+              </a>
+              <a
+                href="/workflows"
+                className="inline-flex items-center px-6 py-2.5 bg-white text-pink-600 font-semibold rounded-full hover:bg-pink-50 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl whitespace-nowrap"
+              >
+                Create Your Own
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      <PageSection>
-        <div className="mx-auto max-w-4xl py-12 px-4 sm:px-6 lg:px-8">
+      <div className="mt-12">
+        <PageSection>
+          <div className="mx-auto max-w-4xl py-12 px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               {workflow.name}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Test Flow
-            </p>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -218,7 +227,8 @@ export default async function PublicSharePage(props: Props) {
             </p>
           </div>
         </div>
-      </PageSection>
+        </PageSection>
+      </div>
     </div>
   );
 }

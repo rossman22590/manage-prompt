@@ -109,10 +109,10 @@ export function PublicWorkflowRunner({ workflow }: Props) {
   });
 
   return (
-    <div className="p-8">
+    <div className="p-8 w-full">
       {/* Input Form */}
       {!streamUrl && (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           {inputs.length > 0 ? (
             <>
               {inputs.map((input) => {
@@ -122,7 +122,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
                   : input.name.charAt(0).toUpperCase() + input.name.slice(1);
                 
                 return (
-                  <div key={input.name} className="space-y-2">
+                  <div key={input.name} className="space-y-2 w-full">
                     <Label htmlFor={input.name} className="text-base font-semibold">
                       {displayLabel}
                       {input.required && (
@@ -138,7 +138,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
                       onChange={(e) =>
                         updateInput({ [input.name]: e.target.value })
                       }
-                      className="text-base"
+                      className="text-base w-full"
                     />
                   ) : (
                     <Input
@@ -149,7 +149,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
                       onChange={(e) =>
                         updateInput({ [input.name]: e.target.value })
                       }
-                      className="text-base"
+                      className="text-base w-full"
                     />
                   )}
                 </div>
@@ -177,9 +177,9 @@ export function PublicWorkflowRunner({ workflow }: Props) {
 
       {/* Result Display */}
       {streamUrl && (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           {/* Query/Prompt Display */}
-          <div className="border-t pt-6">
+          <div className="border-t pt-6 w-full">
             <button
               onClick={() => setShowQuery(!showQuery)}
               className="flex items-center justify-between w-full mb-4 text-left"
@@ -194,7 +194,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
               )}
             </button>
             {showQuery && (
-              <div className="border rounded-xl p-4 bg-slate-50 dark:bg-slate-900 mb-4">
+              <div className="border rounded-xl p-4 bg-slate-50 dark:bg-slate-900 mb-4 w-full">
                 {inputs.length > 0 ? (
                   <div className="space-y-3">
                     {inputs.map((input) => {
@@ -227,13 +227,13 @@ export function PublicWorkflowRunner({ workflow }: Props) {
           </div>
 
           {/* Result Display */}
-          <div className="border-t pt-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="border-t pt-6 w-full">
+            <div className="flex items-center justify-between mb-4 w-full">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                 Result
               </h3>
               {result && (
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-shrink-0">
                   <Button
                     onClick={() => {
                       const blob = new Blob([result], { type: "text/plain" });
@@ -290,7 +290,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
                 </div>
               )}
             </div>
-            <div className="border rounded-xl p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-[200px]">
+            <div className="border rounded-xl p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-[200px] w-full overflow-hidden">
               {isStreaming && !result && (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Image
@@ -309,7 +309,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
                 url={streamUrl}
                 body={inputValues}
                 fallbackText="Failed to process workflow"
-                className="text-base leading-7 text-slate-800 dark:text-slate-100 whitespace-pre-wrap"
+                className="text-base leading-7 text-slate-800 dark:text-slate-100 whitespace-pre-wrap break-words w-full"
                 renderMarkdown={true}
                 onCompleted={() => {
                   setIsStreaming(false);

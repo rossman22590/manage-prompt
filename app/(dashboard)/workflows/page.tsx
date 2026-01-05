@@ -2,7 +2,7 @@ import { ImportWorkflowDialog } from "@/components/console/workflow/workflow-imp
 import { WorkflowItem } from "@/components/console/workflow/workflow-item";
 import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
-import { Input } from "@/components/ui/input";
+import { WorkflowSearch } from "@/components/workflows/workflow-search";
 import {
   Pagination,
   PaginationContent,
@@ -49,14 +49,9 @@ export default async function Workflows(props: Props) {
         actionLink="/workflows/new"
       />
       <div className="flex max-w-7xl px-4 xl:px-0 sm:mx-auto py-4 space-x-4 items-center -mt-8">
-        <form className="flex-1" action="/workflows">
-          <label htmlFor="search" className="sr-only">
-            Search workflows
-          </label>
-          <div className="relative text-gray-600 dark:text-gray-400 focus-within:text-gray-800 dark:focus-within:text-gray-200">
-            <Input name="search" placeholder="Search Workflows" type="search" />
-          </div>
-        </form>
+        <div className="flex-1">
+          <WorkflowSearch />
+        </div>
 
         <ImportWorkflowDialog />
       </div>

@@ -28,13 +28,14 @@ export function UpgradeButton() {
 
   return (
     <>
-      <button
+      <Button
         type="button"
         onClick={() => setModalOpen(true)}
-        className="p-0 m-0 h-auto text-primary-600 hover:text-primary-500 font-medium bg-transparent border-none cursor-pointer"
+        size="sm"
+        className="bg-pink-500 hover:bg-pink-600 text-white"
       >
         Upgrade
-      </button>
+      </Button>
       <CreditPackModal
         open={modalOpen}
         onOpenChange={setModalOpen}

@@ -1,30 +1,30 @@
-﻿import { notFound, redirect } from "next/navigation";
-import PageSection from "@/components/core/page-section";
+﻿import PageSection from "@/components/core/page-section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import { EditableValue } from "@/components/form/editable-text";
 import PageTitle from "@/components/layout/page-title";
+import { ShowHideKey } from "@/components/settings/show-hide-key";
+import { UpgradeButton } from "@/components/settings/upgrade-button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import type { SecretKey } from "@/generated/prisma-client/client";
-import { DateTime } from "@/lib/utils/datetime";
 import { getUser, owner } from "@/lib/hooks/useOwner";
+import { DateTime } from "@/lib/utils/datetime";
 import { prisma } from "@/lib/utils/db";
 import {
   getUpcomingInvoice,
   isSubscriptionCancelled,
 } from "@/lib/utils/stripe";
+import { notFound } from "next/navigation";
 import type Stripe from "stripe";
 import {
   createSecretKey,
-  getEnterprisePlanCheckoutUrl,
   redirectToBilling,
   removeSpendLimit,
   revokeSecretKey,
@@ -33,7 +33,6 @@ import {
   updateSpendLimit,
   updateUserName,
 } from "./actions";
-import { UpgradeButton } from "@/components/settings/upgrade-button";
 
 export default async function Settings() {
   const { userId, ownerId } = await owner();
@@ -81,7 +80,7 @@ export default async function Settings() {
     <>
       <PageTitle title="Settings" />
       <PageSection topInset>
-        <div className="mx-auto max-w-2xl space-y-16 lg:mx-0 lg:max-w-none p-6">
+        <div className="mx-auto max-w-2xl space-y-16 lg:mx-0 lg:max-w-none p-4 sm:p-6 w-full min-w-0 overflow-x-hidden">
           <div>
             <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
               Account
@@ -95,7 +94,7 @@ export default async function Settings() {
                 <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
                   Credits
                 </dt>
-                <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                <dd className="mt-1 flex min-w-0 flex-col gap-2 sm:mt-0 sm:flex-auto sm:flex-row sm:items-center sm:justify-between sm:gap-x-6">
                   <div className="text-gray-900 dark:text-gray-200">
                     {organization?.credits.toLocaleString() ?? 0} credits left
                   </div>
@@ -108,15 +107,15 @@ export default async function Settings() {
                   Billing
                 </dt>
                 {subscription ? (
-                  <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                    <div className="text-gray-900 dark:text-gray-200">
+                  <dd className="mt-1 flex min-w-0 flex-col gap-3 sm:mt-0 sm:flex-auto sm:flex-row sm:items-start sm:justify-between sm:gap-x-6">
+                    <div className="min-w-0 text-gray-900 dark:text-gray-200">
                       <Badge variant="default">
                         {subscription?.status.toUpperCase()}
                       </Badge>
                       {invoice?.amount_remaining && invoice?.period_end ? (
                         <p className="mt-2">
                           <span className="font-bold">Next Invoice:</span>
-                          <span className="ml-2">
+                          <span className="ml-2 break-words">
                             USD {(invoice.amount_remaining / 100).toFixed(2)} on{" "}
                             {DateTime.fromSeconds(
                               invoice.period_end,
@@ -124,7 +123,7 @@ export default async function Settings() {
                           </span>
                         </p>
                       ) : null}
-                      <div className="mt-2 flex items-center">
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
                         <span className="font-semibold">
                           Monthly Spend Limit (USD):
                         </span>
@@ -164,7 +163,7 @@ export default async function Settings() {
                     </form>
                   </dd>
                 ) : (
-                  <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                  <dd className="mt-1 flex min-w-0 flex-col gap-2 sm:mt-0 sm:flex-auto sm:flex-row sm:items-center sm:justify-between sm:gap-x-6">
                     <div className="text-gray-900 dark:text-gray-200">
                       Pay as you go
                     </div>
@@ -176,7 +175,7 @@ export default async function Settings() {
                 <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
                   Name
                 </dt>
-                <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                <dd className="mt-1 flex min-w-0 flex-col gap-2 sm:mt-0 sm:flex-auto sm:flex-row sm:items-center sm:justify-between sm:gap-x-6">
                   <div className="text-gray-900 dark:text-gray-200">
                     <EditableValue
                       id={userId}
@@ -194,7 +193,7 @@ export default async function Settings() {
                   <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
                     Email address
                   </dt>
-                  <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                  <dd className="mt-1 flex min-w-0 flex-col gap-2 sm:mt-0 sm:flex-auto sm:flex-row sm:items-center sm:justify-between sm:gap-x-6">
                     <div className="text-gray-900 dark:text-gray-200">
                       {user?.email}
                     </div>
@@ -207,8 +206,8 @@ export default async function Settings() {
         </div>
       </PageSection>
 
-      <PageSection className="overflow-y-scroll">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none p-6">
+      <PageSection className="overflow-y-auto">
+        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none p-4 sm:p-6 w-full min-w-0 overflow-x-hidden">
           <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
             API Credentials
           </h2>
@@ -228,77 +227,133 @@ export default async function Settings() {
             compromised.
           </p>
 
-          <Table className="mt-6">
+          <div className="mt-6 w-full">
             {!secretKeys.length ? (
-              <TableCaption>
-                You have not created any secret keys yet.
-                <form action={createSecretKey}>
+              <div className="mb-6 pb-6 border-b">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  You have not created any secret keys yet.
+                </p>
+                <form action={createSecretKey} className="inline-block">
                   <ActionButton
-                    variant="link"
+                    variant="default"
                     label="Generate Key"
                     loadingLabel="Creating..."
+                    className="bg-pink-500 hover:bg-pink-600 text-white"
                   />
                 </form>
-              </TableCaption>
+              </div>
             ) : (
-              <TableCaption>
-                You can create multiple secret keys to use with the API.
-                <form action={createSecretKey}>
+              <div className="mb-6 pb-6 border-b">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  You can create multiple secret keys to use with the API.
+                </p>
+                <form action={createSecretKey} className="inline-block">
                   <ActionButton
-                    variant="link"
+                    variant="default"
                     label="Create Key"
                     loadingLabel="Creating..."
+                    className="bg-pink-500 hover:bg-pink-600 text-white"
                   />
                 </form>
-              </TableCaption>
+              </div>
             )}
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Key</TableHead>
-                <TableHead>Rate Limit (Req/sec)</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <div className="space-y-4 sm:hidden">
               {secretKeys.map((key: SecretKey) => (
-                <TableRow key={key.id}>
-                  <TableCell>
-                    <EditableValue
-                      id={key.id}
-                      name="keyName"
-                      type="text"
-                      value={key.name ?? "-"}
-                      action={updateKeyName}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <pre>{key.key}</pre>
-                  </TableCell>
-                  <TableCell>
-                    <EditableValue
-                      id={key.id}
-                      name="rateLimitPerSecond"
-                      type="number"
-                      value={key.rateLimitPerSecond}
-                      action={updateRateLimit}
-                    />
-                  </TableCell>
-                  <TableCell>
+                <div
+                  key={key.id}
+                  className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        Name
+                      </p>
+                      <EditableValue
+                        id={key.id}
+                        name="keyName"
+                        type="text"
+                        value={key.name ?? "-"}
+                        action={updateKeyName}
+                      />
+                    </div>
                     <form action={revokeSecretKey}>
                       <input type="hidden" name="id" value={key.id} />
-                      <DeleteButton label="Revoke" />
+                      <DeleteButton label="Revoke" size="sm" />
                     </form>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        Key
+                      </p>
+                      <ShowHideKey keyValue={key.key} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        Rate Limit (Req/sec)
+                      </p>
+                      <EditableValue
+                        id={key.id}
+                        name="rateLimitPerSecond"
+                        type="number"
+                        value={key.rateLimitPerSecond}
+                        action={updateRateLimit}
+                      />
+                    </div>
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+
+            <div className="hidden sm:block">
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="min-w-0">Key</TableHead>
+                    <TableHead>Rate Limit (Req/sec)</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {secretKeys.map((key: SecretKey) => (
+                    <TableRow key={key.id}>
+                      <TableCell>
+                        <EditableValue
+                          id={key.id}
+                          name="keyName"
+                          type="text"
+                          value={key.name ?? "-"}
+                          action={updateKeyName}
+                        />
+                      </TableCell>
+                      <TableCell className="min-w-0">
+                        <ShowHideKey keyValue={key.key} />
+                      </TableCell>
+                      <TableCell>
+                        <EditableValue
+                          id={key.id}
+                          name="rateLimitPerSecond"
+                          type="number"
+                          value={key.rateLimitPerSecond}
+                          action={updateRateLimit}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <form action={revokeSecretKey}>
+                          <input type="hidden" name="id" value={key.id} />
+                          <DeleteButton label="Revoke" />
+                        </form>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </div>
       </PageSection>
 
     </>
   );
 }
-
-
