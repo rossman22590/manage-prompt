@@ -18,13 +18,6 @@ const getOpenRouterHeaders = () => {
     "X-Title": siteName,
   };
   
-  // Log in development to verify headers are being set
-  if (process.env.NODE_ENV === "development") {
-    console.log("OpenRouter headers being sent:", JSON.stringify(headers, null, 2));
-    console.log("Site Name:", siteName);
-    console.log("App URL:", appUrl);
-  }
-  
   return headers;
 };
 
