@@ -33,6 +33,16 @@ export const UserButton = () => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
+          <Link href="/billing" className="w-full">
+            Billing
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href="/transactions" className="w-full">
+            Transactions
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
           <Link
             href="https://support.myapps.ai/aitutor-api/aitutor-api-info"
             target="_blank"

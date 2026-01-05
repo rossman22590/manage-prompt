@@ -154,6 +154,31 @@ export async function getCreditPackCheckoutSession(
   return url;
 }
 
+export async function getSubscriptionCheckoutSession(
+  customerId: string,
+  priceId: string,
+): Promise<string> {
+  const { url } = await stripe.checkout.sessions.create({
+    customer: customerId,
+    billing_address_collection: "auto",
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    mode: "subscription",
+    success_url: `${process.env.APP_BASE_URL}/billing?payment_success=true`,
+    cancel_url: `${process.env.APP_BASE_URL}/billing?payment_canceled=true`,
+  });
+
+  if (!url) {
+    throw new Error("Failed to create checkout session");
+  }
+
+  return url;
+}
+
 export async function reportUsage(
   ownerId: string,
   subscription: Stripe.Subscription | null,

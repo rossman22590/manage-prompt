@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { buttonVariants } from "@/components/ui/button";
 import { AnimatePresence, motion } from 'framer-motion';
-import { BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, MinusCircle, Network, PlusCircle, ShieldCheckIcon, Sparkles, Terminal, Workflow, Zap } from "lucide-react";
+import { BrainIcon, Bot, CheckIcon, ChevronDownIcon, CodeIcon, FileText, LogIn, MinusCircle, Network, PlusCircle, Rocket, ShieldCheckIcon, Sparkles, Terminal, Variable, Workflow, Zap } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from 'react';
 import {
@@ -359,16 +359,26 @@ export default function Home() {
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Advanced Question Answering Workflow</h3>
                     <div className="space-y-6">
                       {[
-                        { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "≡ƒöÉ" },
-                        { step: 2, title: "Create Workflow", description: "Design your AI tutoring process flow", icon: "≡ƒöÇ" },
-                        { step: 3, title: "Choose Variables", description: "Define input parameters for your workflow", icon: "≡ƒöó" },
-                        { step: 4, title: "Craft Prompt", description: "Write effective prompts for AI models", icon: "Γ£ì∩╕Å" },
-                        { step: 5, title: "Select Model", description: "Choose from various AI models (e.g., GPT-4, Gemini, Claude)", icon: "🤖" },
-                        { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "≡ƒÜÇ" },
-                      ].map((item, index) => (
+                        { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "LogIn" },
+                        { step: 2, title: "Create Workflow", description: "Design your AI tutoring process flow", icon: "Workflow" },
+                        { step: 3, title: "Choose Variables", description: "Define input parameters for your workflow", icon: "Variable" },
+                        { step: 4, title: "Craft Prompt", description: "Write effective prompts for AI models", icon: "FileText" },
+                        { step: 5, title: "Select Model", description: "Choose from various AI models (e.g., GPT-4, Gemini, Claude)", icon: "Bot" },
+                        { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "Rocket" },
+                      ].map((item, index) => {
+                        const IconComponent = {
+                          LogIn: () => <LogIn className="h-5 w-5 text-white" />,
+                          Workflow: () => <Workflow className="h-5 w-5 text-white" />,
+                          Variable: () => <Variable className="h-5 w-5 text-white" />,
+                          FileText: () => <FileText className="h-5 w-5 text-white" />,
+                          Bot: () => <Bot className="h-5 w-5 text-white" />,
+                          Rocket: () => <Rocket className="h-5 w-5 text-white" />,
+                        }[item.icon as keyof typeof IconComponent];
+                        
+                        return (
                         <div key={item.step} className="flex items-start">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center">
-                            <span className="text-lg">{item.icon}</span>
+                            {IconComponent && <IconComponent />}
                           </div>
                           <div className="ml-4 flex-1">
                             <h4 className="text-lg font-medium text-gray-900">{item.title}</h4>
@@ -380,7 +390,8 @@ export default function Home() {
                             </div>
                           )}
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </motion.div>
@@ -490,30 +501,75 @@ export default function Home() {
               </div>
             </AnimatedSection>
             <AnimatedSection delay={0.2}>
-              <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 ring-purple-200 bg-white shadow-xl sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
-                <div className="p-8 sm:p-10 lg:flex-auto">
-                  <h3 className="text-3xl font-bold tracking-tight text-gray-900">AI Tutor API Plan</h3>
-                  <p className="mt-6 text-base leading-7 text-gray-600">
-                    Get access to our powerful AI Tutor API with all the features you need to create intelligent tutoring systems.
-                  </p>
-                  <div className="mt-10 flex items-center gap-x-4">
-                    <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What&apos;s included</h4>
-                    <div className="h-px flex-auto bg-purple-200" />
+              <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-2">
+                {/* Pay as you go Card */}
+                <div className="rounded-3xl ring-1 ring-purple-200 bg-white shadow-xl">
+                  <div className="p-8 sm:p-10">
+                    <h3 className="text-2xl font-bold tracking-tight text-gray-900">Pay as you go</h3>
+                    <p className="mt-6 text-base leading-7 text-gray-600">
+                      Start with our flexible pay-as-you-go plan. Perfect for testing and small projects.
+                    </p>
+                    <div className="mt-10 flex items-center gap-x-4">
+                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What&apos;s included</h4>
+                      <div className="h-px flex-auto bg-purple-200" />
+                    </div>
+                    <ul
+                      role="list"
+                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600"
+                    >
+                      {includedFeatures.map((feature) => (
+                        <li key={feature} className="flex gap-x-3 items-center">
+                          <CheckIcon className="h-6 w-5 flex-none text-purple-600" aria-hidden="true" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul
-                    role="list"
-                    className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-gray-600 sm:grid-cols-2 sm:gap-6"
-                  >
-                    {includedFeatures.map((feature) => (
-                      <li key={feature} className="flex gap-x-3 items-center">
-                        <CheckIcon className="h-6 w-5 flex-none text-purple-600" aria-hidden="true" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="rounded-2xl bg-purple-50 py-10 text-center ring-1 ring-inset ring-purple-200">
+                    <div className="mx-auto max-w-xs px-8">
+                      <p className="text-base font-semibold text-gray-600">Pay as you go</p>
+                      <p className="mt-6 flex items-baseline justify-center gap-x-2">
+                        <span className="text-5xl font-bold tracking-tight text-gray-900">$0</span>
+                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/month</span>
+                      </p>
+                      <p className="mt-2 text-sm text-gray-600">Buy credit packs as needed</p>
+                      <Link
+                        href="https://aitutor-api.vercel.app/console/workflows"
+                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 hover:bg-purple-700 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
+                      >
+                        Get started
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-                <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-                  <div className="rounded-2xl bg-purple-50 py-10 text-center ring-1 ring-inset ring-purple-200 lg:flex lg:flex-col lg:justify-center lg:py-16">
+
+                {/* Enterprise Card */}
+                <div className="rounded-3xl ring-2 ring-purple-500 bg-white shadow-xl">
+                  <div className="p-8 sm:p-10">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-2xl font-bold tracking-tight text-gray-900">Enterprise AI Tutor API Plan</h3>
+                      <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-600">Popular</span>
+                    </div>
+                    <p className="mt-6 text-base leading-7 text-gray-600">
+                      Get access to our powerful AI Tutor API with all the features you need to create intelligent tutoring systems.
+                    </p>
+                    <div className="mt-10 flex items-center gap-x-4">
+                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What&apos;s included</h4>
+                      <div className="h-px flex-auto bg-purple-200" />
+                    </div>
+                    <ul
+                      role="list"
+                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600"
+                    >
+                      {includedFeatures.map((feature) => (
+                        <li key={feature} className="flex gap-x-3 items-center">
+                          <CheckIcon className="h-6 w-5 flex-none text-purple-600" aria-hidden="true" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="rounded-2xl bg-purple-50 py-10 text-center ring-1 ring-inset ring-purple-200">
                     <div className="mx-auto max-w-xs px-8">
                       <p className="text-base font-semibold text-gray-600">Billed Monthly</p>
                       <p className="mt-6 flex items-baseline justify-center gap-x-2">
@@ -521,7 +577,7 @@ export default function Home() {
                         <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/10M tokens</span>
                       </p>
                       <Link
-                        href="https://aitutor-api.vercel.app/console/workflows"
+                        href="/billing"
                         className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 hover:bg-purple-700 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
                       >
                         Get started

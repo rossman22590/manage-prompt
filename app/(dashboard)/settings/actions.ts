@@ -6,6 +6,7 @@ import {
   createOrRetrieveCustomer,
   getCheckoutSession,
   getCreditPackCheckoutSession,
+  getSubscriptionCheckoutSession,
 } from "@/lib/utils/stripe";
 import { MAX_RATE_LIMIT_RPS } from "@/lib/utils/workflow";
 import { init } from "@paralleldrive/cuid2";
@@ -39,6 +40,18 @@ export async function getCreditPackCheckoutUrl(priceId: string) {
 
   const customer = await createOrRetrieveCustomer(ownerId);
   const url = await getCreditPackCheckoutSession(customer, priceId);
+  return { url };
+}
+
+export async function getEnterprisePlanCheckoutUrl() {
+  const { ownerId } = await owner();
+
+  if (!ownerId) {
+    throw new Error("User and org ID not found");
+  }
+
+  const customer = await createOrRetrieveCustomer(ownerId);
+  const url = await getSubscriptionCheckoutSession(customer, "price_1Sm8452D5LvztGUlVlXzWDiz");
   return { url };
 }
 

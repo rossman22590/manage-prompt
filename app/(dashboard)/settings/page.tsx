@@ -1,4 +1,4 @@
-﻿import { notFound } from "next/navigation";
+﻿import { notFound, redirect } from "next/navigation";
 import PageSection from "@/components/core/page-section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import { EditableValue } from "@/components/form/editable-text";
@@ -24,6 +24,7 @@ import {
 import type Stripe from "stripe";
 import {
   createSecretKey,
+  getEnterprisePlanCheckoutUrl,
   redirectToBilling,
   removeSpendLimit,
   revokeSecretKey,
@@ -202,6 +203,7 @@ export default async function Settings() {
               ) : null}
             </dl>
           </div>
+
         </div>
       </PageSection>
 
