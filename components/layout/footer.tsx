@@ -1,12 +1,33 @@
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import logo from "../../public/images/logo.png";
 
 const navigation = {
   solutions: [
     { name: "Workflows", href: "/workflows" },
-    { name: "Chatbots", href: "/chatbots" },
+    { name: "Free AI Tools", href: "/ai-tools" },
+  ],
+  tools: [
+    {
+      name: "Proof Reading",
+      href: "/ai-tools/proof-reading",
+    },
+    {
+      name: "Summarise Text",
+      href: "/ai-tools/summarise-text",
+    },
+  ],
+  project: [
+    { name: "Source code", href: "https://github.com/techulus/manage-prompt" },
+    {
+      name: "Support",
+      href: "https://support.myapps.ai/aitutor-api/aitutor-api-info",
+    },
+    {
+      name: "Documentation",
+      href: "https://support.myapps.ai/aitutor-api/aitutor-api-info",
+    },
   ],
   legal: [
     { name: "Privacy", href: "/#" },
@@ -33,7 +54,7 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
           <div className="space-y-8">
             <Image
               src={logo}
-              alt="ManagePrompt"
+              alt="AI Tutor API"
               width={32}
               height={32}
               className="h-8"
@@ -110,10 +131,6 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
 //   solutions: [
 //     { name: "Workflows", href: "/workflows" },
 //     { name: "Chatbots", href: "/chatbots" },
-//     {
-//       name: "Zapier Integration",
-//       href: "https://zapier.com/developer/public-invite/217847/c90f089190b5e742f49cbef29910800f/",
-//     },
 //     { name: "Free AI Tools", href: "/ai-tools" },
 //   ],
 //   tools: [

@@ -1,9 +1,11 @@
+import classNames from "classnames";
+import { ChevronRightIcon, TestTube } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { type AIModel, AIModelToLabel } from "@/data/workflow";
+import type { Workflow } from "@/generated/prisma-client/client";
+import { cn } from "@/lib/utils";
 import { getWorkflowUsage } from "@/lib/utils/analytics";
-import type { Workflow } from "@prisma/client";
-import classNames from "classnames";
-import { ChevronRightIcon } from "lucide-react";
+import { prisma } from "@/lib/utils/db";
 
 interface Props {
   workflow: Pick<
@@ -15,24 +17,26 @@ interface Props {
     | "published"
     | "model"
     | "ownerId"
-  > & {
-    user: {
-      name: string;
-    };
-  };
+  >;
 }
 
 export async function WorkflowItem({ workflow }: Props) {
   const usage = await getWorkflowUsage(workflow.id);
+  const tests = await prisma.workflowTest.findMany({
+    select: {
+      status: true,
+    },
+    where: {
+      workflowId: workflow.id,
+    },
+  });
 
-  // Safely get the model label, defaulting to the model name if not found
+  const areTestsPassing = tests.every((test) => test.status === "pass");
   const modelLabel = AIModelToLabel[workflow.model as AIModel] || workflow.model;
-
-  // Determine if the model is deprecated
   const isDeprecated = modelLabel.toLowerCase().includes("deprecated");
 
   return (
-    <div className="relative flex items-center space-x-4 p-4 bg-seconday border border-gray-200 hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700 bg-white dark:bg-gray-950">
+    <div className="relative flex items-center space-x-4 p-4 bg-seconday bg-white hover:bg-gray-50 dark:bg-gray-950 dark:hover:bg-gray-900">
       <div className="min-w-0 flex-auto">
         <div className="flex items-center gap-x-2">
           <span
@@ -40,14 +44,14 @@ export async function WorkflowItem({ workflow }: Props) {
               workflow.published
                 ? "bg-green-100 dark:bg-green-900"
                 : "bg-gray-100 dark:bg-card",
-              "h-4 w-4 flex items-center justify-center"
+              "h-4 w-4 flex items-center justify-center",
             )}
             aria-hidden="true"
           >
             <span
               className={classNames(
                 workflow.published ? "bg-green-400" : "bg-red-500",
-                "h-2 w-2"
+                "h-2 w-2",
               )}
             />
           </span>
@@ -58,7 +62,7 @@ export async function WorkflowItem({ workflow }: Props) {
             </a>
           </h2>
         </div>
-        <div className="mt-1 ml-6 flex items-center gap-x-2.5">
+        <div className="mt-1 ml-6 text-xs md:text-sm flex items-center gap-x-2.5 text-gray-500 dark:text-gray-400">
           <p className="truncate">
             {Number(usage?.tokens ?? 0).toLocaleString()} tokens
           </p>
@@ -68,9 +72,32 @@ export async function WorkflowItem({ workflow }: Props) {
           >
             <circle r={1} cx={1} cy={1} />
           </svg>
+
           <p className="whitespace-nowrap">
             {Number(usage?.runs ?? 0).toLocaleString()} runs
           </p>
+
+          {tests.length > 0 && (
+            <>
+              <svg
+                viewBox="0 0 2 2"
+                className="h-0.5 w-0.5 flex-none fill-gray-300"
+              >
+                <circle r={1} cx={1} cy={1} />
+              </svg>
+              <p
+                className={cn(
+                  "whitespace-nowrap font-medium inline-flex items-center",
+                  areTestsPassing
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400",
+                )}
+              >
+                <TestTube className="h-4 w-4" />
+                {areTestsPassing ? "Passed" : "Failed"}
+              </p>
+            </>
+          )}
         </div>
       </div>
       <Badge

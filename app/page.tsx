@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -83,7 +83,6 @@ const features: Feature[] = [
 
 const includedFeatures: string[] = [
   "Unlimited workflows",
-  "Unlimited chatbots",
   "Models by OpenAI, Meta, Google, Mixtral and Anthropic",
   "Email support",
 ];
@@ -360,12 +359,12 @@ export default function Home() {
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Advanced Question Answering Workflow</h3>
                     <div className="space-y-6">
                       {[
-                        { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "🔐" },
-                        { step: 2, title: "Create Workflow", description: "Design your AI tutoring process flow", icon: "🔀" },
-                        { step: 3, title: "Choose Variables", description: "Define input parameters for your workflow", icon: "🔢" },
-                        { step: 4, title: "Craft Prompt", description: "Write effective prompts for AI models", icon: "✍️" },
+                        { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "≡ƒöÉ" },
+                        { step: 2, title: "Create Workflow", description: "Design your AI tutoring process flow", icon: "≡ƒöÇ" },
+                        { step: 3, title: "Choose Variables", description: "Define input parameters for your workflow", icon: "≡ƒöó" },
+                        { step: 4, title: "Craft Prompt", description: "Write effective prompts for AI models", icon: "Γ£ì∩╕Å" },
                         { step: 5, title: "Select Model", description: "Choose from various AI models (e.g., GPT-4, Gemini, Claude)", icon: "🤖" },
-                        { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "🚀" },
+                        { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "≡ƒÜÇ" },
                       ].map((item, index) => (
                         <div key={item.step} className="flex items-start">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center">

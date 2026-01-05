@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/pagination";
 import { owner } from "@/lib/hooks/useOwner";
 import { cn } from "@/lib/utils";
-import { LIMIT, getWorkflowsForOwner } from "@/lib/utils/useWorkflow";
+import { getWorkflowsForOwner, LIMIT } from "@/lib/utils/useWorkflow";
 
 interface Props {
   searchParams: Promise<{
@@ -24,15 +24,14 @@ interface Props {
 
 export default async function Workflows(props: Props) {
   const searchParams = await props.searchParams;
-  const { userId, orgId } = await owner();
+  const { ownerId } = await owner();
 
   const currentPage = searchParams.page
     ? Number.parseInt(searchParams.page)
     : 1;
 
   const { workflows, count } = await getWorkflowsForOwner({
-    orgId: orgId,
-    userId: userId,
+    ownerId,
     search: searchParams.search,
     page: currentPage,
   });
@@ -80,9 +79,9 @@ export default async function Workflows(props: Props) {
         ) : null}
 
         {workflows?.length ? (
-          <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
+          <div className="divide-y border rounded-md overflow-hidden">
             {workflows.map((workflow) => (
-              // @ts-ignore React server component
+              // @ts-ignore
               <WorkflowItem key={workflow.id} workflow={workflow} />
             ))}
           </div>
@@ -107,7 +106,7 @@ export default async function Workflows(props: Props) {
                         href={`/workflows?page=${pageNumber}`}
                         className={cn(
                           pageNumber === currentPage &&
-                            "text-primary font-semibold"
+                            "text-primary font-semibold",
                         )}
                       >
                         {pageNumber}

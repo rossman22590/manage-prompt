@@ -1,3 +1,6 @@
+import { DownloadIcon } from "@radix-ui/react-icons";
+import { PauseCircleIcon, PlayCircleIcon, Terminal } from "lucide-react";
+import Link from "next/link";
 import { WorkflowBranchPicker } from "@/components/console/workflow/workflow-branch-picker";
 import { WorkflowComposer } from "@/components/console/workflow/workflow-composer";
 import {
@@ -12,9 +15,6 @@ import { CardHeader } from "@/components/ui/card";
 import { owner } from "@/lib/hooks/useOwner";
 import { prisma } from "@/lib/utils/db";
 import { getWorkflowAndRuns } from "@/lib/utils/useWorkflow";
-import { DownloadIcon } from "@radix-ui/react-icons";
-import { PauseCircleIcon, PlayCircleIcon, Terminal } from "lucide-react";
-import Link from "next/link";
 import { deleteWorkflow, toggleWorkflowState } from "../actions";
 
 interface Props {
@@ -58,16 +58,6 @@ export default async function WorkflowEditor(props: Props) {
 
   return (
     <>
-      {!workflow.published ? (
-        <Alert variant="destructive" className="mx-auto max-w-7xl mt-4">
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Heads up!</AlertTitle>
-          <AlertDescription>
-            This workflow is not active and hence cannot be run.
-          </AlertDescription>
-        </Alert>
-      ) : null}
-
       {/* Toolbar*/}
       <PageSection bottomMargin className="-mt-4">
         <div className="flex flex-col justify-center">
@@ -82,7 +72,7 @@ export default async function WorkflowEditor(props: Props) {
                   className={buttonVariants({ variant: "ghost", size: "sm" })}
                   prefetch={false}
                 >
-                  <DownloadIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+                  <DownloadIcon className="mr-1 h-4 w-4" aria-hidden="true" />
                   Export
                 </Link>
               </span>
@@ -109,7 +99,7 @@ export default async function WorkflowEditor(props: Props) {
                       size="sm"
                       icon={
                         <PauseCircleIcon
-                          className="mr-2 h-4 w-4"
+                          className="mr-1 h-4 w-4"
                           aria-hidden="true"
                         />
                       }
@@ -120,7 +110,7 @@ export default async function WorkflowEditor(props: Props) {
                       size="sm"
                       icon={
                         <PlayCircleIcon
-                          className="mr-2 h-4 w-4"
+                          className="mr-1 h-4 w-4"
                           aria-hidden="true"
                         />
                       }
@@ -136,13 +126,23 @@ export default async function WorkflowEditor(props: Props) {
                     name="id"
                     defaultValue={workflow.id}
                   />
-                  <DeleteButton size="sm" />
+                  <DeleteButton size="sm" compact />
                 </form>
               </span>
             </nav>
           </div>
         </div>
       </PageSection>
+
+      {!workflow.published ? (
+        <Alert variant="destructive" className="mx-auto max-w-7xl mt-4">
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            This workflow is not active and hence cannot be run.
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       <PageSection>
         <WorkflowComposer

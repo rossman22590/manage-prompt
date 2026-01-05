@@ -1,25 +1,37 @@
-import { type WorkflowInput, modelToProvider } from "@/data/workflow";
+import { type NextRequest, NextResponse } from "next/server";
+import type { WorkflowInput } from "@/data/workflow";
 import { getStreamingCompletion } from "@/lib/utils/ai";
 import {
   ErrorCodes,
   ErrorResponse,
   UnauthorizedResponse,
 } from "@/lib/utils/api";
-import { ByokService } from "@/lib/utils/byok-service";
 import { prisma } from "@/lib/utils/db";
 import { redis } from "@/lib/utils/redis";
-import { reportUsage } from "@/lib/utils/stripe";
+import {
+  hasExceededSpendLimit,
+  isSubscriptionActive,
+  reportUsage,
+} from "@/lib/utils/stripe";
 import {
   cacheWorkflowResult,
   getWorkflowCachedResult,
 } from "@/lib/utils/useWorkflow";
 import { translateInputs } from "@/lib/utils/workflow";
 import { waitUntil } from "@vercel/functions";
-import { createDataStreamResponse } from "ai";
-import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 export const maxDuration = 120;
+
+const estimateTokenCount = (input: string, output: string) => {
+  const inputWordCount = input.trim()
+    ? input.trim().split(/\s+/).length
+    : 0;
+  const outputWordCount = output.trim()
+    ? output.trim().split(/\s+/).length
+    : 0;
+  return Math.floor((inputWordCount + outputWordCount) * 0.6);
+};
 
 export async function OPTIONS() {
   return NextResponse.json(
@@ -53,45 +65,94 @@ export async function POST(
     }
     await redis.del(token);
 
-    const workflow = await prisma.workflow.findUnique({
-      include: {
-        organization: {
-          include: {
-            stripe: true,
-            UserKeys: true,
-          },
+    const [workflow, organization] = await Promise.all([
+      prisma.workflow.findUnique({
+        where: {
+          shortId: params.workflowId,
         },
-      },
-      where: {
-        shortId: params.workflowId,
-      },
-      cacheStrategy: {
-        ttl: 60,
-      },
-    });
+      }),
+      prisma.organization.findUnique({
+        where: {
+          id: validateToken.ownerId,
+        },
+        include: {
+          stripe: true,
+        },
+      }),
+    ]);
     if (!workflow || !workflow?.published) {
       return ErrorResponse("Workflow not found", 404);
     }
     if (workflow.ownerId !== validateToken.ownerId) {
       return UnauthorizedResponse();
     }
+    if (!organization) {
+      return UnauthorizedResponse();
+    }
+
+    if (
+      organization?.credits === 0 &&
+      !isSubscriptionActive(organization?.stripe?.subscription)
+    ) {
+      return ErrorResponse(
+        "Invalid billing. Please contact support.",
+        402,
+        ErrorCodes.InvalidBilling,
+      );
+    }
+
+    if (
+      organization?.credits === 0 &&
+      (await hasExceededSpendLimit(
+        organization?.spendLimit,
+        organization?.stripe?.customerId,
+      ))
+    ) {
+      return ErrorResponse(
+        "Spend limit exceeded. Please increase your spend limit to continue using the service.",
+        402,
+        ErrorCodes.SpendLimitReached,
+      );
+    }
 
     const body = (await req.json().catch(() => {})) ?? {};
+    const rawBody = JSON.stringify(body);
     const cachedResult = await getWorkflowCachedResult(
       params.workflowId,
-      JSON.stringify(body),
+      rawBody,
     );
+    const subscription = organization?.stripe
+      ?.subscription as unknown as Stripe.Subscription;
 
     if (cachedResult) {
-      const chunks = cachedResult.split(" ");
+      const cachedTokenCount = estimateTokenCount(rawBody, cachedResult);
+      waitUntil(
+        reportUsage(organization.id, subscription, cachedTokenCount).catch(
+          (error) => {
+            console.error(error);
+          },
+        ),
+      );
 
-      return createDataStreamResponse({
-        status: 200,
-        statusText: "OK",
-        async execute(dataStream) {
+      const chunks = cachedResult.match(/.{1,1024}/gs) ?? [cachedResult];
+      const encoder = new TextEncoder();
+
+      const stream = new ReadableStream({
+        async start(controller) {
           for (const chunk of chunks) {
-            dataStream.writeData(chunk);
+            controller.enqueue(encoder.encode(chunk));
           }
+          controller.close();
+        },
+      });
+
+      return new Response(stream, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "*",
         },
       });
     }
@@ -104,70 +165,53 @@ export async function POST(
       template: workflow.template,
     });
 
-    const byokService = new ByokService();
-    const isEligibleForByokDiscount = !!byokService.get(
-      modelToProvider[model],
-      workflow.organization.UserKeys,
-    );
-
     const onFinish = async (evt: any) => {
       const output = evt.text ?? "";
 
       const inputWordCount = content.split(" ").length;
       const outWordCount = output.split(" ").length;
-      let totalTokens = Math.floor(
-        !Number.isNaN(evt?.usage?.totalTokens)
-          ? evt?.usage?.totalTokens
-          : (inputWordCount + outWordCount) * 0.6,
-      );
+      const reportedTokens = Number(evt?.usage?.totalTokens);
+      const totalTokens = Number.isFinite(reportedTokens)
+        ? reportedTokens
+        : Math.floor((inputWordCount + outWordCount) * 0.6);
 
-      if (isEligibleForByokDiscount) {
-        totalTokens = Math.floor(totalTokens * 0.3);
-      }
-
-      waitUntil(
-        Promise.all([
-          reportUsage(
-            workflow?.organization?.id,
-            workflow?.organization?.stripe
-              ?.subscription as unknown as Stripe.Subscription,
-            totalTokens,
-          ),
-          prisma.workflowRun.create({
-            data: {
-              result: output,
-              rawRequest: JSON.parse(JSON.stringify({ model, content })),
-              rawResult: JSON.parse(JSON.stringify({ result: output })),
-              totalTokenCount: totalTokens ?? 0,
-              user: {
-                connect: {
-                  id: validateToken.ownerId,
-                },
-              },
-              workflow: {
-                connect: {
-                  id: workflow.id,
-                },
+      Promise.all([
+        reportUsage(organization.id, subscription, totalTokens ?? 0),
+        prisma.workflowRun.create({
+          data: {
+            result: output,
+            rawRequest: JSON.parse(JSON.stringify({ model, content })),
+            rawResult: JSON.parse(JSON.stringify({ result: output })),
+            totalTokenCount: totalTokens ?? 0,
+            user: {
+              connect: {
+                id: validateToken.ownerId,
               },
             },
-          }),
-          workflow.cacheControlTtl
-            ? cacheWorkflowResult(
-                params.workflowId,
-                JSON.stringify(body),
-                output,
-                workflow.cacheControlTtl,
-              )
-            : null,
-        ]),
-      );
+            workflow: {
+              connect: {
+                id: workflow.id,
+              },
+            },
+          },
+        }),
+        workflow.cacheControlTtl
+          ? cacheWorkflowResult(
+              params.workflowId,
+              JSON.stringify(body),
+              output,
+              workflow.cacheControlTtl,
+            )
+          : null,
+      ]).catch((error) => {
+        console.error(error);
+      });
     };
 
     const response = await getStreamingCompletion(
       model,
       content,
       JSON.parse(JSON.stringify(workflow.modelSettings)),
-      workflow.organization.UserKeys,
       onFinish,
     );
 

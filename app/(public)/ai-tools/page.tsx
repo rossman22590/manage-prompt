@@ -1,11 +1,10 @@
-import PageSection from "@/components/core/page-section";
-import PageTitle from "@/components/layout/page-title";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { buildMetadata } from "@/lib/utils/metadata";
 import { MagicWandIcon } from "@radix-ui/react-icons";
 import type { Metadata } from "next";
 import Link from "next/link";
+import PageSection from "@/components/core/page-section";
+import PageTitle from "@/components/layout/page-title";
+import { Button } from "@/components/ui/button";
+import { buildMetadata } from "@/lib/utils/metadata";
 
 const title = "Free AI Tools";
 const description =
@@ -27,29 +26,6 @@ export default async function FreeAiTools() {
         "Use AI to summarise your text and generate a short summary.",
       href: "/ai-tools/summarise-text",
     },
-    {
-      title: "Photo Colorizer",
-      description:
-        "Colorize your black and white photos using AI to bring them to life.",
-      href: "/ai-tools/black-and-white-to-color",
-    },
-    {
-      title: "Photo Realistic Image Creator",
-      description:
-        "Create photo realistic images using AI to generate images from text.",
-      href: "/ai-tools/photo-realistic-image-creator",
-    },
-    {
-      title: "Image Upscaling",
-      description:
-        "Upscale your images using AI to enhance the details and sharpness.",
-      href: "/ai-tools/image-upscale",
-    },
-    {
-      title: "Remove Background",
-      description: "Use AI to remove the background from your images.",
-      href: "/ai-tools/remove-background",
-    },
   ];
 
   return (
@@ -62,21 +38,16 @@ export default async function FreeAiTools() {
               aria-hidden="true"
             />
             <Link href="/" prefetch={false}>
-              Build Your Own AI Tools Using ManagePrompt
+              Build Your Own AI Tools Using AI Tutor API
             </Link>
           </Button>
         </div>
       </PageTitle>
 
       <PageSection topInset>
-        <div className="divide-y overflow-hidden bg-slate-200 dark:bg-slate-900 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
+        <div className="divide-y overflow-hidden shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0 rounded-md">
           {actions.map((action) => (
-            <div
-              key={action.title}
-              className={cn(
-                "group relative bg-white dark:bg-slate-950 p-6 focus-within:ring-2 focus-within:ring-inset  focus-within:ring-primary"
-              )}
-            >
+            <div key={action.title} className="group relative p-6">
               <h3 className="text-xl font-semibold leading-6">
                 <Link
                   prefetch={false}

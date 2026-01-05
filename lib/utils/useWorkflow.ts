@@ -1,32 +1,23 @@
-import { prisma } from "@/lib/utils/db";
-import type { Prisma, Workflow } from "@prisma/client";
 import { createHash } from "node:crypto";
+import type { Prisma, Workflow } from "@/generated/prisma-client/client";
+import { prisma } from "@/lib/utils/db";
 import { owner } from "../hooks/useOwner";
 import { redisStore } from "./redis";
 
 export const LIMIT = 25;
 
 export async function getWorkflowsForOwner({
-  orgId,
-  userId,
+  ownerId,
   search,
   page = 1,
 }: {
-  orgId: string | null;
-  userId: string;
+  ownerId: string;
   search?: string;
   page?: number;
 }) {
   const dbQuery: Prisma.WorkflowFindManyArgs = {
-    include: {
-      user: true,
-    },
     where: {
-      organization: {
-        id: {
-          equals: orgId ?? userId ?? "",
-        },
-      },
+      ownerId,
     },
     orderBy: {
       createdAt: "desc",
@@ -45,11 +36,7 @@ export async function getWorkflowsForOwner({
     prisma.workflow.findMany(dbQuery),
     prisma.workflow.count({
       where: {
-        organization: {
-          id: {
-            equals: orgId ?? userId ?? "",
-          },
-        },
+        ownerId,
       },
     }),
   ]);

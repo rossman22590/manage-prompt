@@ -1,3 +1,5 @@
+import { createId } from "@paralleldrive/cuid2";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   ErrorCodes,
   ErrorResponse,
@@ -10,8 +12,6 @@ import {
   hasExceededSpendLimit,
   isSubscriptionActive,
 } from "@/lib/utils/stripe";
-import { createId } from "@paralleldrive/cuid2";
-import { type NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -38,9 +38,6 @@ export async function GET(req: NextRequest) {
             stripe: true,
           },
         },
-      },
-      cacheStrategy: {
-        ttl: 300,
       },
     });
     if (!key) {
@@ -72,7 +69,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Spend limit
     if (
       organization?.credits === 0 &&
       (await hasExceededSpendLimit(

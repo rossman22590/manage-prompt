@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+import { ManagePasskeys } from "@/components/core/passkeys";
 import PageSection from "@/components/core/page-section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import { EditableValue } from "@/components/form/editable-text";
@@ -12,39 +14,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getUser, owner } from "@/lib/hooks/useOwner";
+import type { SecretKey } from "@/generated/prisma-client/client";
 import { DateTime } from "@/lib/utils/datetime";
+import { getUser, owner } from "@/lib/hooks/useOwner";
 import { prisma } from "@/lib/utils/db";
 import {
   getUpcomingInvoice,
   isSubscriptionCancelled,
 } from "@/lib/utils/stripe";
-import { notFound } from "next/navigation";
 import type Stripe from "stripe";
 import {
   createSecretKey,
+  redirectToBilling,
   removeSpendLimit,
   revokeSecretKey,
   updateKeyName,
   updateRateLimit,
   updateSpendLimit,
-  updateUserName
+  updateUserName,
 } from "./actions";
 
 export default async function Settings() {
   const { userId, ownerId } = await owner();
-  if (!ownerId || !userId) {
-    throw new Error("User not found");
-  }
 
-  const [user, organization, secretKeys, userKeys] = await Promise.all([
+  const [user, organization, secretKeys] = await Promise.all([
     getUser(),
     prisma.organization.findUnique({
-      include: {
-        stripe: true,
-      },
       where: {
         id: ownerId,
+      },
+      include: {
+        stripe: true,
       },
     }),
     prisma.secretKey.findMany({
@@ -57,15 +57,6 @@ export default async function Settings() {
       },
       orderBy: {
         createdAt: "desc",
-      },
-    }),
-    prisma.userKey.findMany({
-      where: {
-        organization: {
-          id: {
-            equals: ownerId,
-          },
-        },
       },
     }),
   ]);
@@ -81,143 +72,10 @@ export default async function Settings() {
     ? await getUpcomingInvoice(organization?.stripe?.customerId)
     : null;
 
-  // const userOpenAIKey = userKeys.find((k) => k.provider === "openai");
-
   return (
     <>
       <PageTitle title="Settings" />
       <PageSection topInset>
-  <div className="mx-auto max-w-2xl space-y-16 lg:mx-0 lg:max-w-none p-6">
-    <div>
-      <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
-        Account
-      </h2>
-      <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
-        Manage your account settings and billing information.
-      </p>
-
-      <dl className="mt-6 space-y-4 divide-y border-t text-sm leading-6">
-        <div className="pt-2 sm:flex">
-          <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-            Credits
-          </dt>
-          <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-            <div className="text-gray-900 dark:text-gray-200">
-              {organization?.credits.toLocaleString() ?? 0} credits left
-            </div>
-            {!subscription ? (
-              <div className="text-gray-900 dark:text-gray-200">
-                <a 
-                  href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" 
-                  className="text-primary-600 hover:text-primary-500 font-medium"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Upgrade
-                </a>
-              </div>
-            ) : null}
-          </dd>
-        </div>
-
-        <div className="pt-2 sm:flex">
-          <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-            Billing
-          </dt>
-          {subscription ? (
-            <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-              <div className="text-gray-900 dark:text-gray-200">
-                <Badge variant="default">
-                  {subscription?.status.toUpperCase()}
-                </Badge>
-                {invoice?.amount_remaining && invoice?.period_end ? (
-                  <p className="mt-2">
-                    <span className="font-bold">Next Invoice:</span>
-                    <span className="ml-2">
-                      USD {(invoice.amount_remaining / 100).toFixed(2)} on{" "}
-                      {DateTime.fromSeconds(
-                        invoice.period_end
-                      ).toDateString()}
-                    </span>
-                  </p>
-                ) : null}
-                <div className="mt-2 flex items-center">
-                  <span className="font-semibold">
-                    Monthly Spend Limit (USD):
-                  </span>
-                  <span className="ml-2">
-                    <EditableValue
-                      id={ownerId}
-                      name="spendLimit"
-                      type="number"
-                      value={organization?.spendLimit ?? "-"}
-                      action={updateSpendLimit}
-                    />
-                  </span>
-                  {organization?.spendLimit ? (
-                    <form action={removeSpendLimit}>
-                      <input type="hidden" name="id" value={ownerId} />
-                      <ActionButton
-                        className="p-0 m-0 h-5"
-                        variant="link"
-                        label="Remove"
-                        loadingLabel="Removing..."
-                      />
-                    </form>
-                  ) : null}
-                </div>
-              </div>
-              <div className="text-gray-900 dark:text-gray-200">
-                <a 
-                  href="https://buy.stripe.com/eVabKL21r9ivdXy4gw" 
-                  className="text-primary-600 hover:text-primary-500 font-medium"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {isSubscriptionCancelled(subscription) ? "Upgrade" : "Manage"}
-                </a>
-              </div>
-            </dd>
-          ) : null}
-        </div>
-
-        <div className="pt-2 sm:flex">
-          <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-            Name
-          </dt>
-          <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-            <div className="text-gray-900 dark:text-gray-200">
-              <EditableValue
-                id={userId}
-                name="userName"
-                type="text"
-                value={user?.name ?? ""}
-                action={updateUserName}
-              />
-            </div>
-          </dd>
-        </div>
-
-        {user?.email ? (
-          <div className="pt-2 sm:flex">
-            <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-              Email address
-            </dt>
-            <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-              <div className="text-gray-900 dark:text-gray-200">
-                {user?.email}
-              </div>
-            </dd>
-          </div>
-        ) : null}
-      </dl>
-    </div>
-  </div>
-</PageSection>
-
-
-
-      {/* <PageSection topInset>
         <div className="mx-auto max-w-2xl space-y-16 lg:mx-0 lg:max-w-none p-6">
           <div>
             <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
@@ -237,15 +95,14 @@ export default async function Settings() {
                     {organization?.credits.toLocaleString() ?? 0} credits left
                   </div>
                   {!subscription ? (
-                    <div className="text-gray-900 dark:text-gray-200">
-                      <form action={redirectToBilling}>
-                        <ActionButton
-                          variant="link"
-                          label="Upgrade"
-                          loadingLabel="Redirecting to checkout..."
-                        />
-                      </form>
-                    </div>
+                    <form action={redirectToBilling}>
+                      <ActionButton
+                        variant="link"
+                        label="Upgrade"
+                        loadingLabel="Loading..."
+                        className="p-0 m-0 h-auto text-primary-600 hover:text-primary-500 font-medium"
+                      />
+                    </form>
                   ) : null}
                 </dd>
               </div>
@@ -266,7 +123,7 @@ export default async function Settings() {
                           <span className="ml-2">
                             USD {(invoice.amount_remaining / 100).toFixed(2)} on{" "}
                             {DateTime.fromSeconds(
-                              invoice.period_end
+                              invoice.period_end,
                             ).toDateString()}
                           </span>
                         </p>
@@ -297,19 +154,18 @@ export default async function Settings() {
                         ) : null}
                       </div>
                     </div>
-                    <div className="text-gray-900 dark:text-gray-200">
-                      <form action={redirectToBilling}>
-                        <ActionButton
-                          variant="link"
-                          label={
-                            isSubscriptionCancelled(subscription)
-                              ? "Upgrade"
-                              : "Manage"
-                          }
-                          loadingLabel="Redirecting..."
-                        />
-                      </form>
-                    </div>
+                    <form action={redirectToBilling}>
+                      <ActionButton
+                        variant="link"
+                        label={
+                          isSubscriptionCancelled(subscription)
+                            ? "Upgrade"
+                            : "Manage"
+                        }
+                        loadingLabel="Loading..."
+                        className="p-0 m-0 h-auto text-primary-600 hover:text-primary-500 font-medium"
+                      />
+                    </form>
                   </dd>
                 ) : null}
               </div>
@@ -346,7 +202,7 @@ export default async function Settings() {
             </dl>
           </div>
         </div>
-      </PageSection> */}
+      </PageSection>
 
       <PageSection className="overflow-y-scroll">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none p-6">
@@ -402,7 +258,7 @@ export default async function Settings() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {secretKeys.map((key) => (
+              {secretKeys.map((key: SecretKey) => (
                 <TableRow key={key.id}>
                   <TableCell>
                     <EditableValue
@@ -438,48 +294,7 @@ export default async function Settings() {
         </div>
       </PageSection>
 
-      {/* <PageSection className="overflow-y-scroll">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none p-6">
-          <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
-            Bring your own key (beta) 
-          </h2>
-          <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
-            If you have your own API key, you can use it to authenticate with AI
-            providers. We currently support OpenAI. (GROQ and Anthropic coming
-            soon)
-          </p>
-
-          <dl className="mt-6 space-y-4 divide-y border-t text-sm leading-6">
-            <div className="pt-2 sm:flex">
-              <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-                OpenAI
-              </dt>
-              <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                <div className="text-gray-900 dark:text-gray-200">
-                  {userOpenAIKey ? (
-                    <CheckCircle className="h-6 w-6 text-green-500" />
-                  ) : (
-                    <EditableValue
-                      id="openai"
-                      name="apiKey"
-                      type="text"
-                      value={userOpenAIKey ? "*******" : "-"}
-                      action={updateUserKey}
-                    />
-                  )}
-                </div>
-
-                {userOpenAIKey ? (
-                  <form className="inline-block" action={revokeUserKey}>
-                    <input type="hidden" name="provider" value="openai" />
-                    <DeleteButton label="Remove" size="sm" />
-                  </form>
-                ) : null}
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </PageSection> */}
+      <ManagePasskeys />
     </>
   );
 }

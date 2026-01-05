@@ -1,33 +1,31 @@
-<p align="center" style="margin-top: 120px"> 
-  <h3 align="center">ManagePrompt</h3> 
+<p align="center" style="margin-top: 120px">
+  <h3 align="center">AI Tutor API</h3>
 
   <p align="center">
-    Launch Your Next AI Project in Hours, Not Months! Our platform handles the technicalities – hosting, security, delivery – so you can focus on the essence of your innovation.
+    Launch your next AI project in hours, not months. Our platform handles hosting, security, and delivery so you can focus on building.
     <br />
-    <a href="https://manageprompt.com"><strong>Learn more »</strong></a>
+    <a href="https://manageprompt.com"><strong>Learn more</strong></a>
     <br />
     <br />
     <a href="https://manageprompt.com">Website</a>
-    ·
-    <a href="https://github.com/techulus/manage-prompt/issues">Issues</a>
-    ·
-    <a href="https://techulus.atlassian.net/servicedesk/customer/portal/5">Support</a>
+    &middot;
+    <a href="https://github.com/techulus/manage-prompt/issues/new">Support</a>
   </p>
 </p>
- 
-## Contact us 💌
+
+## Contact us
 
 If you want to learn more about this project or have any questions, send us an email at [hello+manageprompt@techulus.com](mailto:hello+manageprompt@techulus.com)
 
-## Built with 🛠️ 
+## Built with
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Auth.js](https://authjs.dev)
-- [Upstash](https://upstash.com)
+- [better-auth](https://www.better-auth.com/)
+- [Upstash](https://upstash.com/)
 - Several AI models and AI services
 
-## Getting Started 🚀
+## Getting started
 
 ### Requirements
 
@@ -49,15 +47,14 @@ If you want to learn more about this project or have any questions, send us an e
 
 3. Set up your .env file
 
-   You will find .env.example in the repo. Create your own copy.
+   You will find `.env.sample` in the repo. Create your own copy.
 
-4. You'll need to setup several third party providers in order to run the entire application.
+4. You will need to set up several third-party providers to run the full application.
 
 5. Start the development server
 
    ```sh
-    npm run dev
+   npm run dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:3000) with your browser to see
-   the result.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.

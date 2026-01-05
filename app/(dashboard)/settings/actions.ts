@@ -1,7 +1,6 @@
 "use server";
 
 import { owner } from "@/lib/hooks/useOwner";
-import { ByokService } from "@/lib/utils/byok-service";
 import { prisma } from "@/lib/utils/db";
 import {
   createOrRetrieveCustomer,
@@ -193,67 +192,6 @@ export async function updateUserName(data: FormData) {
     },
     data: {
       name,
-    },
-  });
-
-  redirect("/settings");
-}
-
-export async function updateUserKey(data: FormData) {
-  const { ownerId } = await owner();
-
-  const provider = data.get("id") as string;
-  const apiKey = data.get("apiKey") as string;
-
-  const result = z
-    .object({
-      provider: z.string().min(3).max(10),
-      apiKey: z.string().min(3).max(128),
-    })
-    .safeParse({
-      provider,
-      apiKey,
-    });
-
-  if (!result.success) {
-    return {
-      error: fromZodError(result.error).toString(),
-    };
-  }
-
-  const byokService = new ByokService();
-  const encryptedData = byokService.create(apiKey);
-
-  await prisma.userKey.upsert({
-    where: {
-      id: `${provider}_${ownerId}`,
-    },
-    update: {
-      data: encryptedData,
-    },
-    create: {
-      id: `${provider}_${ownerId}`,
-      provider,
-      data: encryptedData,
-      organization: {
-        connect: {
-          id: ownerId,
-        },
-      },
-    },
-  });
-
-  redirect("/settings");
-}
-
-export async function revokeUserKey(data: FormData) {
-  const { ownerId } = await owner();
-
-  const provider = data.get("provider") as string;
-
-  await prisma.userKey.delete({
-    where: {
-      id: `${provider}_${ownerId}`,
     },
   });
 

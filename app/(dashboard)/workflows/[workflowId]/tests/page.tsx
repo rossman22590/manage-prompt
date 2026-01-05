@@ -1,3 +1,5 @@
+import { CheckCircle, CircleOff, CircleSlash, GitBranch } from "lucide-react";
+import Link from "next/link";
 import { WorkflowBranchPicker } from "@/components/console/workflow/workflow-branch-picker";
 import EmptyState from "@/components/core/empty-state";
 import { Spinner } from "@/components/core/loaders";
@@ -7,8 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { WorkflowTestCondition } from "@/data/workflow";
 import { prisma } from "@/lib/utils/db";
-import { CheckCircle, CircleOff, CircleSlash, GitBranch } from "lucide-react";
-import Link from "next/link";
 import { deleteTest, runTests } from "../../actions";
 
 interface Props {
@@ -142,17 +142,17 @@ export default async function WorkflowTests(props: Props) {
                 </div>
               </div>
 
-              <div className="mt-2 font-mono text-xs">
+              <div className="mt-2 font-mono text-xs whitespace-pre-wrap break-words">
                 <Badge className="mr-2">Expected</Badge>
                 Result for inputs{" "}
                 <span className="font-mono text-xs">
-                  {String(test.input)}
+                  {String(test.input) === "{}" ? "(empty)" : String(test.input)}
                 </span>{" "}
                 {WorkflowTestCondition[test.condition]} {test.output ?? ""}
               </div>
 
               {test.workflowRun ? (
-                <div className="mt-2 font-mono text-xs">
+                <div className="mt-2 font-mono text-xs whitespace-pre-wrap break-words">
                   <Badge className="mr-2">Actual</Badge>
                   {String(test.workflowRun.result)}
                 </div>

@@ -1,19 +1,13 @@
+import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/core/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
-import { Analytics } from "@vercel/analytics/react";
-import classNames from "classnames";
-import { Archivo } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 export const metadata = {
   title: SITE_METADATA.TITLE,
   description: SITE_METADATA.DESCRIPTION,
 };
-
-const archivo = Archivo({
-  subsets: ["latin"],
-});
 
 export const fetchCache = "force-no-store";
 
@@ -25,7 +19,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={classNames("flex min-w-full min-h-full", archivo.className)}
+      className="flex min-w-full min-h-full"
       suppressHydrationWarning
     >
       <head>
@@ -97,15 +91,11 @@ export default async function RootLayout({
         />
       </head>
 
-      <body className="flex-1 min-h-full min-w-full">
+      <body className="flex-1 min-h-full min-w-full tracking-tight">
         <ThemeProvider>{children}</ThemeProvider>
-        <Script
-          strategy="afterInteractive"
-          src="https://analytics.ahrefs.com/analytics.js"
-          data-key="ENZwU7AFoU9yXXczsA6Avw"
-        />
+        <Analytics />
+        <Toaster />
       </body>
-      <Analytics />
     </html>
   );
 }

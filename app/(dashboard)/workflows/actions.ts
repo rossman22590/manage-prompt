@@ -1,26 +1,19 @@
 "use server";
 
-import { type WorkflowInput, modelToProvider } from "@/data/workflow";
-import { owner } from "@/lib/hooks/useOwner";
-import { getCompletion } from "@/lib/utils/ai";
-import { ByokService } from "@/lib/utils/byok-service";
-import { prisma } from "@/lib/utils/db";
-import {
-  hasExceededSpendLimit,
-  isSubscriptionActive,
-  reportUsage,
-} from "@/lib/utils/stripe";
-import {
-  WorkflowBranchSchema,
-  WorkflowSchema,
-  WorkflowTestSchema,
-  translateInputs,
-} from "@/lib/utils/workflow";
 import { createId } from "@paralleldrive/cuid2";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type Stripe from "stripe";
 import { fromZodError } from "zod-validation-error";
+import type { WorkflowInput } from "@/data/workflow";
+import { owner } from "@/lib/hooks/useOwner";
+import { getCompletion } from "@/lib/utils/ai";
+import { prisma } from "@/lib/utils/db";
+import {
+  translateInputs,
+  WorkflowBranchSchema,
+  WorkflowSchema,
+  WorkflowTestSchema,
+} from "@/lib/utils/workflow";
 
 export async function createWorkflow(formData: FormData) {
   const { userId, ownerId } = await owner();
@@ -35,12 +28,13 @@ export async function createWorkflow(formData: FormData) {
   const template = formData.get("template") as string;
   const instruction = (formData.get("instruction") as string) ?? "";
   const modelSettings = (formData.get("modelSettings") as string) ?? null;
-  const cacheControlTtl = Number(formData.get("cacheControlTtl")) ?? 0;
+  const rawCacheTtl = Number(formData.get("cacheControlTtl")) ?? 0;
+  const cacheControlTtl = Math.min(Math.max(rawCacheTtl, 0), 86400);
 
   let inputs: WorkflowInput[] = [];
   try {
     inputs = JSON.parse((formData.get("inputs") as string) ?? "");
-  } catch (e) {
+  } catch {
     inputs = [];
   }
 
@@ -95,12 +89,13 @@ export async function updateWorkflow(formData: FormData) {
   const template = formData.get("template") as string;
   const instruction = (formData.get("instruction") as string) ?? "";
   const modelSettings = (formData.get("modelSettings") as string) ?? null;
-  const cacheControlTtl = Number(formData.get("cacheControlTtl")) ?? 0;
+  const rawCacheTtl = Number(formData.get("cacheControlTtl")) ?? 0;
+  const cacheControlTtl = Math.min(Math.max(rawCacheTtl, 0), 86400);
 
   let inputs: WorkflowInput[] = [];
   try {
     inputs = JSON.parse((formData.get("inputs") as string) ?? "");
-  } catch (e) {
+  } catch {
     inputs = [];
   }
 
@@ -167,145 +162,6 @@ export async function toggleWorkflowState(formData: FormData) {
   });
 
   redirect(`/workflows/${id}`);
-}
-
-export async function runWorkflow(formData: FormData) {
-  const { userId, ownerId } = await owner();
-
-  const id = Number(formData.get("id"));
-  const branch = formData.get("branch") as string;
-  let inputValues: Record<string, string> = {};
-
-  let redirectUrl = `/workflows/${id}`;
-
-  try {
-    inputValues = JSON.parse(formData.get("inputs") as string);
-  } catch (e) {
-    throw "Invalid input values";
-  }
-
-  try {
-    if (!id) throw "ID is missing";
-    if (!userId || !ownerId) throw "User/Owner ID is missing";
-
-    const organization = await prisma.organization.findUnique({
-      include: {
-        stripe: true,
-        UserKeys: true,
-      },
-      where: {
-        id: ownerId,
-      },
-    });
-
-    if (
-      organization?.credits === 0 &&
-      !isSubscriptionActive(organization?.stripe?.subscription)
-    )
-      throw "No credits remaining";
-
-    if (
-      organization?.credits !== 0 &&
-      (await hasExceededSpendLimit(
-        organization?.spendLimit,
-        organization?.stripe?.customerId,
-      ))
-    ) {
-      throw "Spend limit exceeded";
-    }
-
-    const workflow = await prisma.workflow.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        modelSettings: true,
-        template: true,
-        model: true,
-        inputs: true,
-      },
-    });
-
-    if (!workflow) throw "Workflow not found";
-
-    const workflowBranch = branch
-      ? await prisma.workflowBranch.findFirst({
-          where: {
-            shortId: branch,
-            workflowId: id,
-          },
-        })
-      : null;
-
-    if (workflowBranch) {
-      workflow.model = workflowBranch.model;
-      workflow.template = workflowBranch.template;
-
-      redirectUrl = `/workflows/${id}?branch=${workflowBranch.shortId}`;
-    }
-
-    const inputs = workflow.inputs as unknown as WorkflowInput[];
-    const model = workflow.model;
-    const content = await translateInputs({
-      inputs,
-      inputValues,
-      template: workflow.template,
-    });
-
-    const response = await getCompletion(
-      model,
-      content,
-      JSON.parse(JSON.stringify(workflow.modelSettings)),
-      organization?.UserKeys,
-    );
-
-    let { result, rawResult, totalTokenCount } = response;
-    if (!result) throw "No result returned from OpenAI";
-
-    const byokService = new ByokService();
-    const isEligibleForByokDiscount = !!byokService.get(
-      modelToProvider[model],
-      organization?.UserKeys,
-    );
-    if (isEligibleForByokDiscount) {
-      totalTokenCount = Math.floor(totalTokenCount * 0.3);
-    }
-
-    await Promise.all([
-      prisma.workflowRun.create({
-        data: {
-          result,
-          rawRequest: JSON.parse(JSON.stringify({ model, content })),
-          rawResult: JSON.parse(JSON.stringify(rawResult)),
-          branchId: workflowBranch?.shortId,
-          totalTokenCount,
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-          workflow: {
-            connect: {
-              id,
-            },
-          },
-        },
-      }),
-      reportUsage(
-        ownerId,
-        organization?.stripe?.subscription as unknown as Stripe.Subscription,
-        totalTokenCount,
-      ),
-    ]);
-  } catch (error) {
-    console.error(error);
-    return {
-      error:
-        error instanceof Error ? error?.message : "Oops! Something went wrong.",
-    };
-  }
-
-  redirect(redirectUrl);
 }
 
 export async function createWorkflowBranch(formData: FormData) {
@@ -448,7 +304,7 @@ export async function mergeWorkflowBranch(formData: FormData) {
       template: workflowBranch?.template,
       modelSettings: workflowBranch?.modelSettings as unknown as Record<
         string,
-        unknown
+        string | number | boolean | null
       >,
     },
   });
@@ -461,8 +317,6 @@ export async function createTest(formData: FormData) {
   const input = formData.get("input") as string;
   const condition = formData.get("condition") as string;
   const output = (formData.get("output") as string) ?? "";
-
-  console.log({ id, input, output, condition });
 
   const validationResult = WorkflowTestSchema.safeParse({
     id,
@@ -507,7 +361,7 @@ export async function deleteTest(formData: FormData) {
 }
 
 export async function runTests(formData: FormData) {
-  const { userId, ownerId } = await owner();
+  const { userId } = await owner();
   const id = Number(formData.get("id"));
   const branch = formData.get("branch") as string;
 
@@ -518,14 +372,6 @@ export async function runTests(formData: FormData) {
   });
 
   const workflow = await prisma.workflow.findUnique({
-    include: {
-      organization: {
-        select: {
-          stripe: true,
-          UserKeys: true,
-        },
-      },
-    },
     where: {
       id,
     },
@@ -578,8 +424,8 @@ export async function runTests(formData: FormData) {
       JSON.parse(JSON.stringify(workflow.modelSettings)),
     );
 
-    let { result, rawResult, totalTokenCount } = response;
-    if (!result) throw "No result returned from OpenAI";
+    const { result, rawResult, totalTokenCount } = response;
+    if (!result) throw "No result returned from provider";
 
     let testPassed = false;
     switch (test.condition) {
@@ -605,18 +451,10 @@ export async function runTests(formData: FormData) {
         try {
           JSON.parse(result);
           testPassed = true;
-        } catch (e) {
+        } catch {
           testPassed = false;
         }
         break;
-    }
-
-    const isEligibleForByokDiscount = !!new ByokService().get(
-      modelToProvider[model],
-      workflow.organization?.UserKeys,
-    );
-    if (isEligibleForByokDiscount) {
-      totalTokenCount = Math.floor(totalTokenCount * 0.3);
     }
 
     const [run] = await Promise.all([
@@ -639,12 +477,6 @@ export async function runTests(formData: FormData) {
           },
         },
       }),
-      reportUsage(
-        ownerId,
-        workflow.organization?.stripe
-          ?.subscription as unknown as Stripe.Subscription,
-        totalTokenCount,
-      ),
     ]);
 
     await prisma.workflowTest.update({

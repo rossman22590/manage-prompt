@@ -1,150 +1,138 @@
 "use client";
 
-import { createToastWrapper } from "@/components/core/toast";
-import { ActionButton } from "@/components/form/button";
-import { Header } from "@/components/layout/header";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { FingerprintIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { login, register } from "../actions";
-
-const DISABLE_REGISTRATION = process.env.NEXT_PUBLIC_DISABLE_REGISTRATION === 'true';
+import { signIn } from "@/lib/auth-client";
+import logo from "../../../public/images/logo.png";
 
 export default function SignInForm() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [hasSendEmail, setHasSendEmail] = useState(false);
 
-  const handleSubmit = async (formData: FormData) => {
-    const action = isLogin ? login : register;
-    const result = await action(formData);
-    
-    if (result.success) {
-      toast.success(result.message);
-    } else {
-      toast.error(result.message);
+  const signInWithMagicLink = useCallback(async () => {
+    try {
+      if (!email) return;
+      setProcessing(true);
+      toast.promise(
+        signIn
+          .magicLink({ email, callbackURL: "/start" })
+          .then((result) => {
+            if (result?.error) {
+              throw new Error(result.error?.message);
+            }
+
+            setHasSendEmail(true);
+          })
+          .finally(() => {
+            setProcessing(false);
+          }),
+        {
+          loading: "Sending magic link...",
+          success: "Magic link sent!",
+          error: "Failed to send magic link.",
+        },
+      );
+    } catch (error) {
+      console.error(error);
     }
-  };
+  }, [email]);
 
   return (
     <div className="m-6 flex h-full items-center justify-center">
-      <Header />
-      {createToastWrapper("dark")}
-
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-hero text-4xl">
-            {isLogin || DISABLE_REGISTRATION ? "Sign In" : "Register"}
-          </CardTitle>
-          <CardDescription>
-            {isLogin || DISABLE_REGISTRATION
-              ? "Enter your email below to login to your account."
-              : "Enter your email below to create a new account."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid gap-2">
-            <form action={handleSubmit}>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john.doe@myapps.ai"
-                name="email"
-                required
-              />
+          <div className="flex lg:flex-1">
+            <Image
+              src={logo}
+              alt="AI Tutor API"
+              width={32}
+              height={32}
+              className="-mt-2 mr-2 rounded-md"
+            />
 
-              <ActionButton
-                variant="default"
-                className="mt-2 w-full"
-                label={isLogin || DISABLE_REGISTRATION ? "Sign in" : "Register"}
-                loadingLabel={isLogin || DISABLE_REGISTRATION ? "Signing in..." : "Registering..."}
-              />
-            </form>
-
-            {!DISABLE_REGISTRATION && (
-              <button
-                type="button"
-                className="mt-4 text-blue-500 hover:underline"
-                onClick={() => setIsLogin(!isLogin)}
-              >
-                {isLogin ? "Need an account? Register" : "Already have an account? Sign in"}
-              </button>
-            )}
+            <Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
+              <p className="relative">AI Tutor API</p>
+            </Link>
           </div>
+
+          <CardTitle className="text-hero text-2xl">Get Started</CardTitle>
+        </CardHeader>
+
+        <CardContent className="grid gap-4">
+          <Label htmlFor="email">Email</Label>
+
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                signInWithMagicLink();
+              }
+            }}
+            value={email}
+          />
+
+          {hasSendEmail ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              An email has been sent to{" "}
+              <span className="font-semibold">{email}</span> with a magic link
+              to sign in.
+            </p>
+          ) : (
+            <Button
+              className="gap-2 disabled:opacity-50"
+              disabled={processing}
+              onClick={signInWithMagicLink}
+            >
+              Sign-in with Magic Link
+            </Button>
+          )}
+
+          <Button
+            variant="secondary"
+            className="gap-2"
+            disabled={processing}
+            onClick={async () => {
+              setProcessing(true);
+              toast.promise(
+                signIn
+                  .passkey()
+                  .then((result) => {
+                    if (result?.error) {
+                      throw new Error(result.error?.message);
+                    }
+
+                    window.location.href = "/start";
+                  })
+                  .finally(() => {
+                    setProcessing(false);
+                  }),
+                {
+                  loading: "Waiting for passkey...",
+                  success: "Signed in with passkey!",
+                  error: "Failed to receive passkey.",
+                },
+              );
+            }}
+          >
+            <FingerprintIcon size={16} />
+            Sign-in with Passkey
+          </Button>
         </CardContent>
       </Card>
     </div>
   );
 }
-
-
-// "use client";
-
-// import { createToastWrapper } from "@/components/core/toast";
-// import { ActionButton } from "@/components/form/button";
-// import { Header } from "@/components/layout/header";
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import toast from "react-hot-toast";
-// import { login } from "../actions";
-
-// export default function SignInForm() {
-//   return (
-//     <div className="m-6 flex h-full items-center justify-center">
-//       <Header />
-//       {createToastWrapper("dark")}
-
-//       <Card className="w-full max-w-md">
-//         <CardHeader>
-//           <CardTitle className="text-hero text-4xl">Get Started</CardTitle>
-//           <CardDescription>
-//             Enter your email below to login to your account.
-//           </CardDescription>
-//         </CardHeader>
-//         <CardContent className="grid gap-4">
-//           <div className="grid gap-2">
-//             <form
-//               action={(formData) => {
-//                 toast.promise(login(formData), {
-//                   loading: "Logging in...",
-//                   success: "Logged in!",
-//                   error: "Failed to log in.",
-//                 });
-//               }}
-//             >
-//               <Label htmlFor="email">Email</Label>
-//               <Input
-//                 id="email"
-//                 type="email"
-//                 placeholder="john.doe@myapps.ai"
-//                 name="email"
-//                 required
-//               />
-
-//               <ActionButton
-//                 variant="default"
-//                 className="mt-2 w-full"
-//                 label="Sign in"
-//                 loadingLabel="Logging in..."
-//               />
-//             </form>
-//           </div>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// }

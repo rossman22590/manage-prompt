@@ -23,7 +23,7 @@ export function Header() {
         <div className="flex lg:flex-1">
           <Image
             src={logo}
-            alt="ManagePrompt"
+            alt="AI Tutor API"
             width={32}
             height={32}
             className="-mt-2 mr-2"
