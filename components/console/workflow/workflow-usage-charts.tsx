@@ -12,7 +12,7 @@ import {
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "hsl(var(--chart-3))",
+    color: "hsl(270, 70%, 60%)", // Purple color
   },
 } satisfies ChartConfig;
 

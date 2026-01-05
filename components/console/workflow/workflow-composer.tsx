@@ -5,7 +5,7 @@ import {
   type WorkflowInput,
   WorkflowInputType,
 } from "@/data/workflow";
-import type { Workflow } from "@prisma/client";
+import type { Workflow } from "@/generated/prisma-client/client";
 import { useMemo, useReducer, useState } from "react";
 import { toast } from "sonner";
 import { ApiCodeSnippet } from "../../code/snippet";
@@ -160,6 +160,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                   Object.keys(inputValues).length !==
                     (inputs as WorkflowInput[])?.length
                 }
+                className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
               >
                 {isLoading ? <Spinner message="Loading..." /> : "Run"}
               </Button>
@@ -249,7 +250,10 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
             />
           </div>
           <div className="mt-4 flex justify-end">
-            <Button onClick={handleReset} variant="outline">
+            <Button
+              onClick={handleReset}
+              className="bg-pink-50 hover:bg-pink-100 text-pink-700 hover:text-pink-700 dark:bg-pink-950/30 dark:hover:bg-pink-900/40 dark:text-pink-300 dark:hover:text-pink-300 border-pink-300 dark:border-pink-700"
+            >
               Run Again
             </Button>
           </div>

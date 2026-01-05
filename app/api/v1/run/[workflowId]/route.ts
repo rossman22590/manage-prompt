@@ -79,29 +79,37 @@ export async function POST(
 
     // Check if the organization has valid billing
     const organization = key.organization;
-    if (
-      organization?.credits === 0 &&
-      !isSubscriptionActive(organization?.stripe?.subscription)
-    ) {
+    
+    // Block if credits are 0 (regardless of subscription status)
+    if (organization?.credits === 0) {
+      // If no subscription, block with invalid billing
+      if (!isSubscriptionActive(organization?.stripe?.subscription)) {
+        return ErrorResponse(
+          "Invalid billing. Please contact support.",
+          402,
+          ErrorCodes.InvalidBilling,
+        );
+      }
+      
+      // If has subscription but spend limit exceeded, block with spend limit error
+      if (
+        await hasExceededSpendLimit(
+          organization?.spendLimit,
+          organization?.stripe?.customerId,
+        )
+      ) {
+        return ErrorResponse(
+          "Spend limit exceeded. Please increase your spend limit to continue using the service.",
+          402,
+          ErrorCodes.SpendLimitReached,
+        );
+      }
+      
+      // If has subscription but no spend limit exceeded, still block at 0 credits
       return ErrorResponse(
-        "Invalid billing. Please contact support.",
+        "No credits remaining. Please add credits to continue using the service.",
         402,
         ErrorCodes.InvalidBilling,
-      );
-    }
-
-    // Spend limit
-    if (
-      organization?.credits === 0 &&
-      (await hasExceededSpendLimit(
-        organization?.spendLimit,
-        organization?.stripe?.customerId,
-      ))
-    ) {
-      return ErrorResponse(
-        "Spend limit exceeded. Please increase your spend limit to continue using the service.",
-        402,
-        ErrorCodes.SpendLimitReached,
       );
     }
 

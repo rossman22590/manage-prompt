@@ -5,6 +5,7 @@ import { prisma } from "@/lib/utils/db";
 import {
   createOrRetrieveCustomer,
   getCheckoutSession,
+  getCreditPackCheckoutSession,
 } from "@/lib/utils/stripe";
 import { MAX_RATE_LIMIT_RPS } from "@/lib/utils/workflow";
 import { init } from "@paralleldrive/cuid2";
@@ -27,6 +28,18 @@ export async function redirectToBilling() {
   const customer = await createOrRetrieveCustomer(ownerId);
   const url = await getCheckoutSession(customer);
   redirect(url);
+}
+
+export async function getCreditPackCheckoutUrl(priceId: string) {
+  const { ownerId } = await owner();
+
+  if (!ownerId) {
+    throw new Error("User and org ID not found");
+  }
+
+  const customer = await createOrRetrieveCustomer(ownerId);
+  const url = await getCreditPackCheckoutSession(customer, priceId);
+  return { url };
 }
 
 export async function createSecretKey() {

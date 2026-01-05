@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_30%)] active:shadow-[0_0_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_30%)] active:translate-y-1 dark:shadow-[0_4px_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_50%)] dark:active:shadow-[0_0_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_50%)]",
+        default: "bg-primary text-primary-foreground hover:bg-[hsl(330,81%,40%)] hover:text-white shadow-[0_4px_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_30%)] active:shadow-[0_0_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_30%)] active:translate-y-1 dark:shadow-[0_4px_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_50%)] dark:active:shadow-[0_0_0_0_color-mix(in_srgb,hsl(var(--primary)),#000_50%)]",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-[hsl(330,81%,95%)] hover:text-[hsl(330,81%,40%)] dark:hover:bg-[hsl(330,81%,15%)] dark:hover:text-pink-300",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        ghost: "hover:bg-[hsl(330,81%,95%)] hover:text-[hsl(330,81%,40%)] dark:hover:bg-[hsl(330,81%,15%)] dark:hover:text-pink-300",
+        link: "text-primary underline-offset-4 hover:underline hover:text-[hsl(330,81%,40%)]",
       },
       size: {
         default: "h-10 px-4 py-2",

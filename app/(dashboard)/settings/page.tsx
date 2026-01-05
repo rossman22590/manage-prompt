@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { SecretKey } from "@prisma/client";
+import type { SecretKey } from "@/generated/prisma-client/client";
 import { DateTime } from "@/lib/utils/datetime";
 import { getUser, owner } from "@/lib/hooks/useOwner";
 import { prisma } from "@/lib/utils/db";
@@ -32,6 +32,7 @@ import {
   updateSpendLimit,
   updateUserName,
 } from "./actions";
+import { UpgradeButton } from "@/components/settings/upgrade-button";
 
 export default async function Settings() {
   const { userId, ownerId } = await owner();
@@ -67,9 +68,13 @@ export default async function Settings() {
   const subscription = organization?.stripe
     ?.subscription as unknown as Stripe.Subscription;
 
-  const invoice: Stripe.Invoice | null = organization?.stripe?.customerId
-    ? await getUpcomingInvoice(organization?.stripe?.customerId)
-    : null;
+  const invoice: Stripe.Invoice | null =
+    organization?.stripe?.customerId && subscription?.id
+      ? await getUpcomingInvoice(
+          organization?.stripe?.customerId,
+          subscription.id,
+        )
+      : null;
 
   return (
     <>
@@ -93,16 +98,7 @@ export default async function Settings() {
                   <div className="text-gray-900 dark:text-gray-200">
                     {organization?.credits.toLocaleString() ?? 0} credits left
                   </div>
-                  {!subscription ? (
-                    <form action={redirectToBilling}>
-                      <ActionButton
-                        variant="link"
-                        label="Upgrade"
-                        loadingLabel="Loading..."
-                        className="p-0 m-0 h-auto text-primary-600 hover:text-primary-500 font-medium"
-                      />
-                    </form>
-                  ) : null}
+                  {!subscription ? <UpgradeButton /> : null}
                 </dd>
               </div>
 
@@ -166,7 +162,13 @@ export default async function Settings() {
                       />
                     </form>
                   </dd>
-                ) : null}
+                ) : (
+                  <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                    <div className="text-gray-900 dark:text-gray-200">
+                      Pay as you go
+                    </div>
+                  </dd>
+                )}
               </div>
 
               <div className="pt-2 sm:flex">

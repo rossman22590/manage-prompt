@@ -97,6 +97,7 @@ export default async function WorkflowEditor(props: Props) {
                   {workflow.published ? (
                     <ActionButton
                       size="sm"
+                      variant="default"
                       icon={
                         <PauseCircleIcon
                           className="mr-1 h-4 w-4"
@@ -108,6 +109,7 @@ export default async function WorkflowEditor(props: Props) {
                   ) : (
                     <ActionButton
                       size="sm"
+                      variant="default"
                       icon={
                         <PlayCircleIcon
                           className="mr-1 h-4 w-4"

@@ -70,7 +70,7 @@ export default async function WorkflowTests(props: Props) {
               <span className="isolate inline-flex sm:space-x-3">
                 <Link
                   href={`/workflows/${params.workflowId}/tests/new`}
-                  className={buttonVariants({ variant: "ghost", size: "sm" })}
+                  className={`${buttonVariants({ variant: "ghost", size: "sm" })} text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:text-pink-300 dark:hover:bg-pink-950/20`}
                 >
                   New
                 </Link>
@@ -89,6 +89,7 @@ export default async function WorkflowTests(props: Props) {
                     size="sm"
                     label="Run"
                     loadingLabel="Running"
+                    className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
                   />
                 </form>
               </span>

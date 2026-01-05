@@ -51,7 +51,7 @@ export default function PageTitle({
         {actionLink && actionLabel ? (
           <Link
             href={actionLink}
-            className={buttonVariants({ size: "sm" })}
+            className={`${buttonVariants({ size: "sm" })} bg-pink-500 hover:bg-pink-600 text-white border-pink-500`}
             prefetch={false}
           >
             {actionLabel}

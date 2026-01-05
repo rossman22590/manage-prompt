@@ -1,6 +1,6 @@
 ﻿import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import type { User } from "@prisma/client";
+import type { User } from "@/generated/prisma-client/client";
 import { auth } from "../auth";
 import { prisma } from "../utils/db";
 
