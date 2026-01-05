@@ -6,7 +6,7 @@
     "dev": "next dev",
     "generate": "prisma generate",
     "postinstall": "prisma generate",
-    "prebuild": "prisma migrate deploy --skip-generate; prisma generate",
+    "prebuild": "prisma migrate deploy; prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "biome check --write ."
