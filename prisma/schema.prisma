@@ -130,6 +130,7 @@ model Workflow {
   ownerId         String
   name            String
   published       Boolean          @default(false)
+  shareExpiresAt  DateTime?
   model           String
   modelSettings   Json?
   template        String

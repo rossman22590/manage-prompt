@@ -78,7 +78,12 @@ export default async function WorkflowEditor(props: Props) {
                 </Link>
 
                 {workflow.published && (
-                  <ShareButton workflowShortId={workflow.shortId} workflowName={workflow.name} />
+                  <ShareButton 
+                    workflowShortId={workflow.shortId} 
+                    workflowId={workflow.id} 
+                    workflowName={workflow.name}
+                    shareExpiresAt={workflow.shareExpiresAt}
+                  />
                 )}
               </span>
             </div>

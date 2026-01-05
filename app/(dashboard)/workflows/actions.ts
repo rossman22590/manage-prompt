@@ -151,17 +151,82 @@ export async function deleteWorkflow(formData: FormData) {
 export async function toggleWorkflowState(formData: FormData) {
   const id = Number(formData.get("id"));
   const published = Number(formData.get("published"));
+  const willBePublished = !published;
 
   await prisma.workflow.update({
     where: {
       id,
     },
     data: {
-      published: !published,
+      published: willBePublished,
+      // If activating, clear any expiration so share link works again
+      shareExpiresAt: willBePublished ? null : undefined,
     },
   });
 
   redirect(`/workflows/${id}`);
+}
+
+export async function expireWorkflowShare(formData: FormData) {
+  const id = Number(formData.get("id"));
+  const { userId, ownerId } = await owner();
+
+  if (!userId || !ownerId) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify the workflow belongs to the user
+  const workflow = await prisma.workflow.findFirst({
+    where: {
+      id,
+      ownerId,
+    },
+  });
+
+  if (!workflow) {
+    throw new Error("Workflow not found");
+  }
+
+  // Expire the share link (but keep workflow active for owner)
+  await prisma.workflow.update({
+    where: {
+      id,
+    },
+    data: {
+      shareExpiresAt: new Date(), // Set expiration to now
+    },
+  });
+}
+
+export async function reactivateWorkflowShare(formData: FormData) {
+  const id = Number(formData.get("id"));
+  const { userId, ownerId } = await owner();
+
+  if (!userId || !ownerId) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify the workflow belongs to the user
+  const workflow = await prisma.workflow.findFirst({
+    where: {
+      id,
+      ownerId,
+    },
+  });
+
+  if (!workflow) {
+    throw new Error("Workflow not found");
+  }
+
+  // Clear expiration to reactivate the share link
+  await prisma.workflow.update({
+    where: {
+      id,
+    },
+    data: {
+      shareExpiresAt: null, // Clear expiration
+    },
+  });
 }
 
 export async function createWorkflowBranch(formData: FormData) {

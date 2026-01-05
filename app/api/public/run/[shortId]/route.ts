@@ -31,6 +31,11 @@ export async function POST(
       return ErrorResponse("Workflow not found or not published", 404);
     }
 
+    // Check if share link has expired
+    if (workflow.shareExpiresAt && workflow.shareExpiresAt < new Date()) {
+      return ErrorResponse("This share link has expired", 410);
+    }
+
     const organization = workflow.organization;
 
     // Block if credits are 0 (regardless of subscription status)
