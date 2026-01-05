@@ -1,7 +1,8 @@
-import { modelToProviderId } from "@/data/workflow";
+import { modelToProviderId, type WorkflowInput } from "@/data/workflow";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { hasExceededSpendLimit, isSubscriptionActive, reportUsage } from "@/lib/utils/stripe";
+import { translateInputs } from "@/lib/utils/workflow";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
 import { NextRequest } from "next/server";
@@ -95,10 +96,11 @@ export async function POST(
 
     const body = (await req.json().catch(() => ({}))) ?? {};
 
-    // Build the prompt from template
-    let prompt = workflow.template;
-    Object.keys(body).forEach((key) => {
-      prompt = prompt.replace(`{{${key}}}`, body[key]);
+    const inputs = workflow.inputs as unknown as WorkflowInput[];
+    const { content, imageParts } = await translateInputs({
+      inputs,
+      inputValues: body,
+      template: workflow.template,
     });
 
     // Build instruction if present
@@ -117,12 +119,72 @@ export async function POST(
 
     const modelSettings = (workflow.modelSettings as any) ?? {};
 
-    // Note: maxTokens is not supported by OpenRouter provider in Vercel AI SDK
-    // OpenRouter models have their own default token limits
+    // If images are present, use messages format with parts array
+    if (imageParts && imageParts.length > 0) {
+      const parts: Array<{ type: 'text' | 'file'; text?: string; url?: string; mediaType?: string }> = [];
+      
+      // Split content by [IMAGE] placeholders and add text/file parts
+      const textParts = content.split('[IMAGE]');
+      for (let i = 0; i < textParts.length; i++) {
+        if (textParts[i]) {
+          parts.push({ type: 'text', text: textParts[i] });
+        }
+        if (i < imageParts.length) {
+          const imagePart = imageParts[i];
+          parts.push({
+            type: 'file',
+            url: imagePart.url,
+            mediaType: imagePart.mediaType,
+          });
+        }
+      }
+
+      // Build content array in the correct format for Vercel AI SDK
+      const messageContent = parts.map(part => 
+        part.type === 'text' 
+          ? { type: 'text' as const, text: part.text || '' }
+          : { 
+              type: 'image' as const, 
+              image: part.url || ''
+            }
+      );
+
+      const completion = streamText({
+        model: openrouter(model),
+        headers: getOpenRouterHeaders(),
+        messages: [
+          {
+            role: 'user' as const,
+            content: messageContent,
+          },
+        ],
+        system: instruction || undefined,
+        temperature: modelSettings.temperature ?? 0.7,
+        topP: modelSettings.topP ?? 1,
+        frequencyPenalty: modelSettings.frequencyPenalty ?? 0,
+        presencePenalty: modelSettings.presencePenalty ?? 0,
+        onFinish: async (result) => {
+          const totalTokens = result.usage?.totalTokens ?? 0;
+          if (totalTokens > 0) {
+            await reportUsage(organization.id, subscription, totalTokens);
+          }
+        },
+      });
+
+      return completion.toTextStreamResponse({
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "*",
+        },
+      });
+    }
+
+    // No images, use prompt format
     const completion = streamText({
       model: openrouter(model),
       headers: getOpenRouterHeaders(),
-      prompt,
+      prompt: content,
       system: instruction || undefined,
       temperature: modelSettings.temperature ?? 0.7,
       topP: modelSettings.topP ?? 1,

@@ -144,6 +144,76 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                         }
                       />
                     ) : null}
+
+                    {type === WorkflowInputType.image ? (
+                      <div className="space-y-3">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Upload an image file or enter an image URL (.png, .jpg, .jpeg)
+                        </div>
+                        <Input
+                          type="text"
+                          placeholder="Enter image URL (e.g., https://example.com/image.png)"
+                          value={inputValues[name] && !inputValues[name].startsWith('data:') ? inputValues[name] : ""}
+                          onChange={(e) => {
+                            const url = e.target.value.trim();
+                            if (url) {
+                              // Validate it's a valid image URL
+                              try {
+                                const urlObj = new URL(url);
+                                const pathname = urlObj.pathname.toLowerCase();
+                                if (/\.(png|jpg|jpeg|gif|webp)$/i.test(pathname)) {
+                                  updateInput({ [name]: url });
+                                } else {
+                                  toast.error("Please enter a valid image URL (.png, .jpg, .jpeg, .gif, or .webp)");
+                                }
+                              } catch {
+                                toast.error("Please enter a valid URL");
+                              }
+                            } else {
+                              updateInput({ [name]: "" });
+                            }
+                          }}
+                        />
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-gray-300 dark:border-gray-600"></span>
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">Or</span>
+                          </div>
+                        </div>
+                        <Input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              // Validate file type
+                              const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                              if (!validTypes.includes(file.type)) {
+                                toast.error("Please select a valid image file (.png, .jpg, .jpeg, .gif, or .webp)");
+                                return;
+                              }
+                              // Convert file to base64 data URL
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                updateInput({ [name]: reader.result as string });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        {inputValues[name] && (
+                          <div className="mt-2">
+                            <img 
+                              src={inputValues[name]} 
+                              alt="Preview" 
+                              className="max-w-full h-auto max-h-64 rounded-lg border border-gray-300 dark:border-gray-700"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
                   </div>
                 ),
               )}

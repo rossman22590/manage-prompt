@@ -155,7 +155,7 @@ export async function POST(
 
     const inputs = workflow.inputs as unknown as WorkflowInput[];
     const model = workflow.model;
-    const content = await translateInputs({
+    const { content, imageParts } = await translateInputs({
       inputs,
       inputValues: body,
       template: workflow.template,
@@ -165,6 +165,7 @@ export async function POST(
       model,
       content,
       JSON.parse(JSON.stringify(workflow.modelSettings)),
+      imageParts,
     );
 
     const { result, rawResult, totalTokenCount } = response;

@@ -7,11 +7,14 @@ import { toast } from "sonner";
 import {
   AIModels,
   AIModelToLabel,
+  hasLargeContextWindow,
+  isVisionCapable,
   modelHasInstruction,
   type WorkflowInput,
   WorkflowInputType,
   WorkflowInputTypeToLabel,
 } from "@/data/workflow";
+import { Eye, Layers } from "lucide-react";
 import type { Workflow } from "@/generated/prisma-client/client";
 import { SaveButton } from "../../form/button";
 import { Button, buttonVariants } from "../../ui/button";
@@ -170,7 +173,15 @@ export function WorkflowForm({
                 <SelectContent className="max-h-60 overflow-y-auto">
                   {filteredModels.map((m) => (
                     <SelectItem key={m} value={m}>
-                      {AIModelToLabel[m]}
+                      <div className="flex items-center gap-2">
+                        <span>{AIModelToLabel[m]}</span>
+                        {isVisionCapable(m) && (
+                          <Eye className="h-4 w-4 text-pink-500 dark:text-pink-400" title="Supports image input" />
+                        )}
+                        {hasLargeContextWindow(m) && (
+                          <Layers className="h-4 w-4 text-pink-500 dark:text-pink-400" title="Supports 200k+ context window" />
+                        )}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -353,15 +364,21 @@ export function WorkflowForm({
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent>
-                              {Object.keys(WorkflowInputType).map((type) => (
-                                <SelectItem
-                                  key={type}
-                                  value={type}
-                                  className="capitalize"
-                                >
-                                  {WorkflowInputTypeToLabel[type]}
-                                </SelectItem>
-                              ))}
+                              {Object.keys(WorkflowInputType).map((type) => {
+                                const isImageType = type === WorkflowInputType.image;
+                                const isDisabled = isImageType && !isVisionCapable(model);
+                                return (
+                                  <SelectItem
+                                    key={type}
+                                    value={type}
+                                    className="capitalize"
+                                    disabled={isDisabled}
+                                  >
+                                    {WorkflowInputTypeToLabel[type]}
+                                    {isDisabled && " (requires vision model)"}
+                                  </SelectItem>
+                                );
+                              })}
                             </SelectContent>
                           </Select>
                         </div>

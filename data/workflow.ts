@@ -180,6 +180,66 @@ export const modelToProviderId: Record<string | AIModel, string> = {
 
 export const AIModels = Object.keys(AIModelToLabel) as Array<AIModel>;
 
+// Models that support image/vision input
+export const visionCapableModels: Set<AIModel> = new Set([
+  // OpenAI vision models
+  "gpt-4o",
+  "gpt-4o-mini",
+  "gpt-4-turbo",
+  "gpt-4",
+  "gpt-4.1",
+  "gpt-4.1-mini",
+  "gpt-4.1-nano",
+  "gpt-4.5",
+  "gpt-5",
+  "gpt-5-pro",
+  "gpt-5.2",
+  "gpt-5.2-chat",
+  "gpt-5.2-pro",
+  
+  // Anthropic Claude models (all support vision)
+  "claude-sonnet-4.5",
+  "claude-opus-4.5",
+  "claude-haiku-4.5",
+  
+  // Google Gemini models (all support vision)
+  "gemini-2-5-pro",
+  "gemini-2-5-flash",
+  "gemini-2-5-flash-lite",
+  "gemini-3-pro-preview",
+  
+  // Mistral vision model
+  "pixtral-12b-2409",
+] as AIModel[]);
+
+export const isVisionCapable = (model: AIModel): boolean => {
+  return visionCapableModels.has(model);
+};
+
+// Models that support 200k+ token context windows
+export const largeContextWindowModels: Set<AIModel> = new Set([
+  // 200K context models
+  "claude-opus-4.5",
+  "claude-haiku-4.5",
+  
+  // 400K context models
+  "gpt-5.2",
+  "gpt-5.2-chat",
+  "gpt-5.2-pro",
+  "gpt-5",
+  "gpt-5-pro",
+  
+  // 1M context models
+  "claude-sonnet-4.5",
+  "gemini-2-5-pro",
+  "gemini-2-5-flash",
+  "gemini-3-pro-preview",
+] as AIModel[]);
+
+export const hasLargeContextWindow = (model: AIModel): boolean => {
+  return largeContextWindowModels.has(model);
+};
+
 // The rest of your code remains unchanged
 export const modelHasInstruction: Record<string, boolean> = {};
 
@@ -197,6 +257,7 @@ export enum WorkflowInputType {
   textarea = "textarea",
   number = "number",
   url = "url",
+  image = "image",
 }
 
 export const WorkflowInputTypeToLabel: Record<WorkflowInputType | string, string> = {
@@ -204,6 +265,7 @@ export const WorkflowInputTypeToLabel: Record<WorkflowInputType | string, string
   textarea: "Text Area",
   number: "Number",
   url: "Webpage content",
+  image: "Image",
 } as const;
 
 export const WorkflowTestCondition: Record<string, string> = {
