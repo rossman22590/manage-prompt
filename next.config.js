@@ -6,6 +6,7 @@ const nextConfig = {
   experimental: {
     turbo: {},
   },
+  runtime: 'nodejs'
 };
 
 module.exports = withSentryConfig(

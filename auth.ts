@@ -2,8 +2,11 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import { prisma } from "./lib/utils/db";
 
+export const runtime = 'nodejs';
+
 const authOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.AUTH_SECRET,
   providers: [
     {
       id: "resend-email",
@@ -25,7 +28,6 @@ const authOptions = {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              // Use your Resend API key here:
               "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
             },
             body: JSON.stringify({
@@ -61,7 +63,7 @@ const authOptions = {
           throw new Error("Failed to send verification email");
         }
       },
-    } as any, // Cast to `any` to bypass additional type checking for our custom provider.
+    } as any,
   ],
   pages: {
     signIn: "/sign-in",
