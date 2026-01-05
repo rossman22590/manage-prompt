@@ -1,7 +1,7 @@
 <p align="center" style="margin-top: 120px">
   <h3 align="center">AI Tutor API</h3>
 
-  <p align="center">
+  <p align="center"> 
     Launch your next AI project in hours, not months. Our platform handles hosting, security, and delivery so you can focus on building.
     <br />
     <a href="https://manageprompt.com"><strong>Learn more</strong></a>
