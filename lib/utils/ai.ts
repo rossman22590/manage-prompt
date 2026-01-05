@@ -1,14 +1,31 @@
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { generateText, streamText } from "ai";
 import type { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
 import { modelToProviderId } from "@/data/workflow";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { generateText, streamText } from "ai";
 
 const getOpenRouterHeaders = () => {
-  const appUrl = process.env.APP_BASE_URL ?? "https://manageprompt.com";
-  return {
+  // Try multiple env vars for app URL
+  const appUrl = 
+    process.env.APP_BASE_URL || 
+    process.env.NEXT_PUBLIC_APP_BASE_URL || 
+    "https://manageprompt.com";
+  
+  // Allow custom site name via env var
+  const siteName = process.env.OPENROUTER_SITE_NAME || "AI Tutor API";
+  
+  const headers: Record<string, string> = {
     "HTTP-Referer": appUrl,
-    "X-Title": "AI Tutor API",
+    "X-Title": siteName,
   };
+  
+  // Log in development to verify headers are being set
+  if (process.env.NODE_ENV === "development") {
+    console.log("OpenRouter headers being sent:", JSON.stringify(headers, null, 2));
+    console.log("Site Name:", siteName);
+    console.log("App URL:", appUrl);
+  }
+  
+  return headers;
 };
 
 export const getCompletion = async (
@@ -59,6 +76,10 @@ export const getStreamingCompletion = async (
   settings?: ModelSettings,
   onFinish?: (evt: any) => Promise<void>,
 ) => {
+  if (!process.env.OPENROUTER_API_KEY) {
+    throw new Error("OPENROUTER_API_KEY is not set");
+  }
+
   const modelParams = {
     prompt: content,
     temperature: settings?.temperature ?? 0.5,

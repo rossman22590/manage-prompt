@@ -33,7 +33,7 @@ async function sendVerificationEmail(email: string) {
       "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM,
+      from: process.env.RESEND_FROM_EMAIL,
       to: email,
       subject: "Sign in to your account",
       html: `<p>You've successfully signed in to your account.</p>`,

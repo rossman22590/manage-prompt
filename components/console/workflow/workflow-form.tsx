@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -12,7 +12,7 @@ import {
   WorkflowInputType,
   WorkflowInputTypeToLabel,
 } from "@/data/workflow";
-import type { Workflow } from "@/generated/prisma-client/client";
+import type { Workflow } from "@prisma/client";
 import { SaveButton } from "../../form/button";
 import { Button, buttonVariants } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -795,3 +795,5 @@ export function WorkflowForm({
 //     </form>
 //   );
 // }
+
+

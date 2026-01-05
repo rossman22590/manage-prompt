@@ -13,6 +13,9 @@ export const AIModelToLabel = {
   "gpt-4.5": "GPT-4.5",
   "gpt-5": "GPT-5",
   "gpt-5-pro": "GPT-5 Pro",
+  "gpt-5.2": "GPT-5.2",
+  "gpt-5.2-chat": "GPT-5.2 Chat",
+  "gpt-5.2-pro": "GPT-5.2 Pro",
   "o1": "o1",
   "o1-mini": "o1 Mini",
   "o1-preview": "o1 Preview",
@@ -33,6 +36,9 @@ export const AIModelToLabel = {
   "claude-4-sonnet": "Claude 4 Sonnet",
   "claude-4-opus": "Claude 4 Opus",
   "claude-4-1-opus": "Claude 4.1 Opus",
+  "claude-sonnet-4.5": "Claude Sonnet 4.5",
+  "claude-opus-4.5": "Claude Opus 4.5",
+  "claude-haiku-4.5": "Claude Haiku 4.5",
 
   // xAI models
   "grok-2-latest": "Grok 2",
@@ -100,6 +106,9 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "gpt-4.5": "openai/gpt-4.1",
   "gpt-5": "openai/gpt-5",
   "gpt-5-pro": "openai/gpt-5-pro",
+  "gpt-5.2": "openai/gpt-5.2",
+  "gpt-5.2-chat": "openai/gpt-5.2-chat",
+  "gpt-5.2-pro": "openai/gpt-5.2-pro",
   "o1": "openai/o1",
   "o1-mini": "openai/o1",
   "o1-preview": "openai/o1",
@@ -120,6 +129,9 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "claude-4-sonnet": "anthropic/claude-sonnet-4",
   "claude-4-opus": "anthropic/claude-opus-4",
   "claude-4-1-opus": "anthropic/claude-opus-4.1",
+  "claude-sonnet-4.5": "anthropic/claude-sonnet-4.5",
+  "claude-opus-4.5": "anthropic/claude-opus-4.5",
+  "claude-haiku-4.5": "anthropic/claude-haiku-4.5",
 
   // xAI models
   "grok-2-latest": "x-ai/grok-3",

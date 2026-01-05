@@ -92,15 +92,33 @@ export async function GET(req: NextRequest) {
       ? 60
       : Math.min(Math.max(ttlFromQuery, 1), 300);
 
-    await redis.set(
-      pub_token,
-      {
-        ownerId: organization?.id,
-      },
-      {
-        ex: ttl,
-      },
-    );
+    try {
+      await redis.set(
+        pub_token,
+        {
+          ownerId: organization?.id,
+        },
+        {
+          ex: ttl,
+        },
+      );
+    } catch (redisError: any) {
+      console.error("Redis connection error:", redisError);
+      // Check if it's a connection/DNS error
+      if (
+        redisError?.cause?.code === "ENOTFOUND" ||
+        redisError?.message?.includes("fetch failed") ||
+        redisError?.message?.includes("getaddrinfo")
+      ) {
+        return ErrorResponse(
+          "Redis service unavailable. Please check your UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN environment variables.",
+          503,
+          ErrorCodes.InternalServerError,
+        );
+      }
+      // Re-throw other Redis errors to be caught by outer catch
+      throw redisError;
+    }
 
     return NextResponse.json(
       { success: true, token: pub_token, ttl },
@@ -112,7 +130,8 @@ export async function GET(req: NextRequest) {
       },
     );
   } catch (error) {
-    console.error(error);
+    console.error("Token creation error:", error);
+    console.error("Error stack:", error instanceof Error ? error.stack : "No stack");
     return ErrorResponse(
       "Failed to create token, please try again or contact support.",
       500,

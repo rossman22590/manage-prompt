@@ -1,5 +1,4 @@
-import { notFound } from "next/navigation";
-import { ManagePasskeys } from "@/components/core/passkeys";
+﻿import { notFound } from "next/navigation";
 import PageSection from "@/components/core/page-section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import { EditableValue } from "@/components/form/editable-text";
@@ -14,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { SecretKey } from "@/generated/prisma-client/client";
+import type { SecretKey } from "@prisma/client";
 import { DateTime } from "@/lib/utils/datetime";
 import { getUser, owner } from "@/lib/hooks/useOwner";
 import { prisma } from "@/lib/utils/db";
@@ -294,7 +293,8 @@ export default async function Settings() {
         </div>
       </PageSection>
 
-      <ManagePasskeys />
     </>
   );
 }
+
+

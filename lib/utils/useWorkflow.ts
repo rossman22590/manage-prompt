@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
-import type { Prisma, Workflow } from "@/generated/prisma-client/client";
+﻿import { createHash } from "node:crypto";
+import type { Prisma, Workflow } from "@prisma/client";
 import { prisma } from "@/lib/utils/db";
 import { owner } from "../hooks/useOwner";
 import { redisStore } from "./redis";
@@ -156,3 +156,5 @@ export async function cacheWorkflowResult(
     console.error(e);
   }
 }
+
+

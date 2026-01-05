@@ -21,6 +21,7 @@ export default function StreamingText({
 }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const hasStarted = useRef(false);
 
   const getData = useCallback(async () => {
@@ -34,6 +35,10 @@ export default function StreamingText({
     });
 
     if (!response.ok) {
+      const errorText = await response.text().catch(() => "Unknown error");
+      console.error("Stream error:", response.status, errorText);
+      setError(errorText || `HTTP ${response.status}`);
+      setLoading(false);
       return null;
     }
 
@@ -65,6 +70,14 @@ export default function StreamingText({
       getData();
     }
   }, [url, getData]);
+
+  if (error) {
+    return (
+      <p className={`${className} text-red-500`}>
+        Error: {error}
+      </p>
+    );
+  }
 
   return loading ? (
     <Spinner className={className} />

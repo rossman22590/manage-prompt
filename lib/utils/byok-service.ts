@@ -1,5 +1,5 @@
-import type { AIProvider } from "@/data/workflow";
-import type { UserKey } from "@/generated/prisma-client/client";
+﻿import type { AIProvider } from "@/data/workflow";
+import type { UserKey } from "@prisma/client";
 import { type EncryptedPayload, EncryptionService } from "./encryption";
 
 export class ByokService {
@@ -25,3 +25,5 @@ export class ByokService {
     return null;
   }
 }
+
+

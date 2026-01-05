@@ -208,6 +208,14 @@ export async function POST(
       });
     };
 
+    if (!process.env.OPENROUTER_API_KEY) {
+      return ErrorResponse(
+        "OpenRouter API key not configured",
+        500,
+        ErrorCodes.InternalServerError,
+      );
+    }
+
     const response = await getStreamingCompletion(
       model,
       content,
@@ -217,9 +225,13 @@ export async function POST(
 
     return response;
   } catch (error) {
-    console.error(error);
+    console.error("Stream route error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return ErrorResponse(
-      "Failed to run workflow",
+      `Failed to run workflow: ${error instanceof Error ? error.message : "Unknown error"}`,
       500,
       ErrorCodes.InternalServerError,
     );

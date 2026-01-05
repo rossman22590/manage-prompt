@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
-import { useMemo, useReducer, useState } from "react";
-import { toast } from "sonner";
 import {
   modelHasInstruction,
   type WorkflowInput,
   WorkflowInputType,
 } from "@/data/workflow";
-import type { Workflow } from "@/generated/prisma-client/client";
+import type { Workflow } from "@prisma/client";
+import { useMemo, useReducer, useState } from "react";
+import { toast } from "sonner";
 import { ApiCodeSnippet } from "../../code/snippet";
 import { Spinner } from "../../core/loaders";
 import StreamingText from "../../core/streaming-text";
@@ -201,7 +201,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
           <ApiCodeSnippet
             har={{
               method: "POST",
-              url: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/v1/run/${workflow.shortId}`,
+              url: `${process.env.NEXT_PUBLIC_APP_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")}/api/v1/run/${workflow.shortId}`,
               queryString: [],
               headers: [
                 {
@@ -264,3 +264,5 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
     </div>
   );
 }
+
+

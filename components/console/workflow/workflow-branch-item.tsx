@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { GitBranchIcon } from "lucide-react";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import {
   mergeWorkflowBranch,
 } from "@/app/(dashboard)/workflows/actions";
 import { ActionButton, DeleteButton } from "@/components/form/button";
-import type { WorkflowBranch } from "@/generated/prisma-client/client";
+import type { WorkflowBranch } from "@prisma/client";
 import { DateTime } from "@/lib/utils/datetime";
 import { Button, buttonVariants } from "../../ui/button";
 import {
@@ -114,3 +114,5 @@ export function WorkflowBranchItem({ branch }: Props) {
     </li>
   );
 }
+
+

@@ -1,6 +1,5 @@
 "use client";
 
-import { FingerprintIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useState } from "react";
@@ -101,36 +100,6 @@ export default function SignInForm() {
             </Button>
           )}
 
-          <Button
-            variant="secondary"
-            className="gap-2"
-            disabled={processing}
-            onClick={async () => {
-              setProcessing(true);
-              toast.promise(
-                signIn
-                  .passkey()
-                  .then((result) => {
-                    if (result?.error) {
-                      throw new Error(result.error?.message);
-                    }
-
-                    window.location.href = "/start";
-                  })
-                  .finally(() => {
-                    setProcessing(false);
-                  }),
-                {
-                  loading: "Waiting for passkey...",
-                  success: "Signed in with passkey!",
-                  error: "Failed to receive passkey.",
-                },
-              );
-            }}
-          >
-            <FingerprintIcon size={16} />
-            Sign-in with Passkey
-          </Button>
         </CardContent>
       </Card>
     </div>

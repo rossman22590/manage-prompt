@@ -77,6 +77,7 @@ model Organization {
   logo_url           String?
   rawData            Json?
   credits            Int                  @default(0)
+  spendLimit         Int?
   createdByUser      String
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
@@ -85,6 +86,7 @@ model Organization {
   SecretKey          SecretKey[]
   UserKeys           UserKey[]
   workflows          Workflow[]
+  stripe             Stripe?
 }
 
 model OrganizationToUser {
@@ -205,4 +207,17 @@ model Passkey {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("passkey")
+}
+
+model Stripe {
+  id             Int          @id @default(autoincrement())
+  customerId     String       @unique
+  subscriptionId String?      @unique
+  subscription   Json?
+  ownerId        String       @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+
+  @@map("Stripe")
 }

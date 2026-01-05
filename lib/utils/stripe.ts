@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/utils/db";
 import { createId } from "@paralleldrive/cuid2";
-import type Stripe from "stripe";
+import Stripe from "stripe";
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2024-12-18.acacia",
+});
 
 export async function createOrRetrieveCustomer(
   ownerId: string,
@@ -94,56 +96,68 @@ export async function reportUsage(
   if (!ownerId) {
     throw new Error("[reportUsage]: Owner ID not found");
   }
-  if (!isSubscriptionActive(subscription)) {
-    await prisma.organization.update({
-      where: {
-        id: ownerId,
+
+  // Always deduct credits from database based on actual token usage
+  // Convert tokens to credits (1 credit = 100 tokens)
+  const creditsToDeduct = Math.max(1, Math.ceil(quantity / 100));
+  
+  await prisma.organization.update({
+    where: {
+      id: ownerId,
+    },
+    data: {
+      credits: {
+        decrement: creditsToDeduct,
       },
-      data: {
-        credits: {
-          decrement: 1,
+    },
+  });
+
+  // If there's an active subscription, also report usage to Stripe
+  if (isSubscriptionActive(subscription) && subscription) {
+    console.log(
+      `Report usage for subscription ${subscription.id}, quantity ${quantity}`,
+    );
+    const item = subscription.items?.data.find(
+      (item) => item.price.id === process.env.STRIPE_WORKFLOW_RUN_PRICE_ID,
+    );
+
+    if (item) {
+      const timestamp = Number.parseInt(`${Date.now() / 1000}`);
+
+      await stripe.subscriptionItems.createUsageRecord(
+        item.id,
+        {
+          quantity,
+          timestamp: timestamp,
+          action: "increment",
         },
-      },
-    });
-    return;
+        {
+          idempotencyKey: `${subscription.id}-${createId()}`,
+        },
+      ).catch((error) => {
+        console.error("Failed to report usage to Stripe:", error);
+        // Don't throw - credits are already deducted
+      });
+    }
   }
-
-  if (!subscription) {
-    throw new Error("[reportUsage]: Subscription not found");
-  }
-
-  console.log(
-    `Report usage for subscription ${subscription.id}, quantity ${quantity}`,
-  );
-  const item = subscription.items?.data.find(
-    (item) => item.price.id === process.env.STRIPE_WORKFLOW_RUN_PRICE_ID,
-  );
-
-  if (!item) {
-    throw new Error("Subscription item not found");
-  }
-
-  const timestamp = Number.parseInt(`${Date.now() / 1000}`);
-
-  await stripe.subscriptionItems.createUsageRecord(
-    item.id,
-    {
-      quantity,
-      timestamp: timestamp,
-      action: "increment",
-    },
-    {
-      idempotencyKey: `${subscription.id}-${createId()}`,
-    },
-  );
 }
 
 export function isSubscriptionActive(subscription: any) {
-  return ["trialing", "active"].includes(subscription?.status);
+  if (!subscription) return false;
+  // Handle both JSON object and parsed object
+  const status = typeof subscription === "string" 
+    ? JSON.parse(subscription)?.status 
+    : subscription?.status;
+  return ["trialing", "active"].includes(status);
 }
 
 export function isSubscriptionCancelled(subscription: any) {
-  return subscription?.status === "canceled";
+  if (!subscription) return false;
+  // Handle both JSON object and parsed object
+  const status = typeof subscription === "string" 
+    ? JSON.parse(subscription)?.status 
+    : subscription?.status;
+  return status === "canceled";
 }
 
 export async function getUpcomingInvoice(
