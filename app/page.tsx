@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { buttonVariants } from "@/components/ui/button";
 import { AnimatePresence, motion } from 'framer-motion';
-import { BrainIcon, Bot, CheckIcon, ChevronDownIcon, CodeIcon, FileText, LogIn, MinusCircle, Network, PlusCircle, Rocket, ShieldCheckIcon, Sparkles, Terminal, Variable, Workflow, Zap } from "lucide-react";
+import { Bot, BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, FileText, LogIn, MinusCircle, Network, PlusCircle, Rocket, ShieldCheckIcon, Sparkles, Terminal, Variable, Workflow, Zap } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from 'react';
 import {
@@ -366,14 +366,15 @@ export default function Home() {
                         { step: 5, title: "Select Model", description: "Choose from various AI models (e.g., GPT-4, Gemini, Claude)", icon: "Bot" },
                         { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "Rocket" },
                       ].map((item, index) => {
-                        const IconComponent = {
+                        const iconMap: Record<string, () => React.JSX.Element> = {
                           LogIn: () => <LogIn className="h-5 w-5 text-white" />,
                           Workflow: () => <Workflow className="h-5 w-5 text-white" />,
                           Variable: () => <Variable className="h-5 w-5 text-white" />,
                           FileText: () => <FileText className="h-5 w-5 text-white" />,
                           Bot: () => <Bot className="h-5 w-5 text-white" />,
                           Rocket: () => <Rocket className="h-5 w-5 text-white" />,
-                        }[item.icon as keyof typeof IconComponent];
+                        };
+                        const IconComponent = iconMap[item.icon];
                         
                         return (
                         <div key={item.step} className="flex items-start">

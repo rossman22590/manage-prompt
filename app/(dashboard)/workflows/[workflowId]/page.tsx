@@ -1,6 +1,7 @@
 import { DownloadIcon } from "@radix-ui/react-icons";
 import { PauseCircleIcon, PlayCircleIcon, Terminal } from "lucide-react";
 import Link from "next/link";
+import { ShareButton } from "@/components/console/workflow/share-button";
 import { WorkflowBranchPicker } from "@/components/console/workflow/workflow-branch-picker";
 import { WorkflowComposer } from "@/components/console/workflow/workflow-composer";
 import {
@@ -75,6 +76,10 @@ export default async function WorkflowEditor(props: Props) {
                   <DownloadIcon className="mr-1 h-4 w-4" aria-hidden="true" />
                   Export
                 </Link>
+
+                {workflow.published && (
+                  <ShareButton workflowShortId={workflow.shortId} workflowName={workflow.name} />
+                )}
               </span>
             </div>
 

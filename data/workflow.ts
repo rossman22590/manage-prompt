@@ -188,6 +188,8 @@ export type WorkflowInput = {
   type?: WorkflowInputType;
   label?: string;
   value?: string;
+  required?: boolean;
+  placeholder?: string;
 };
 
 export enum WorkflowInputType {

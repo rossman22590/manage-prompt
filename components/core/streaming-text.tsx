@@ -11,6 +11,7 @@ export default function StreamingText({
   className,
   renderMarkdown = false,
   onCompleted,
+  onResultChange,
 }: {
   url: string;
   body?: any;
@@ -18,11 +19,19 @@ export default function StreamingText({
   className?: string;
   renderMarkdown?: boolean;
   onCompleted?: () => void;
+  onResultChange?: (result: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [error, setError] = useState<string | null>(null);
   const hasStarted = useRef(false);
+
+  // Use useEffect to call onResultChange when result changes, avoiding setState during render
+  useEffect(() => {
+    if (result && onResultChange) {
+      onResultChange(result);
+    }
+  }, [result, onResultChange]);
 
   const getData = useCallback(async () => {
     setLoading(true);
