@@ -173,10 +173,10 @@ const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; toggleOpen: () => void
   <div className="mb-4">
     <button
       onClick={toggleOpen}
-      className="flex justify-between items-center w-full p-4 bg-purple-50 rounded-lg focus:outline-none"
+      className="flex justify-between items-center w-full p-4 bg-purple-50 dark:bg-[#1a1a1a] rounded-lg focus:outline-none"
     >
-      <span className="text-lg font-semibold text-gray-900">{item.question}</span>
-      {isOpen ? <MinusCircle className="h-5 w-5 text-purple-600" /> : <PlusCircle className="h-5 w-5 text-purple-600" />}
+      <span className="text-lg font-semibold text-gray-900 dark:text-gray-200">{item.question}</span>
+      {isOpen ? <MinusCircle className="h-5 w-5 text-purple-600 dark:text-pink-500" /> : <PlusCircle className="h-5 w-5 text-purple-600 dark:text-pink-500" />}
     </button>
     <AnimatePresence>
       {isOpen && (
@@ -185,9 +185,9 @@ const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; toggleOpen: () => void
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
-          className="p-4 bg-white"
+          className="p-4 bg-white dark:bg-black"
         >
-          <p className="text-gray-600">{item.answer}</p>
+          <p className="text-gray-600 dark:text-gray-400">{item.answer}</p>
         </motion.div>
       )}
     </AnimatePresence>
@@ -203,19 +203,19 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 text-gray-800 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 dark:from-black dark:to-black text-gray-800 dark:text-gray-200 overflow-hidden">
       <Header />
 
       <main>
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden dark:bg-black">
           {/* Background animation */}
           <div className="absolute inset-0 z-0">
             <div className="relative h-full w-full">
-              {['purple', 'pink', 'blue'].map((color, index) => (
+              {['purple', 'pink'].map((color, index) => (
                 <div 
                   key={color}
-                  className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-${color}-200 via-${color}-100 to-transparent opacity-${70 - index * 15} animate-pulse`}
+                  className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-${color}-200 via-${color}-100 to-transparent dark:from-black dark:via-black dark:to-transparent opacity-${70 - index * 15} dark:opacity-0 animate-pulse`}
                   style={{ animationDelay: `${-index * 2}s` }}
                 />
               ))}
@@ -228,19 +228,19 @@ export default function Home() {
               <h1 className="text-6xl sm:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 animate-gradient-x">
                 AI Tutor API
               </h1>
-              <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-600">
+              <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-600 dark:text-gray-400">
                 Revolutionize learning with AI-driven technology that powers AI Tutor. Empower your applications with our cutting-edge AI Tutor API.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
                   href="https://aitutor-api.vercel.app/workflows"
-                  className={buttonVariants({ variant: "default", size: "lg", className: "bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
+                  className={buttonVariants({ variant: "default", size: "lg", className: "bg-purple-600 dark:bg-pink-500 hover:bg-purple-700 dark:hover:bg-pink-600 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Get started
                 </Link>
                 <Link
                   href="https://support.myapps.ai/introduction"
-                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
+                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 dark:text-pink-500 border-purple-600 dark:border-pink-500 hover:bg-purple-100 dark:hover:bg-pink-950/30 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Documentation
                 </Link>
@@ -254,18 +254,18 @@ export default function Home() {
             transition={{ repeat: Infinity, duration: 2 }}
             className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
           >
-            <ChevronDownIcon className="h-10 w-10 text-purple-600 opacity-70" />
+            <ChevronDownIcon className="h-10 w-10 text-purple-600 dark:text-pink-500 opacity-70" />
           </motion.div>
         </section>
 
         {/* Features Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white opacity-50" />
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-white dark:!bg-black">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white dark:from-transparent dark:to-transparent opacity-50 dark:opacity-0" />
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600">Powerful Features</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">Powerful Features</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
                   Build Intelligent Systems
                 </p>
               </div>
@@ -274,12 +274,12 @@ export default function Home() {
               <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
                 {features.map((feature, index) => (
                   <AnimatedSection key={feature.name} delay={index * 0.2}>
-                    <div className="flex flex-col bg-purple-50 rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200 transform hover:scale-105">
-                      <dt className="flex items-center gap-x-3 text-xl font-semibold leading-7 text-gray-900">
-                        <feature.icon className="h-8 w-8 flex-none text-purple-600" aria-hidden="true" />
+                    <div className="flex flex-col bg-purple-50 dark:bg-[#1a1a1a] rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200 dark:hover:shadow-gray-900 transform hover:scale-105">
+                      <dt className="flex items-center gap-x-3 text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200">
+                        <feature.icon className="h-8 w-8 flex-none text-purple-600 dark:text-pink-500" aria-hidden="true" />
                         {feature.name}
                       </dt>
-                      <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                      <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-400">
                         <p className="flex-auto">{feature.description}</p>
                       </dd>
                     </div>
@@ -291,15 +291,15 @@ export default function Home() {
         </section>
 
       {/* Multi LLM API Section */}
-<section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+<section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-[#1a0a1a]">
   <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
     <AnimatedSection>
       <div className="mx-auto max-w-2xl lg:text-center">
-        <h2 className="text-base font-semibold leading-7 text-purple-600">Multi LLM API</h2>
-        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+        <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">Multi LLM API</h2>
+        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
           One API, Multiple Language Models
         </p>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
+        <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
           Access a wide range of language models through a single, unified API. Simplify your workflow and leverage the power of multiple AI models.
         </p>
       </div>
@@ -312,10 +312,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+            className="flex flex-col items-center p-6 bg-white dark:bg-[#1a1a1a] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
           >
-            <model.Icon className="h-12 w-12 text-purple-600 mb-4" />
-            <h3 className="text-lg font-semibold">{model.name}</h3>
+            <model.Icon className="h-12 w-12 text-purple-600 dark:text-pink-500 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{model.name}</h3>
           </motion.div>
         ))}
       </div>
@@ -324,15 +324,15 @@ export default function Home() {
 </section>
 
         {/* AI Workflows Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-b from-white to-purple-50">
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-b from-white to-purple-50 dark:bg-black">
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600">AI Workflows</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">AI Workflows</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
                   Streamline Your AI Processes
                 </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
+                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
                   Create powerful AI workflows that combine multiple language models and custom logic to solve complex problems.
                 </p>
               </div>
@@ -340,10 +340,10 @@ export default function Home() {
             <AnimatedSection delay={0.2}>
               <div className="mt-16 relative">
                 <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-gray-300" />
+                  <div className="w-full border-t border-gray-300 dark:border-gray-800" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-gradient-to-r from-purple-50 via-white to-purple-50 px-6 text-lg font-semibold leading-6 text-gray-900">
+                  <span className="bg-gradient-to-r from-purple-50 via-white to-purple-50 dark:from-gray-950 dark:via-black dark:to-gray-950 px-6 text-lg font-semibold leading-6 text-gray-900 dark:text-gray-200">
                     Workflow Example
                   </span>
                 </div>
@@ -353,10 +353,10 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden"
+                  className="w-full max-w-4xl bg-white dark:bg-[#1a1a1a] rounded-lg shadow-xl overflow-hidden"
                 >
                   <div className="px-6 py-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Advanced Question Answering Workflow</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-200 mb-6">Advanced Question Answering Workflow</h3>
                     <div className="space-y-6">
                       {[
                         { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "LogIn" },
@@ -382,12 +382,12 @@ export default function Home() {
                             {IconComponent && <IconComponent />}
                           </div>
                           <div className="ml-4 flex-1">
-                            <h4 className="text-lg font-medium text-gray-900">{item.title}</h4>
-                            <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                            <h4 className="text-lg font-medium text-gray-900 dark:text-gray-200">{item.title}</h4>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{item.description}</p>
                           </div>
                           {index < 5 && (
                             <div className="ml-4 flex-shrink-0 h-full">
-                              <div className="w-px h-full bg-gray-200 mx-auto"></div>
+                              <div className="w-px h-full bg-gray-200 dark:bg-gray-800 mx-auto"></div>
                             </div>
                           )}
                         </div>
@@ -402,7 +402,7 @@ export default function Home() {
               <div className="mt-16 text-center">
                 <Link
                   href="https://support.myapps.ai/introduction"
-                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 border-purple-600 hover:bg-purple-100 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
+                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 dark:text-pink-500 border-purple-600 dark:border-pink-500 hover:bg-purple-100 dark:hover:bg-pink-950/30 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
                 >
                   Learn More About Workflows
                 </Link>
@@ -412,15 +412,15 @@ export default function Home() {
         </section>
 
         {/* API Usage Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-white dark:!bg-[#1a0a1a]">
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600">API Usage</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">API Usage</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
                   Integrate AI Tutor in Minutes
                 </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
+                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
                   Our API is designed for easy integration. Here's a quick example of how to use it in different languages.
                 </p>
               </div>
@@ -432,7 +432,7 @@ export default function Home() {
                     <button
                       key={lang}
                       onClick={() => setActiveTab(lang)}
-                      className={`px-4 py-2 rounded-lg ${activeTab === lang ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                      className={`px-4 py-2 rounded-lg ${activeTab === lang ? 'bg-purple-600 dark:bg-pink-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
                     >
                       {lang.charAt(0).toUpperCase() + lang.slice(1)}
                     </button>
@@ -449,15 +449,15 @@ export default function Home() {
         </section>
 
         {/* API Features Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-black">
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600">API Features</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">API Features</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
                   Powerful Capabilities at Your Fingertips
                 </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
+                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
                   Explore the advanced features of our AI Tutor API that set it apart from the rest.
                 </p>
               </div>
@@ -477,11 +477,11 @@ export default function Home() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                    className="flex flex-col items-center p-6 bg-white dark:bg-[#1a1a1a] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                   >
-                    <feature.icon className="h-12 w-12 text-purple-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-center">{feature.name}</h3>
-                    <p className="mt-2 text-sm text-gray-600 text-center">{feature.description}</p>
+                    <feature.icon className="h-12 w-12 text-purple-600 dark:text-pink-500 mb-4" />
+                    <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-gray-200">{feature.name}</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 text-center">{feature.description}</p>
                   </motion.div>
                 ))}
               </div>
@@ -490,13 +490,13 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-purple-50">
-          <div className="absolute inset-0 bg-gradient-to-t from-white to-purple-50 opacity-50"></div>
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-purple-50 dark:!bg-[#1a0a1a]">
+          <div className="absolute inset-0 bg-gradient-to-t from-white to-purple-50 dark:from-transparent dark:to-transparent opacity-50 dark:opacity-0"></div>
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl sm:text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Simple, transparent pricing</h2>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">Simple, transparent pricing</h2>
+                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
                   Prices are per 10 Million  tokens.
                 </p>
               </div>
@@ -504,39 +504,39 @@ export default function Home() {
             <AnimatedSection delay={0.2}>
               <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-2">
                 {/* Pay as you go Card */}
-                <div className="rounded-3xl ring-1 ring-purple-200 bg-white shadow-xl">
+                <div className="rounded-3xl ring-1 ring-purple-200 dark:ring-gray-800 bg-white dark:bg-black shadow-xl">
                   <div className="p-8 sm:p-10">
-                    <h3 className="text-2xl font-bold tracking-tight text-gray-900">Pay as you go</h3>
-                    <p className="mt-6 text-base leading-7 text-gray-600">
+                    <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">Pay as you go</h3>
+                    <p className="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
                       Start with our flexible pay-as-you-go plan. Perfect for testing and small projects.
                     </p>
                     <div className="mt-10 flex items-center gap-x-4">
-                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What&apos;s included</h4>
-                      <div className="h-px flex-auto bg-purple-200" />
+                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600 dark:text-pink-500">What&apos;s included</h4>
+                      <div className="h-px flex-auto bg-purple-200 dark:bg-gray-800" />
                     </div>
                     <ul
                       role="list"
-                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600"
+                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-400"
                     >
                       {includedFeatures.map((feature) => (
                         <li key={feature} className="flex gap-x-3 items-center">
-                          <CheckIcon className="h-6 w-5 flex-none text-purple-600" aria-hidden="true" />
+                          <CheckIcon className="h-6 w-5 flex-none text-purple-600 dark:text-pink-500" aria-hidden="true" />
                           {feature}
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="rounded-2xl bg-purple-50 py-10 text-center ring-1 ring-inset ring-purple-200">
+                  <div className="rounded-2xl bg-purple-50 dark:bg-[#1a1a1a] py-10 text-center ring-1 ring-inset ring-purple-200 dark:ring-gray-800">
                     <div className="mx-auto max-w-xs px-8">
-                      <p className="text-base font-semibold text-gray-600">Pay as you go</p>
+                      <p className="text-base font-semibold text-gray-600 dark:text-gray-400">Pay as you go</p>
                       <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                        <span className="text-5xl font-bold tracking-tight text-gray-900">$0</span>
-                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/month</span>
+                        <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-200">$0</span>
+                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-gray-400">/month</span>
                       </p>
-                      <p className="mt-2 text-sm text-gray-600">Buy credit packs as needed</p>
+                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Buy credit packs as needed</p>
                       <Link
                         href="https://aitutor-api.vercel.app/console/workflows"
-                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 hover:bg-purple-700 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
+                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 dark:bg-pink-500 hover:bg-purple-700 dark:hover:bg-pink-600 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
                       >
                         Get started
                       </Link>
@@ -545,41 +545,41 @@ export default function Home() {
                 </div>
 
                 {/* Enterprise Card */}
-                <div className="rounded-3xl ring-2 ring-purple-500 bg-white shadow-xl">
+                <div className="rounded-3xl ring-2 ring-purple-500 dark:ring-pink-500 bg-white dark:bg-black shadow-xl">
                   <div className="p-8 sm:p-10">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-2xl font-bold tracking-tight text-gray-900">Enterprise AI Tutor API Plan</h3>
-                      <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-600">Popular</span>
+                      <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">Enterprise AI Tutor API Plan</h3>
+                      <span className="rounded-full bg-purple-100 dark:bg-pink-900/30 px-3 py-1 text-xs font-semibold text-purple-600 dark:text-pink-400">Popular</span>
                     </div>
-                    <p className="mt-6 text-base leading-7 text-gray-600">
+                    <p className="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
                       Get access to our powerful AI Tutor API with all the features you need to create intelligent tutoring systems.
                     </p>
                     <div className="mt-10 flex items-center gap-x-4">
-                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600">What&apos;s included</h4>
-                      <div className="h-px flex-auto bg-purple-200" />
+                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600 dark:text-pink-500">What&apos;s included</h4>
+                      <div className="h-px flex-auto bg-purple-200 dark:bg-gray-800" />
                     </div>
                     <ul
                       role="list"
-                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600"
+                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-400"
                     >
                       {includedFeatures.map((feature) => (
                         <li key={feature} className="flex gap-x-3 items-center">
-                          <CheckIcon className="h-6 w-5 flex-none text-purple-600" aria-hidden="true" />
+                          <CheckIcon className="h-6 w-5 flex-none text-purple-600 dark:text-pink-500" aria-hidden="true" />
                           {feature}
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="rounded-2xl bg-purple-50 py-10 text-center ring-1 ring-inset ring-purple-200">
+                  <div className="rounded-2xl bg-purple-50 dark:bg-[#1a1a1a] py-10 text-center ring-1 ring-inset ring-purple-200 dark:ring-gray-800">
                     <div className="mx-auto max-w-xs px-8">
-                      <p className="text-base font-semibold text-gray-600">Billed Monthly</p>
+                      <p className="text-base font-semibold text-gray-600 dark:text-gray-400">Billed Monthly</p>
                       <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                        <span className="text-5xl font-bold tracking-tight text-gray-900">$150</span>
-                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600">/10M tokens</span>
+                        <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-200">$150</span>
+                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-gray-400">/10M tokens</span>
                       </p>
                       <Link
                         href="/billing"
-                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 hover:bg-purple-700 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
+                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 dark:bg-pink-500 hover:bg-purple-700 dark:hover:bg-pink-600 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
                       >
                         Get started
                       </Link>
@@ -592,12 +592,12 @@ export default function Home() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-white dark:!bg-black">
           <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
             <AnimatedSection>
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600">FAQ</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">FAQ</h2>
+                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
                   Frequently Asked Questions
                 </p>
               </div>
@@ -618,15 +618,15 @@ export default function Home() {
         </section>
 
         {/* Integration Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100">
+        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-[#1a0a1a]">
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
           <AnimatedSection>
             <div className="mx-auto max-w-2xl lg:text-center">
-              <h2 className="text-base font-semibold leading-7 text-purple-600">Easy Integration</h2>
-              <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">Easy Integration</h2>
+              <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
                 Integrate with Your Favorite Tools
               </p>
-              <p className="mt-6 text-lg leading-8 text-gray-600">
+              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
                 Our API seamlessly integrates with a wide range of development tools and platforms, making it easy to incorporate AI into your existing workflows.
               </p>
             </div>
@@ -639,13 +639,10 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex flex-col items-center justify-center w-32 h-32 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110"
-                  style={{
-                    background: `linear-gradient(135deg, #fff, ${tech.color})`,
-                  }}
+                  className="flex flex-col items-center justify-center w-32 h-32 bg-white dark:bg-[#1a1a1a] rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110 border border-gray-200 dark:border-gray-800"
                 >
-                  <tech.Icon className="text-4xl mb-2" style={{ color: "#000" }} />
-                  <span className="text-sm font-semibold text-gray-800">{tech.name}</span>
+                  <tech.Icon className="text-4xl mb-2 text-gray-900 dark:text-white" />
+                  <span className="text-sm font-semibold text-gray-800 dark:text-white">{tech.name}</span>
                 </motion.div>
               ))}
             </div>

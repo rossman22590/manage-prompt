@@ -44,7 +44,7 @@ export default async function Billing() {
       <PageSection topInset>
         <div className="mx-auto max-w-5xl space-y-8 p-6">
           {/* Current Credits */}
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
@@ -60,35 +60,35 @@ export default async function Billing() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Buy Credits Card */}
-            <div className="rounded-3xl ring-1 ring-purple-200 dark:ring-purple-800 bg-white dark:bg-gray-800 shadow-xl overflow-hidden">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-black overflow-hidden">
               <div className="p-8 sm:p-10">
-                <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">
+                <h3 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-200">
                   Buy Credit Packs
                 </h3>
-                <p className="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
+                <p className="mt-4 text-sm leading-6 text-gray-600 dark:text-gray-400">
                   Purchase credit packs to add credits to your account. Credits are deducted when you run workflows (1 credit = 100 tokens).
                 </p>
-                <div className="mt-10 flex items-center gap-x-4">
-                  <h4 className="flex-none text-sm font-semibold leading-6 text-pink-600 dark:text-pink-400">
+                <div className="mt-8 flex items-center gap-x-4">
+                  <h4 className="flex-none text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
                     Available Packs
                   </h4>
-                  <div className="h-px flex-auto bg-purple-200 dark:bg-purple-800" />
+                  <div className="h-px flex-auto bg-gray-200 dark:bg-gray-800" />
                 </div>
                 <ul
                   role="list"
-                  className="mt-8 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-400"
+                  className="mt-6 space-y-3 text-sm leading-6 text-gray-600 dark:text-gray-400"
                 >
                   <li className="flex gap-x-3 items-center">
-                    <CheckIcon className="h-6 w-5 flex-none text-pink-600 dark:text-pink-400" aria-hidden="true" />
+                    <CheckIcon className="h-5 w-5 flex-none text-gray-500 dark:text-gray-400" aria-hidden="true" />
                     Starter Pack: $25 for 1,000 credits
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <CheckIcon className="h-6 w-5 flex-none text-pink-600 dark:text-pink-400" aria-hidden="true" />
+                    <CheckIcon className="h-5 w-5 flex-none text-gray-500 dark:text-gray-400" aria-hidden="true" />
                     Pro Pack: $50 for 2,500 credits
                   </li>
                 </ul>
               </div>
-              <div className="rounded-2xl bg-purple-50 dark:bg-purple-900/20 py-10 text-center ring-1 ring-inset ring-purple-200 dark:ring-purple-800">
+              <div className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#1a1a1a] py-8 text-center">
                 <div className="mx-auto max-w-xs px-8">
                   <BuyCreditsButton />
                 </div>
@@ -97,7 +97,7 @@ export default async function Billing() {
 
             {/* Enterprise Subscription Card */}
             {!subscription && (
-              <div className="rounded-3xl ring-2 ring-pink-500 dark:ring-pink-600 bg-white dark:bg-gray-800 shadow-xl overflow-hidden">
+              <div className="rounded-3xl ring-2 ring-pink-500 dark:ring-pink-600 bg-white dark:bg-black shadow-xl overflow-hidden">
                 <div className="p-8 sm:p-10">
                   <div className="flex items-center gap-2 mb-4">
                     <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">
@@ -160,7 +160,7 @@ export default async function Billing() {
 
             {/* Current Subscription Info */}
             {subscription && (
-              <div className="rounded-3xl ring-1 ring-purple-200 dark:ring-purple-800 bg-white dark:bg-gray-800 shadow-xl overflow-hidden">
+              <div className="rounded-3xl ring-1 ring-purple-200 dark:ring-purple-900 bg-white dark:bg-black shadow-xl overflow-hidden">
                 <div className="p-8 sm:p-10">
                   <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">
                     Current Subscription

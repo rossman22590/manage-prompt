@@ -1,4 +1,4 @@
-import { modelToProviderId, type WorkflowInput } from "@/data/workflow";
+import { hasWebSearch, modelToProviderId, type WorkflowInput } from "@/data/workflow";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { hasExceededSpendLimit, isSubscriptionActive, reportUsage } from "@/lib/utils/stripe";
@@ -109,15 +109,25 @@ export async function POST(
       instruction = instruction.replace(`{{${key}}}`, body[key]);
     });
 
-    const model = modelToProviderId[workflow.model] ?? workflow.model;
+    let providerModelId = modelToProviderId[workflow.model] ?? workflow.model;
+    // Append :online for web search capable models
+    // Only if enableWebSearch is true (defaults to true if not specified)
+    // Note: :online works for ANY model on OpenRouter (uses native search if available, otherwise Exa)
+    // We enable it for models that have native/built-in web search capabilities
+    const isPerplexityModel = providerModelId.startsWith('perplexity/');
+    const modelSettings = (workflow.modelSettings as any) ?? {};
+    const shouldEnableWebSearch = modelSettings.enableWebSearch !== false; // Default to true
+    if (hasWebSearch(workflow.model as any) && !isPerplexityModel && shouldEnableWebSearch) {
+      // Append :online suffix - uses native search for OpenAI/Gemini, Exa for others
+      providerModelId = `${providerModelId}:online`;
+    }
+    
     const subscription = organization?.stripe
       ?.subscription as unknown as Stripe.Subscription | null;
 
     const openrouter = createOpenRouter({
       apiKey: process.env.OPENROUTER_API_KEY,
     });
-
-    const modelSettings = (workflow.modelSettings as any) ?? {};
 
     // If images are present, use messages format with parts array
     if (imageParts && imageParts.length > 0) {
@@ -150,7 +160,7 @@ export async function POST(
       );
 
       const completion = streamText({
-        model: openrouter(model),
+        model: openrouter(providerModelId),
         headers: getOpenRouterHeaders(),
         messages: [
           {
@@ -182,7 +192,7 @@ export async function POST(
 
     // No images, use prompt format
     const completion = streamText({
-      model: openrouter(model),
+      model: openrouter(providerModelId),
       headers: getOpenRouterHeaders(),
       prompt: content,
       system: instruction || undefined,

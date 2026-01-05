@@ -9,6 +9,7 @@ import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
 import { cn } from "@/lib/utils";
 import logo from "../../public/images/logo.png";
 import { UserButton } from "../core/auth";
+import { ThemeToggle } from "../core/theme-toggle";
 
 type Props = {
   isPublicPage?: boolean;
@@ -101,7 +102,8 @@ export default function NavBar({ isPublicPage = false }: Props) {
             </div>
 
             {!isPublicPage ? (
-              <div className="flex ml-2 justify-center">
+              <div className="flex ml-2 justify-center gap-2">
+                <ThemeToggle />
                 <UserButton />
               </div>
             ) : null}
@@ -130,7 +132,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
               aria-current={tab.current ? "page" : undefined}
               prefetch={false}
             >
-              <span className="rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-gray-100 hover:text-black dark:hover:bg-gray-800 dark:hover:text-white">
+              <span className="rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-gray-100 hover:text-black dark:hover:bg-[#2a2a2a] dark:hover:text-white">
                 {tab.name}
               </span>
             </Link>

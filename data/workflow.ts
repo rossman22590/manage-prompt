@@ -240,6 +240,32 @@ export const hasLargeContextWindow = (model: AIModel): boolean => {
   return largeContextWindowModels.has(model);
 };
 
+// Models that support web search capabilities
+export const webSearchCapableModels: Set<AIModel> = new Set([
+  // Perplexity models (built-in web search)
+  "sonar",
+  "sonar-pro",
+  "sonar-reasoning",
+  "sonar-reasoning-pro",
+  
+  // OpenAI models (web_search tool support)
+  "gpt-5",
+  "gpt-5-pro",
+  "gpt-5.2",
+  "gpt-5.2-chat",
+  "gpt-5.2-pro",
+  
+  // Google Gemini models (google_search tool support)
+  "gemini-2-5-pro",
+  "gemini-2-5-flash",
+  "gemini-2-5-flash-lite",
+  "gemini-3-pro-preview",
+] as AIModel[]);
+
+export const hasWebSearch = (model: AIModel): boolean => {
+  return webSearchCapableModels.has(model);
+};
+
 // The rest of your code remains unchanged
 export const modelHasInstruction: Record<string, boolean> = {};
 

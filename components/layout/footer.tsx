@@ -75,24 +75,6 @@ export function Footer({ isHome = false }: { isHome?: boolean }) {
           </div>
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold leading-6">Solutions</h3>
-                <ul className="mt-6 space-y-1">
-                  {navigation.solutions.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-sm leading-6 text-gray-700 dark:text-gray-300 hover:text-black hover:dark:text-white"
-                        prefetch={false}
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="md:grid md:grid-cols-2 md:gap-8">
               <div className="mt-10 md:mt-0">
                 <h3 className="text-sm font-semibold leading-6">Legal</h3>
                 <ul className="mt-6 space-y-1">

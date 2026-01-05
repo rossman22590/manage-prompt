@@ -55,13 +55,12 @@ export function CreditPackModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] border-pink-200 dark:border-pink-800">
+      <DialogContent className="sm:max-w-[600px] border-gray-200 dark:border-gray-800">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl text-pink-600 dark:text-pink-400">
-            <Sparkles className="h-6 w-6 text-pink-500" />
+          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-200">
             Buy Credit Packs
           </DialogTitle>
-          <DialogDescription className="text-pink-600/80 dark:text-pink-400/80">
+          <DialogDescription className="text-gray-600 dark:text-gray-400">
             Choose a credit pack to add credits to your account. Credits are
             deducted when you run workflows (1 credit = 100 tokens).
           </DialogDescription>
@@ -71,10 +70,10 @@ export function CreditPackModal({
           {CREDIT_PACKS.map((pack) => (
             <div
               key={pack.priceId}
-              className={`relative rounded-lg border-2 p-6 transition-all hover:shadow-lg ${
+              className={`relative rounded-lg border p-6 transition-all ${
                 pack.popular
-                  ? "border-pink-500 bg-pink-50 dark:bg-pink-950/20"
-                  : "border-pink-200 dark:border-pink-800 bg-background"
+                  ? "border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#1a1a1a]"
+                  : "border-gray-200 dark:border-gray-800 bg-white dark:bg-black"
               }`}
             >
               {pack.popular && (
@@ -86,26 +85,26 @@ export function CreditPackModal({
               )}
 
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-pink-700 dark:text-pink-300">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
                   {pack.name}
                 </h3>
-                <p className="mt-1 text-sm text-pink-600/70 dark:text-pink-400/70">
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                   {pack.description}
                 </p>
               </div>
 
               <div className="mb-4">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+                  <span className="text-3xl font-bold text-gray-900 dark:text-gray-200">
                     ${pack.price}
                   </span>
-                  <span className="text-sm text-pink-500/70 dark:text-pink-400/70">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     one-time
                   </span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-pink-500" />
-                  <span className="text-lg font-semibold text-pink-700 dark:text-pink-300">
+                  <Sparkles className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
                     {pack.credits.toLocaleString()} credits
                   </span>
                 </div>
@@ -114,12 +113,8 @@ export function CreditPackModal({
               <Button
                 onClick={() => handleSelect(pack.priceId)}
                 disabled={loading === pack.priceId}
-                className={`w-full ${
-                  pack.popular
-                    ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
-                    : "bg-pink-50 hover:bg-pink-100 text-pink-700 dark:bg-pink-950/30 dark:hover:bg-pink-900/40 dark:text-pink-300 border-pink-300 dark:border-pink-700"
-                }`}
-                variant={pack.popular ? "default" : "outline"}
+                className="w-full bg-pink-500 hover:bg-pink-600 text-white"
+                variant="default"
               >
                 {loading === pack.priceId ? (
                   "Processing..."

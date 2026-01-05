@@ -36,7 +36,7 @@ export async function WorkflowItem({ workflow }: Props) {
   const isDeprecated = modelLabel.toLowerCase().includes("deprecated");
 
   return (
-    <div className="relative flex items-center space-x-4 p-4 bg-seconday bg-white hover:bg-gray-50 dark:bg-gray-950 dark:hover:bg-gray-900">
+    <div className="relative flex items-center space-x-4 p-4 bg-white hover:bg-gray-50 dark:bg-black dark:hover:bg-[#2a2a2a]">
       <div className="min-w-0 flex-auto">
         <div className="flex items-center gap-x-2">
           <span

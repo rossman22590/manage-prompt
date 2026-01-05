@@ -1,5 +1,5 @@
 import type { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
-import { modelToProviderId } from "@/data/workflow";
+import { hasWebSearch, modelToProviderId } from "@/data/workflow";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { generateText, streamText } from "ai";
 
@@ -35,6 +35,18 @@ export const getCompletion = async (
     apiKey: process.env.OPENROUTER_API_KEY,
   });
 
+  // Get provider ID and append :online for identified web search capable models
+  // Only if enableWebSearch is true (defaults to true if not specified)
+  // Note: While :online works for any model on OpenRouter, we only enable it for models we've identified
+  // Perplexity models have built-in search, so they don't need :online suffix
+  let providerModelId = modelToProviderId[model] ?? model;
+  const isPerplexityModel = providerModelId.startsWith('perplexity/');
+  const shouldEnableWebSearch = settings?.enableWebSearch !== false; // Default to true
+  if (hasWebSearch(model as any) && !isPerplexityModel && shouldEnableWebSearch) {
+    // Append :online suffix for identified models (uses native search for OpenAI/Gemini, Exa for others)
+    providerModelId = `${providerModelId}:online`;
+  }
+
   // If images are present, use messages format with parts array
   if (imageParts && imageParts.length > 0) {
     const parts: Array<{ type: 'text' | 'file'; text?: string; url?: string; mediaType?: string }> = [];
@@ -66,7 +78,7 @@ export const getCompletion = async (
     );
 
     const completion = await generateText({
-      model: openrouter(modelToProviderId[model] ?? model),
+      model: openrouter(providerModelId),
       headers: getOpenRouterHeaders(),
       messages: [
         {
@@ -75,7 +87,6 @@ export const getCompletion = async (
         },
       ],
       temperature: settings?.temperature ?? 0.5,
-      maxTokens: settings?.maxTokens ?? 4096,
       topP: settings?.topP ?? 1,
       frequencyPenalty: settings?.frequencyPenalty ?? 0,
       presencePenalty: settings?.presencePenalty ?? 0,
@@ -106,7 +117,7 @@ export const getCompletion = async (
   };
 
   const completion = await generateText({
-    model: openrouter(modelToProviderId[model] ?? model),
+    model: openrouter(providerModelId),
     headers: getOpenRouterHeaders(),
     ...modelParams,
   });
@@ -140,6 +151,18 @@ export const getStreamingCompletion = async (
     apiKey: process.env.OPENROUTER_API_KEY,
   });
 
+  // Get provider ID and append :online for identified web search capable models
+  // Only if enableWebSearch is true (defaults to true if not specified)
+  // Note: While :online works for any model on OpenRouter, we only enable it for models we've identified
+  // Perplexity models have built-in search, so they don't need :online suffix
+  let providerModelId = modelToProviderId[model] ?? model;
+  const isPerplexityModel = providerModelId.startsWith('perplexity/');
+  const shouldEnableWebSearch = settings?.enableWebSearch !== false; // Default to true
+  if (hasWebSearch(model as any) && !isPerplexityModel && shouldEnableWebSearch) {
+    // Append :online suffix for identified models (uses native search for OpenAI/Gemini, Exa for others)
+    providerModelId = `${providerModelId}:online`;
+  }
+
   // If images are present, use messages format with parts array
   if (imageParts && imageParts.length > 0) {
     const parts: Array<{ type: 'text' | 'file'; text?: string; url?: string; mediaType?: string }> = [];
@@ -171,7 +194,7 @@ export const getStreamingCompletion = async (
     );
 
     const completion = streamText({
-      model: openrouter(modelToProviderId[model] ?? model),
+      model: openrouter(providerModelId),
       headers: getOpenRouterHeaders(),
       messages: [
         {
@@ -180,7 +203,6 @@ export const getStreamingCompletion = async (
         },
       ],
       temperature: settings?.temperature ?? 0.5,
-      maxTokens: settings?.maxTokens ?? 1024,
       topP: settings?.topP ?? 1,
       frequencyPenalty: settings?.frequencyPenalty ?? 0,
       presencePenalty: settings?.presencePenalty ?? 0,
@@ -207,7 +229,7 @@ export const getStreamingCompletion = async (
   };
 
   const completion = streamText({
-    model: openrouter(modelToProviderId[model] ?? model),
+    model: openrouter(providerModelId),
     headers: getOpenRouterHeaders(),
     ...modelParams,
     onFinish,

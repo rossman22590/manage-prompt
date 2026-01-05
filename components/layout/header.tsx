@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
+import { ThemeToggle } from "../core/theme-toggle";
 
 const navigation = [
   {
@@ -49,7 +52,8 @@ export function Header() {
             </a>
           ))}
         </div>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-4">
+          <ThemeToggle />
           <Link
             href="/workflows"
             className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
@@ -57,6 +61,9 @@ export function Header() {
           >
             Console <span aria-hidden="true">&rarr;</span>
           </Link>
+        </div>
+        <div className="flex lg:hidden items-center gap-2">
+          <ThemeToggle />
         </div>
       </nav>
     </header>

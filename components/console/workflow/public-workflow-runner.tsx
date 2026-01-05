@@ -190,7 +190,7 @@ export function PublicWorkflowRunner({ workflow }: Props) {
                           <span className="w-full border-t border-gray-300 dark:border-gray-600"></span>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">Or</span>
+                          <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">Or</span>
                         </div>
                       </div>
                       <Input

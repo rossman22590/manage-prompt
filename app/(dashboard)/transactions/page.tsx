@@ -1,5 +1,6 @@
 import PageSection from "@/components/core/page-section";
 import PageTitle from "@/components/layout/page-title";
+import { ClickableTransactionRow } from "@/components/transactions/clickable-transaction-row";
 import {
     Table,
     TableBody,
@@ -8,6 +9,7 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
+import { AIModelToLabel } from "@/data/workflow";
 import { owner } from "@/lib/hooks/useOwner";
 import { prisma } from "@/lib/utils/db";
 import { notFound } from "next/navigation";
@@ -30,6 +32,7 @@ export default async function Transactions() {
         select: {
           id: true,
           name: true,
+          model: true,
           runs: {
             orderBy: {
               createdAt: "desc",
@@ -54,6 +57,8 @@ export default async function Transactions() {
     date: Date;
     status: string;
     workflowName?: string;
+    workflowId?: number;
+    model?: string;
   }> = [];
 
   if (organization.stripe?.customerId) {
@@ -104,11 +109,13 @@ export default async function Transactions() {
     }
   }
 
-  // Flatten runs from all workflows with their workflow names
+  // Flatten runs from all workflows with their workflow names and models
   const allRunsWithWorkflow = organization.workflows.flatMap((workflow) =>
     workflow.runs.map((run) => ({
       ...run,
       workflowName: workflow.name,
+      workflowId: workflow.id,
+      model: workflow.model,
     }))
   );
   
@@ -127,6 +134,8 @@ export default async function Transactions() {
       date: run.createdAt,
       status: "completed",
       workflowName: run.workflowName,
+      workflowId: (run as any).workflowId,
+      model: run.model,
     };
   });
 
@@ -149,7 +158,7 @@ export default async function Transactions() {
             </p>
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-black overflow-hidden">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -157,21 +166,25 @@ export default async function Transactions() {
                     <TableHead className="whitespace-nowrap">Date</TableHead>
                     <TableHead className="whitespace-nowrap">Type</TableHead>
                     <TableHead className="min-w-[200px]">Description</TableHead>
-                    <TableHead className="whitespace-nowrap">Workflow Name</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">Amount</TableHead>
-                    <TableHead className="whitespace-nowrap">Status</TableHead>
+                    <TableHead className="whitespace-nowrap hidden sm:table-cell">Workflow Name</TableHead>
+                    <TableHead className="whitespace-nowrap hidden md:table-cell">Model</TableHead>
+                    <TableHead className="text-right whitespace-nowrap hidden sm:table-cell">Amount</TableHead>
+                    <TableHead className="whitespace-nowrap hidden sm:table-cell">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {allTransactions.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      <TableCell colSpan={7} className="text-center py-8 text-gray-500 dark:text-gray-400">
                         No transactions found
                       </TableCell>
                     </TableRow>
                   ) : (
                     allTransactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
+                      <ClickableTransactionRow 
+                        key={transaction.id}
+                        workflowId={transaction.workflowId}
+                      >
                         <TableCell className="font-medium whitespace-nowrap">
                           <div className="flex flex-col">
                             <span className="text-sm">{transaction.date.toLocaleDateString()}</span>
@@ -191,12 +204,43 @@ export default async function Transactions() {
                             {transaction.type === "subscription" ? "Subscription" : transaction.type === "payment" ? "Payment" : "Credit Usage"}
                           </span>
                         </TableCell>
-                        <TableCell className="max-w-[300px]">
+                        <TableCell className="max-w-[200px] sm:max-w-[300px]">
                           <div className="truncate" title={transaction.description}>
                             {transaction.description}
                           </div>
+                          {/* Show workflow name, model, amount, and status on mobile */}
+                          <div className="sm:hidden mt-1 space-y-0.5">
+                            {transaction.workflowName && (
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Workflow:</span> {transaction.workflowName}
+                              </div>
+                            )}
+                            {transaction.model && (
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Model:</span> {AIModelToLabel[transaction.model as keyof typeof AIModelToLabel] || transaction.model}
+                              </div>
+                            )}
+                            <div className={`text-xs font-semibold ${
+                              transaction.amount < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"
+                            }`}>
+                              <span className="font-medium text-gray-600 dark:text-gray-400">Amount:</span> {transaction.amount < 0 ? "-" : "+"}
+                              {transaction.type === "credit_usage" 
+                                ? `${Math.abs(transaction.amount)} credits`
+                                : `$${Math.abs(transaction.amount).toFixed(2)}`
+                              }
+                            </div>
+                            <div className="text-xs">
+                              <span className={`px-1.5 py-0.5 rounded ${
+                                transaction.status === "paid" || transaction.status === "succeeded" || transaction.status === "completed"
+                                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                              }`}>
+                                {transaction.status}
+                              </span>
+                            </div>
+                          </div>
                         </TableCell>
-                        <TableCell className="whitespace-nowrap">
+                        <TableCell className="whitespace-nowrap hidden sm:table-cell">
                           {transaction.workflowName ? (
                             <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
                               {transaction.workflowName}
@@ -205,7 +249,16 @@ export default async function Transactions() {
                             <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
                           )}
                         </TableCell>
-                        <TableCell className={`text-right font-semibold whitespace-nowrap ${
+                        <TableCell className="whitespace-nowrap hidden md:table-cell">
+                          {transaction.model ? (
+                            <span className="text-sm text-gray-900 dark:text-gray-200">
+                              {AIModelToLabel[transaction.model as keyof typeof AIModelToLabel] || transaction.model}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className={`text-right font-semibold whitespace-nowrap hidden sm:table-cell ${
                           transaction.amount < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"
                         }`}>
                           {transaction.amount < 0 ? "-" : "+"}
@@ -214,7 +267,7 @@ export default async function Transactions() {
                             : `$${Math.abs(transaction.amount).toFixed(2)}`
                           }
                         </TableCell>
-                        <TableCell className="whitespace-nowrap">
+                        <TableCell className="whitespace-nowrap hidden sm:table-cell">
                           <span className={`px-2 py-1 rounded text-xs ${
                             transaction.status === "paid" || transaction.status === "succeeded" || transaction.status === "completed"
                               ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
@@ -223,7 +276,7 @@ export default async function Transactions() {
                             {transaction.status}
                           </span>
                         </TableCell>
-                      </TableRow>
+                      </ClickableTransactionRow>
                     ))
                   )}
                 </TableBody>

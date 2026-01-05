@@ -70,7 +70,7 @@ export function WorkflowRunItem({ workflowRun }: Props) {
             {branchId ?? "main"}
           </span>
           {totalTokenCount ? (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300">
               {totalTokenCount} tokens
             </span>
           ) : null}
@@ -91,7 +91,7 @@ export function WorkflowRunItem({ workflowRun }: Props) {
           <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Citations:</h4>
           <ul className="mt-2 space-y-1">
             {citations.map((citation: string, index: number) => (
-              <li key={index} className="text-xs text-blue-500 hover:text-blue-700 flex items-center">
+              <li key={index} className="text-xs text-pink-500 hover:text-pink-400 dark:text-pink-400 dark:hover:text-pink-300 flex items-center">
                 <LinkIcon className="w-3 h-3 mr-1" />
                 <a href={citation} target="_blank" rel="noopener noreferrer" className="truncate">
                   {citation}

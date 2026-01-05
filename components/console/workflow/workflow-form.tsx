@@ -1,21 +1,22 @@
 ﻿"use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import slugify from "slugify";
-import { toast } from "sonner";
 import {
   AIModels,
   AIModelToLabel,
   hasLargeContextWindow,
+  hasWebSearch,
   isVisionCapable,
   modelHasInstruction,
   type WorkflowInput,
   WorkflowInputType,
   WorkflowInputTypeToLabel,
 } from "@/data/workflow";
-import { Eye, Layers } from "lucide-react";
 import type { Workflow } from "@/generated/prisma-client/client";
+import { Eye, Globe, Layers } from "lucide-react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import slugify from "slugify";
+import { toast } from "sonner";
 import { SaveButton } from "../../form/button";
 import { Button, buttonVariants } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -27,6 +28,12 @@ import {
   SelectValue,
 } from "../../ui/select";
 import { Textarea } from "../../ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../ui/tooltip";
 import {
   type ModelSettings,
   WorkflowModelSettings,
@@ -171,19 +178,45 @@ export function WorkflowForm({
                   <SelectValue placeholder="Select a model" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60 overflow-y-auto">
-                  {filteredModels.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      <div className="flex items-center gap-2">
-                        <span>{AIModelToLabel[m]}</span>
-                        {isVisionCapable(m) && (
-                          <Eye className="h-4 w-4 text-pink-500 dark:text-pink-400" title="Supports image input" />
-                        )}
-                        {hasLargeContextWindow(m) && (
-                          <Layers className="h-4 w-4 text-pink-500 dark:text-pink-400" title="Supports 200k+ context window" />
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
+                  <TooltipProvider>
+                    {filteredModels.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        <div className="flex items-center gap-2">
+                          <span>{AIModelToLabel[m]}</span>
+                          {isVisionCapable(m) && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Eye className="h-4 w-4 text-pink-500 dark:text-pink-400 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Supports image input</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          {hasLargeContextWindow(m) && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Layers className="h-4 w-4 text-pink-500 dark:text-pink-400 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Supports 200k+ context window</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          {hasWebSearch(m) && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Globe className="h-4 w-4 text-pink-500 dark:text-pink-400 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Supports web search</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </TooltipProvider>
                 </SelectContent>
               </Select>
 
@@ -205,6 +238,7 @@ export function WorkflowForm({
                   onChange={(val) => {
                     setModelSettings(val);
                   }}
+                  model={model as any}
                 />
               )}
 
@@ -366,7 +400,7 @@ export function WorkflowForm({
                             <SelectContent>
                               {Object.keys(WorkflowInputType).map((type) => {
                                 const isImageType = type === WorkflowInputType.image;
-                                const isDisabled = isImageType && !isVisionCapable(model);
+                                const isDisabled = isImageType && !isVisionCapable(model as any);
                                 return (
                                   <SelectItem
                                     key={type}

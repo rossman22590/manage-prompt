@@ -261,7 +261,7 @@ export default async function Settings() {
               {secretKeys.map((key: SecretKey) => (
                 <div
                   key={key.id}
-                  className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+                  className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-black"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

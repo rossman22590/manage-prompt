@@ -474,7 +474,7 @@ export async function runTests(formData: FormData) {
     const inputs = workflow.inputs as unknown as WorkflowInput[];
     const model = workflow.model;
 
-    const content = await translateInputs({
+    const { content, imageParts } = await translateInputs({
       inputs,
       inputValues: JSON.parse(test.input as unknown as string) as Record<
         string,
@@ -487,6 +487,7 @@ export async function runTests(formData: FormData) {
       model,
       content,
       JSON.parse(JSON.stringify(workflow.modelSettings)),
+      imageParts,
     );
 
     const { result, rawResult, totalTokenCount } = response;

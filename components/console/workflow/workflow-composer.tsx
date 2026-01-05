@@ -179,7 +179,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                             <span className="w-full border-t border-gray-300 dark:border-gray-600"></span>
                           </div>
                           <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">Or</span>
+                            <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">Or</span>
                           </div>
                         </div>
                         <Input
@@ -241,12 +241,12 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
         <TabsContent value="review">
           <div className="border-b">
             {modelHasInstruction[model] ? (
-              <div className="mx-px mt-px px-3 pb-12 pt-2 text-sm leading-5 text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-900 whitespace-pre-wrap">
+              <div className="mx-px mt-px px-3 pb-12 pt-2 text-sm leading-5 text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-[#1a1a1a] whitespace-pre-wrap">
                 <span className="font-semibold">Instruction:</span>{" "}
                 {geneatedInstruction}
               </div>
             ) : null}
-            <div className="mx-px mt-px px-3 pb-12 pt-2 text-sm leading-5 text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-900 whitespace-pre-wrap">
+            <div className="mx-px mt-px px-3 pb-12 pt-2 text-sm leading-5 text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-[#1a1a1a] whitespace-pre-wrap">
               {generatedTemplate}
             </div>
           </div>
@@ -310,7 +310,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
       {streamUrl && (
         <div className="mt-6 border-t pt-6">
           <h3 className="text-lg font-semibold mb-3">Result</h3>
-          <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
+          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-[#1a1a1a]">
             <StreamingText
               url={streamUrl}
               body={inputValues}

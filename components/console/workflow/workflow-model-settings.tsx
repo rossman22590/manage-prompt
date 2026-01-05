@@ -11,6 +11,9 @@ import {
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Slider } from "../../ui/slider";
+import { Switch } from "../../ui/switch";
+import { hasWebSearch } from "@/data/workflow";
+import type { AIModel } from "@/data/workflow";
 
 export type ModelSettings = {
   temperature?: number;
@@ -18,14 +21,16 @@ export type ModelSettings = {
   topP?: number;
   frequencyPenalty?: number;
   presencePenalty?: number;
+  enableWebSearch?: boolean;
 };
 
 type Props = {
   defaultValue: ModelSettings;
   onChange: (settings: ModelSettings) => void;
+  model?: AIModel;
 };
 
-export function WorkflowModelSettings({ defaultValue, onChange }: Props) {
+export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) {
   const [temperature, setTemperature] = useState(
     defaultValue?.temperature ?? 1,
   );
@@ -37,6 +42,9 @@ export function WorkflowModelSettings({ defaultValue, onChange }: Props) {
   const [presencePenalty, setPresencePenalty] = useState(
     defaultValue?.presencePenalty ?? 0,
   );
+  const [enableWebSearch, setEnableWebSearch] = useState(
+    defaultValue?.enableWebSearch ?? true, // Default to true for web search capable models
+  );
 
   const triggerChange = useCallback(
     (val: any) => {
@@ -46,10 +54,11 @@ export function WorkflowModelSettings({ defaultValue, onChange }: Props) {
         topP,
         frequencyPenalty,
         presencePenalty,
+        enableWebSearch,
         ...val,
       });
     },
-    [temperature, maxTokens, topP, frequencyPenalty, presencePenalty, onChange],
+    [temperature, maxTokens, topP, frequencyPenalty, presencePenalty, enableWebSearch, onChange],
   );
 
   return (
@@ -148,6 +157,25 @@ export function WorkflowModelSettings({ defaultValue, onChange }: Props) {
               values make the model repeat less.
             </CardDescription>
           </div>
+
+          {model && hasWebSearch(model) && (
+            <div className="flex items-center justify-between space-x-2">
+              <div className="flex flex-col space-y-1">
+                <Label htmlFor="web-search">Enable Web Search</Label>
+                <CardDescription>
+                  Enable real-time web search for this model. This will append :online to the model ID.
+                </CardDescription>
+              </div>
+              <Switch
+                id="web-search"
+                checked={enableWebSearch}
+                onCheckedChange={(checked) => {
+                  setEnableWebSearch(checked);
+                  triggerChange({ enableWebSearch: checked });
+                }}
+              />
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
