@@ -27,7 +27,9 @@ export default async function Transactions() {
     include: {
       stripe: true,
       workflows: {
-        include: {
+        select: {
+          id: true,
+          name: true,
           runs: {
             orderBy: {
               createdAt: "desc",
@@ -51,6 +53,7 @@ export default async function Transactions() {
     amount: number;
     date: Date;
     status: string;
+    workflowName?: string;
   }> = [];
 
   if (organization.stripe?.customerId) {
@@ -101,11 +104,16 @@ export default async function Transactions() {
     }
   }
 
-  // Flatten runs from all workflows and add credit usage transactions
-  const allRuns = organization.workflows.flatMap((workflow) => workflow.runs);
+  // Flatten runs from all workflows with their workflow names
+  const allRunsWithWorkflow = organization.workflows.flatMap((workflow) =>
+    workflow.runs.map((run) => ({
+      ...run,
+      workflowName: workflow.name,
+    }))
+  );
   
   // Sort runs by date and take the most recent 100 across all workflows
-  const recentRuns = allRuns
+  const recentRuns = allRunsWithWorkflow
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .slice(0, 100);
 
@@ -118,6 +126,7 @@ export default async function Transactions() {
       amount: -creditsUsed, // Negative for usage
       date: run.createdAt,
       status: "completed",
+      workflowName: run.workflowName,
     };
   });
 
@@ -148,6 +157,7 @@ export default async function Transactions() {
                     <TableHead className="whitespace-nowrap">Date</TableHead>
                     <TableHead className="whitespace-nowrap">Type</TableHead>
                     <TableHead className="min-w-[200px]">Description</TableHead>
+                    <TableHead className="whitespace-nowrap">Workflow Name</TableHead>
                     <TableHead className="text-right whitespace-nowrap">Amount</TableHead>
                     <TableHead className="whitespace-nowrap">Status</TableHead>
                   </TableRow>
@@ -155,7 +165,7 @@ export default async function Transactions() {
                 <TableBody>
                   {allTransactions.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500 dark:text-gray-400">
                         No transactions found
                       </TableCell>
                     </TableRow>
@@ -185,6 +195,15 @@ export default async function Transactions() {
                           <div className="truncate" title={transaction.description}>
                             {transaction.description}
                           </div>
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {transaction.workflowName ? (
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                              {transaction.workflowName}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+                          )}
                         </TableCell>
                         <TableCell className={`text-right font-semibold whitespace-nowrap ${
                           transaction.amount < 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"
