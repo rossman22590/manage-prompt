@@ -26,14 +26,17 @@ interface Props {
 export default async function WorkflowRunDetails(props: Props) {
   const searchParams = await props.searchParams;
   const params = await props.params;
-  const currentPage = searchParams.page
-    ? Number.parseInt(searchParams.page)
+  const parsedPage = searchParams.page
+    ? Number.parseInt(searchParams.page, 10)
     : 1;
+  const currentPage =
+    Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const { count, workflowRuns } = await getWorkflowAndRuns({
     id: Number(params.workflowId),
     page: currentPage,
   });
-  const totalPages = Math.ceil(count / LIMIT);
+  const totalPages = Math.max(1, Math.ceil(count / LIMIT));
+  const hasNextPage = currentPage < totalPages;
 
   return (
     <>
@@ -54,7 +57,7 @@ export default async function WorkflowRunDetails(props: Props) {
               {currentPage > 1 ? (
                 <PaginationItem>
                   <PaginationPrevious
-                    href={`/workflows/${params.workflowId}?page=${
+                    href={`/workflows/${params.workflowId}/runs?page=${
                       currentPage - 1
                     }`}
                   />
@@ -65,7 +68,7 @@ export default async function WorkflowRunDetails(props: Props) {
                 return (
                   <PaginationItem key={`page-${pageNumber}`}>
                     <PaginationLink
-                      href={`/workflows?page=${pageNumber}`}
+                      href={`/workflows/${params.workflowId}/runs?page=${pageNumber}`}
                       className={cn(
                         pageNumber === currentPage &&
                           "text-primary font-semibold",
@@ -76,10 +79,10 @@ export default async function WorkflowRunDetails(props: Props) {
                   </PaginationItem>
                 );
               })}
-              {(currentPage - 1) * LIMIT + workflowRuns.length < count ? (
+              {hasNextPage ? (
                 <PaginationItem>
                   <PaginationNext
-                    href={`/workflows/${params.workflowId}?page=${
+                    href={`/workflows/${params.workflowId}/runs?page=${
                       currentPage + 1
                     }`}
                   />

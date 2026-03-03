@@ -1,10 +1,10 @@
-﻿import { createHash } from "node:crypto";
+import { createHash } from "node:crypto";
 import type { Prisma, Workflow } from "@/generated/prisma-client/client";
 import { prisma } from "@/lib/utils/db";
 import { owner } from "../hooks/useOwner";
 import { redisStore } from "./redis";
 
-export const LIMIT = 25;
+export const LIMIT = 15;
 
 export async function getWorkflowsForOwner({
   ownerId,
@@ -15,6 +15,7 @@ export async function getWorkflowsForOwner({
   search?: string;
   page?: number;
 }) {
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1;
   const dbQuery: Prisma.WorkflowFindManyArgs = {
     where: {
       ownerId,
@@ -23,7 +24,7 @@ export async function getWorkflowsForOwner({
       createdAt: "desc",
     },
     take: LIMIT,
-    skip: (page - 1) * LIMIT,
+    skip: (safePage - 1) * LIMIT,
   };
 
   if (search) {
@@ -65,6 +66,7 @@ export async function getWorkflowAndRuns({
   skipWorkflowRun?: boolean;
   branch?: string;
 }) {
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1;
   const { ownerId } = await owner();
   if (!ownerId) throw new Error("Owner ID not found");
 
@@ -117,7 +119,7 @@ export async function getWorkflowAndRuns({
             createdAt: "desc",
           },
           take: LIMIT,
-          skip: (page - 1) * LIMIT,
+          skip: (safePage - 1) * LIMIT,
         }),
         prisma.workflowRun.count({
           where: {
