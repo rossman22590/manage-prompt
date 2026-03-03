@@ -1,81 +1,83 @@
+import { SITE_METADATA } from "@/data/marketing";
 import { ImageResponse } from "next/og";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-
-    // ?title=<title>
     const hasTitle = searchParams.has("title");
-    const title = hasTitle ? searchParams.get("title")?.slice(0, 100) : "";
+    const title = hasTitle
+      ? searchParams.get("title")?.slice(0, 100)
+      : SITE_METADATA.TITLE;
+    const tagline = SITE_METADATA.TAGLINE;
 
     return new ImageResponse(
       <div
         style={{
-          backgroundColor: "black",
-          backgroundSize: "150px 150px",
           height: "100%",
           width: "100%",
           display: "flex",
-          textAlign: "center",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          flexDirection: "column",
-          flexWrap: "nowrap",
+          background:
+            "linear-gradient(135deg, hsl(292 84% 28%) 0%, hsl(270 55% 22%) 50%, hsl(262 65% 26%) 100%)",
         }}
       >
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            justifyItems: "center",
-            fontSize: 60,
+            padding: "0 80px",
           }}
         >
-          🪄🪄✨
+          <div
+            style={{
+              fontSize: 72,
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+              color: "white",
+              lineHeight: 1.1,
+              textAlign: "center",
+            }}
+          >
+            {title}
+          </div>
+          {title === SITE_METADATA.TITLE ? (
+            <div
+              style={{
+                fontSize: 28,
+                color: "rgba(255,255,255,0.75)",
+                marginTop: 20,
+                letterSpacing: "-0.02em",
+                textAlign: "center",
+              }}
+            >
+              {tagline}
+            </div>
+          ) : null}
         </div>
         <div
           style={{
-            fontSize: 60,
-            fontStyle: "normal",
-            letterSpacing: "-0.025em",
-            color: "white",
-            marginTop: 30,
-            padding: "0 120px",
-            lineHeight: 1.4,
-            whiteSpace: "pre-wrap",
+            position: "absolute",
+            bottom: 48,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          {title}
-        </div>
-
-        <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: 18,
-            position: "absolute",
-            width: 800,
-            height: 80,
-            bottom: -25,
-            left: 200,
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            bottom: 8,
-            left: 495,
-            textAlign: "center",
-            fontSize: 24,
-            fontStyle: "normal",
-            letterSpacing: "-0.025em",
-            color: "black",
-            lineHeight: 1.4,
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          manageprompt.com
+          <span
+            style={{
+              fontSize: 20,
+              color: "rgba(255,255,255,0.5)",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
+            One API · Every model · Zero infrastructure
+          </span>
         </div>
       </div>,
       {

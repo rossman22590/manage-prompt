@@ -3,11 +3,46 @@ import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { SITE_METADATA } from "@/data/marketing";
+import { getAppBaseUrl } from "@/lib/utils/url";
+import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata = {
-  title: SITE_METADATA.TITLE,
+const baseUrl = getAppBaseUrl();
+const ogImageUrl = `${baseUrl}/og?title=${encodeURIComponent(SITE_METADATA.TITLE)}`;
+
+export const metadata: Metadata = {
+  title: {
+    default: SITE_METADATA.TITLE,
+    template: `%s | ${SITE_METADATA.TITLE}`,
+  },
   description: SITE_METADATA.DESCRIPTION,
+  metadataBase: new URL(baseUrl),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: baseUrl,
+    siteName: SITE_METADATA.TITLE,
+    title: SITE_METADATA.TITLE,
+    description: SITE_METADATA.DESCRIPTION,
+    images: [
+      {
+        url: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: SITE_METADATA.TITLE,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_METADATA.TITLE,
+    description: SITE_METADATA.DESCRIPTION,
+    images: [ogImageUrl],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const fetchCache = "force-no-store";

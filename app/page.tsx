@@ -924,13 +924,16 @@ export default function Home() {
               <Link
                 href="/workflows"
                 className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "rounded-2xl bg-white text-neutral-900 font-bold px-10",
-                  "shadow-lg hover:shadow-xl hover:bg-white/90",
-                  "transition-all duration-300 active:scale-[0.97]"
+                  buttonVariants({ variant: "ghost", size: "lg" }),
+                  "rounded-2xl !bg-white !text-neutral-900 font-bold px-10",
+                  "shadow-lg hover:shadow-xl hover:!bg-white/90 hover:!text-neutral-900",
+                  "transition-all duration-300 active:scale-[0.97] group"
                 )}
               >
-                Start building free
+                <span className="flex items-center gap-2">
+                  Start building free
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
               </Link>
               <Link
                 href="/workflows-guide"
