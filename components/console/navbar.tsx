@@ -13,9 +13,13 @@ import { ThemeToggle } from "../core/theme-toggle";
 
 type Props = {
   isPublicPage?: boolean;
+  showAdminLink?: boolean;
 };
 
-export default function NavBar({ isPublicPage = false }: Props) {
+export default function NavBar({
+  isPublicPage = false,
+  showAdminLink = false,
+}: Props) {
   const path = usePathname();
   const params = useParams();
 
@@ -56,7 +60,7 @@ export default function NavBar({ isPublicPage = false }: Props) {
       ];
     }
 
-    return [
+    const baseTabs = [
       {
         name: "Workflows",
         href: "/workflows",
@@ -68,7 +72,15 @@ export default function NavBar({ isPublicPage = false }: Props) {
         current: path === "/settings",
       },
     ];
-  }, [path, params]);
+    if (showAdminLink) {
+      baseTabs.push({
+        name: "Admin",
+        href: "/admin",
+        current: path === "/admin",
+      });
+    }
+    return baseTabs;
+  }, [path, params, showAdminLink]);
 
   return (
     <>
