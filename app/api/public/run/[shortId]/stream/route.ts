@@ -9,7 +9,7 @@ import { streamText } from "ai";
 import { NextRequest } from "next/server";
 import type Stripe from "stripe";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const getOpenRouterHeaders = () => {
   const appUrl =

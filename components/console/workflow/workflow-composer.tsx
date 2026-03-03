@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   modelHasInstruction,
@@ -6,6 +6,7 @@ import {
   WorkflowInputType,
 } from "@/data/workflow";
 import type { Workflow } from "@/generated/prisma-client/client";
+import { CheckIcon, CopyIcon } from "lucide-react";
 import { useMemo, useReducer, useState } from "react";
 import { toast } from "sonner";
 import { ApiCodeSnippet } from "../../code/snippet";
@@ -14,6 +15,7 @@ import StreamingText from "../../core/streaming-text";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
+import { Switch } from "../../ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { Textarea } from "../../ui/textarea";
 
@@ -36,7 +38,15 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  const [resultText, setResultText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [useStreaming, setUseStreaming] = useState(false);
+  const [tokenTtl, setTokenTtl] = useState(60);
+  const [deployToken, setDeployToken] = useState<string | null>(null);
+  const [isGeneratingToken, setIsGeneratingToken] = useState(false);
+  const [isCopyingToken, setIsCopyingToken] = useState(false);
+  const [isCopyingTokenCurl, setIsCopyingTokenCurl] = useState(false);
+  const [isCopyingCurl, setIsCopyingCurl] = useState(false);
 
   const generatedTemplate = useMemo(() => {
     let result = template;
@@ -58,6 +68,48 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
     return result;
   }, [inputValues, instruction]);
 
+  const sampleRequestBody = useMemo(
+    () =>
+      JSON.stringify(
+        ((inputs ?? []) as WorkflowInput[]).reduce(
+          (acc, input) =>
+            Object.assign(acc, {
+              [input.name]: "value",
+            }),
+          {},
+        ),
+      ),
+    [inputs],
+  );
+
+  const streamCurlCommand = useMemo(() => {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_BASE_URL ||
+      (typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost:3000");
+    const tokenValue = deployToken ?? "pub_tok_xxx";
+
+    return `curl --request POST \\
+  --url ${baseUrl}/api/v1/run/${workflow.shortId}/stream?token=${tokenValue} \\
+  --header 'Content-Type: application/json' \\
+  --data '${sampleRequestBody}' \\
+  --no-buffer`;
+  }, [deployToken, sampleRequestBody, workflow.shortId]);
+
+  const tokenCurlCommand = useMemo(() => {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_BASE_URL ||
+      (typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost:3000");
+    const key = apiSecretKey ?? "api-secret-key";
+
+    return `curl --request GET \\
+  --url ${baseUrl}/api/v1/token?ttl=${tokenTtl} \\
+  --header 'Authorization: Bearer ${key}'`;
+  }, [apiSecretKey, tokenTtl]);
+
   const handleRunWorkflow = async () => {
     if (!apiSecretKey) {
       toast.error("API key not available");
@@ -66,21 +118,42 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
 
     setIsLoading(true);
     setStreamUrl(null);
+    setResultText(null);
     setError(null);
 
     try {
-      const tokenResponse = await fetch("/api/v1/token", {
-        headers: {
-          Authorization: `Bearer ${apiSecretKey}`,
-        },
-      });
+      if (useStreaming) {
+        const tokenResponse = await fetch("/api/v1/token", {
+          headers: {
+            Authorization: `Bearer ${apiSecretKey}`,
+          },
+        });
 
-      if (!tokenResponse.ok) {
-        throw new Error("Failed to get streaming token");
+        if (!tokenResponse.ok) {
+          throw new Error("Failed to get streaming token");
+        }
+
+        const { token } = await tokenResponse.json();
+        setStreamUrl(`/api/v1/run/${workflow.shortId}/stream?token=${token}`);
+      } else {
+        const response = await fetch(`/api/v1/run/${workflow.shortId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiSecretKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(inputValues),
+        });
+
+        if (!response.ok) {
+          const payload = await response.text();
+          throw new Error(payload || "Failed to run workflow");
+        }
+
+        const payload = await response.json();
+        setResultText(payload?.result ?? "");
+        toast.success("Workflow completed");
       }
-
-      const { token } = await tokenResponse.json();
-      setStreamUrl(`/api/v1/run/${workflow.shortId}/stream?token=${token}`);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to run workflow";
@@ -93,7 +166,70 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
 
   const handleReset = () => {
     setStreamUrl(null);
+    setResultText(null);
     setError(null);
+  };
+
+  const handleCopy = async (
+    value: string,
+    type: "token" | "tokenCurl" | "curl",
+  ) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      if (type === "token") {
+        setIsCopyingToken(true);
+        setTimeout(() => setIsCopyingToken(false), 1500);
+      } else if (type === "tokenCurl") {
+        setIsCopyingTokenCurl(true);
+        setTimeout(() => setIsCopyingTokenCurl(false), 1500);
+      } else {
+        setIsCopyingCurl(true);
+        setTimeout(() => setIsCopyingCurl(false), 1500);
+      }
+      toast.success("Copied");
+    } catch (copyError) {
+      console.error(copyError);
+      toast.error("Failed to copy");
+    }
+  };
+
+  const handleGenerateStreamToken = async () => {
+    if (!apiSecretKey) {
+      toast.error("API key not available");
+      return;
+    }
+
+    setIsGeneratingToken(true);
+    setDeployToken(null);
+
+    try {
+      const response = await fetch(`/api/v1/token?ttl=${tokenTtl}`, {
+        headers: {
+          Authorization: `Bearer ${apiSecretKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        const payload = await response.text();
+        throw new Error(payload || "Failed to generate token");
+      }
+
+      const payload = await response.json();
+      if (!payload?.token) {
+        throw new Error("No token returned");
+      }
+
+      setDeployToken(payload.token);
+      toast.success("Streaming token generated");
+    } catch (generateError) {
+      const message =
+        generateError instanceof Error
+          ? generateError.message
+          : "Failed to generate token";
+      toast.error(message);
+    } finally {
+      setIsGeneratingToken(false);
+    }
   };
 
   return (
@@ -105,6 +241,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
           ) : null}
           <TabsTrigger value="review">Review</TabsTrigger>
           <TabsTrigger value="deploy">Deploy</TabsTrigger>
+          <TabsTrigger value="streaming">Streaming</TabsTrigger>
         </TabsList>
         {inputs?.length ? (
           <TabsContent value="compose">
@@ -220,19 +357,40 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
             </div>
 
             <div className="mt-2 flex justify-end">
+              <div className="mr-4 flex items-center gap-2">
+                <Label
+                  htmlFor="stream-toggle-compose"
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Stream
+                </Label>
+                <Switch
+                  id="stream-toggle-compose"
+                  checked={useStreaming}
+                  onCheckedChange={setUseStreaming}
+                  aria-label="Toggle streaming responses"
+                />
+              </div>
               <Button
                 onClick={handleRunWorkflow}
                 disabled={
                   !workflow.published ||
                   !apiSecretKey ||
                   isLoading ||
-                  !!streamUrl ||
+                  streamUrl !== null ||
+                  resultText !== null ||
                   Object.keys(inputValues).length !==
                     (inputs as WorkflowInput[])?.length
                 }
                 className="bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
               >
-                {isLoading ? <Spinner message="Loading..." /> : "Run"}
+                {isLoading ? (
+                  <Spinner message="Loading..." />
+                ) : useStreaming ? (
+                  "Run (Stream)"
+                ) : (
+                  "Run"
+                )}
               </Button>
             </div>
           </TabsContent>
@@ -252,18 +410,39 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
           </div>
 
           <div className="mt-2 flex justify-end">
+            <div className="mr-4 flex items-center gap-2">
+              <Label
+                htmlFor="stream-toggle-review"
+                className="text-xs font-medium text-muted-foreground"
+              >
+                Stream
+              </Label>
+              <Switch
+                id="stream-toggle-review"
+                checked={useStreaming}
+                onCheckedChange={setUseStreaming}
+                aria-label="Toggle streaming responses"
+              />
+            </div>
             <Button
               onClick={handleRunWorkflow}
               disabled={
                 !workflow.published ||
                 !apiSecretKey ||
                 isLoading ||
-                !!streamUrl ||
+                streamUrl !== null ||
+                resultText !== null ||
                 Object.keys(inputValues).length !==
                   (inputs as WorkflowInput[])?.length
               }
             >
-              {isLoading ? <Spinner message="Loading..." /> : "Run"}
+              {isLoading ? (
+                <Spinner message="Loading..." />
+              ) : useStreaming ? (
+                "Run (Stream)"
+              ) : (
+                "Run"
+              )}
             </Button>
           </div>
         </TabsContent>
@@ -286,15 +465,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
               ],
               postData: {
                 mimeType: "application/json",
-                text: JSON.stringify(
-                  ((inputs ?? []) as WorkflowInput[]).reduce(
-                    (acc, input) =>
-                      Object.assign(acc, {
-                        [input.name]: "value",
-                      }),
-                    {},
-                  ),
-                ),
+                text: sampleRequestBody,
               },
             }}
           />
@@ -305,19 +476,153 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
             </span>
           </div>
         </TabsContent>
+
+        <TabsContent value="streaming">
+          <div className="rounded-xl border border-border/60 bg-card p-4 sm:p-5">
+            <h3 className="text-sm font-semibold text-foreground">
+              Stream setup and test
+            </h3>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Streaming uses a short-lived token from
+              <span className="font-mono"> /api/v1/token</span>, then calls
+              <span className="font-mono"> /api/v1/run/{workflow.shortId}/stream</span>.
+            </p>
+
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="w-full sm:w-36">
+                <Label className="mb-1 block text-[11px] uppercase text-muted-foreground">
+                  TTL (seconds)
+                </Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={300}
+                  value={tokenTtl}
+                  onChange={(event) =>
+                    setTokenTtl(
+                      Math.min(
+                        300,
+                        Math.max(1, Number(event.target.value || 60)),
+                      ),
+                    )
+                  }
+                />
+              </div>
+              <Button
+                onClick={handleGenerateStreamToken}
+                disabled={!apiSecretKey || isGeneratingToken}
+                className="sm:mt-5"
+              >
+                {isGeneratingToken ? (
+                  <Spinner message="Generating..." />
+                ) : (
+                  "Generate stream token"
+                )}
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              <Label className="text-[11px] uppercase text-muted-foreground">
+                Generated token
+              </Label>
+              <div className="mt-1 flex items-center gap-2 rounded-lg border border-border/60 bg-muted/30 p-2">
+                <code className="min-w-0 flex-1 truncate px-1 text-xs text-foreground">
+                  {deployToken ?? "Generate a token to test streaming"}
+                </code>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={!deployToken}
+                  onClick={() => deployToken && handleCopy(deployToken, "token")}
+                >
+                  {isCopyingToken ? (
+                    <CheckIcon className="h-4 w-4" />
+                  ) : (
+                    <CopyIcon className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <Label className="text-[11px] uppercase text-muted-foreground">
+                  Step 1: Get streaming token
+                </Label>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleCopy(tokenCurlCommand, "tokenCurl")}
+                >
+                  {isCopyingTokenCurl ? (
+                    <>
+                      <CheckIcon className="mr-1 h-4 w-4" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <CopyIcon className="mr-1 h-4 w-4" />
+                      Copy curl
+                    </>
+                  )}
+                </Button>
+              </div>
+              <pre className="overflow-x-auto rounded-lg border border-border/60 bg-secondary p-3 text-xs whitespace-pre-wrap">
+                {tokenCurlCommand}
+              </pre>
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <Label className="text-[11px] uppercase text-muted-foreground">
+                  Step 2: Stream the response
+                </Label>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleCopy(streamCurlCommand, "curl")}
+                >
+                  {isCopyingCurl ? (
+                    <>
+                      <CheckIcon className="mr-1 h-4 w-4" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <CopyIcon className="mr-1 h-4 w-4" />
+                      Copy curl
+                    </>
+                  )}
+                </Button>
+              </div>
+              <pre className="overflow-x-auto rounded-lg border border-border/60 bg-secondary p-3 text-xs whitespace-pre-wrap">
+                {streamCurlCommand}
+              </pre>
+            </div>
+          </div>
+        </TabsContent>
       </Tabs>
 
-      {streamUrl && (
+      {(streamUrl || resultText !== null) && (
         <div className="mt-6 border-t pt-6">
           <h3 className="text-lg font-semibold mb-3">Result</h3>
           <div className="border rounded-lg p-4 bg-gray-50 dark:bg-[#1a1a1a]">
-            <StreamingText
-              url={streamUrl}
-              body={inputValues}
-              fallbackText="Failed to process workflow"
-              className="text-sm leading-5 text-slate-800 dark:text-slate-100 whitespace-pre-wrap"
-              onCompleted={() => toast.success("Workflow completed")}
-            />
+            {streamUrl ? (
+              <StreamingText
+                url={streamUrl}
+                body={inputValues}
+                fallbackText="Failed to process workflow"
+                className="text-sm leading-5 text-slate-800 dark:text-slate-100 whitespace-pre-wrap"
+                onCompleted={() => toast.success("Workflow completed")}
+              />
+            ) : (
+              <pre className="text-sm leading-5 text-slate-800 dark:text-slate-100 whitespace-pre-wrap">
+                {resultText}
+              </pre>
+            )}
           </div>
           <div className="mt-4 flex justify-end">
             <Button
