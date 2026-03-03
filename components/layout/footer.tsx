@@ -5,14 +5,13 @@ import logo from "../../public/images/logo.png";
 
 const cols = {
   product: [
-    { name: "Workflows",     href: "/workflows" },
-    { name: "Free AI Tools", href: "/ai-tools" },
-    { name: "Pricing",       href: "/#pricing" },
+    { name: "Workflows",       href: "/workflows" },
+    { name: "Pricing",         href: "/pricing" },
+    { name: "About Workflows", href: "/workflows-guide" },
   ],
   developers: [
     { name: "Documentation", href: "https://support.myapps.ai/aitutor-api/aitutor-api-info", external: true },
     { name: "API Reference", href: "https://support.myapps.ai/aitutor-api/aitutor-api-info", external: true },
-    { name: "Source Code",   href: "https://github.com/techulus/manage-prompt", external: true },
   ],
   company: [
     { name: "Support", href: "https://support.myapps.ai/aitutor-api/aitutor-api-info", external: true },

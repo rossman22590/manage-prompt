@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion, useInView, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight, Bot, BrainIcon, CheckIcon, ChevronRight, CodeIcon, Copy, FileText, LogIn,
-  MinusCircle, Network, PlusCircle, Rocket, ShieldCheckIcon,
-  Sparkles, Terminal, Variable, Workflow, Zap,
+  Network, PlusCircle, Rocket, ShieldCheckIcon,
+  Variable, Workflow, Zap
 } from "lucide-react";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
@@ -246,7 +246,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.1, ease }}
             className="text-display-lg sm:text-display-xl tracking-tight"
           >
-            <span className="text-foreground">The only platform{" "}</span>
+            <span className="text-foreground">Easy to use platform{" "}</span>
             <br className="hidden sm:block" />
             <span className="text-foreground">powered by </span>
             <span className="text-gradient">advanced AI</span>
