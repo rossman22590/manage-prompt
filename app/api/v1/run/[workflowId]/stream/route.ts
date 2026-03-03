@@ -173,7 +173,7 @@ export async function POST(
       template: workflow.template,
     });
 
-    const onFinish = (evt: any) => {
+    const onFinish = async (evt: any) => {
       const output = evt.text ?? "";
 
       const inputWordCount = content.split(" ").length;
@@ -216,6 +216,7 @@ export async function POST(
       });
 
       waitUntil(runPromise);
+      await runPromise;
     };
 
     if (!process.env.OPENROUTER_API_KEY) {
