@@ -1,6 +1,7 @@
-import { Analytics } from "@vercel/analytics/next";
+import { IntercomChat } from "@/components/core/intercom-chat";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_METADATA } from "@/data/marketing";
 import "./globals.css";
 
@@ -92,7 +93,10 @@ export default async function RootLayout({
       </head>
 
       <body className="flex-1 min-h-full min-w-full tracking-tight">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <IntercomChat />
+        </ThemeProvider>
         <Analytics />
         <Toaster />
       </body>

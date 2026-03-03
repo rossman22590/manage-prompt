@@ -48,7 +48,7 @@ export default async function Workflows(props: Props) {
         actionLabel="New"
         actionLink="/workflows/new"
       />
-      <div className="flex max-w-7xl px-4 xl:px-0 sm:mx-auto py-4 space-x-4 items-center -mt-8">
+      <div className="flex max-w-7xl px-4 xl:px-0 sm:mx-auto py-4 space-x-4 items-center">
         <div className="flex-1">
           <WorkflowSearch />
         </div>

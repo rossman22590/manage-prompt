@@ -19,7 +19,7 @@ export default async function WorkflowUsage(props: Props) {
   );
 
   return (
-    <PageSection topInset>
+    <PageSection className="mt-4">
       <CardHeader>
         <h3 className="text-lg font-semibold">Usage (Last 30 days)</h3>
       </CardHeader>

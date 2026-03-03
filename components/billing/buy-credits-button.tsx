@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { CreditPackModal } from "@/components/settings/credit-pack-modal";
 import { getCreditPackCheckoutUrl } from "@/app/(dashboard)/settings/actions";
+import { CreditPackModal } from "@/components/settings/credit-pack-modal";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export function BuyCreditsButton() {
   const [modalOpen, setModalOpen] = useState(false);

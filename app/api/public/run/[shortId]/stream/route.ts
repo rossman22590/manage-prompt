@@ -1,6 +1,7 @@
 import { hasWebSearch, modelToProviderId, type WorkflowInput } from "@/data/workflow";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
+import { redis } from "@/lib/utils/redis";
 import { hasExceededSpendLimit, isSubscriptionActive, reportUsage } from "@/lib/utils/stripe";
 import { translateInputs } from "@/lib/utils/workflow";
 import { waitUntil } from "@vercel/functions";
@@ -8,6 +9,8 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
 import { NextRequest } from "next/server";
 import type Stripe from "stripe";
+
+export const maxDuration = 300;
 
 const getOpenRouterHeaders = () => {
   const appUrl =
@@ -33,10 +36,16 @@ export async function POST(
   const token = searchParams.get("token");
 
   if (!token) {
-    return ErrorResponse("Token required", 401);
+    return ErrorResponse("Unauthorized", 401);
   }
 
   try {
+    const tokenPayload: { shortId: string } | null = await redis.get(token);
+    if (!tokenPayload || tokenPayload.shortId !== params.shortId) {
+      return ErrorResponse("Unauthorized", 401);
+    }
+    await redis.del(token);
+
     // Find the workflow by shortId
     const workflow = await prisma.workflow.findUnique({
       where: {
@@ -63,7 +72,7 @@ export async function POST(
     const organization = workflow.organization;
 
     // Block if credits are 0 (regardless of subscription status)
-    if (organization?.credits === 0) {
+    if ((organization?.credits ?? 0) <= 0) {
       // If no subscription, block with invalid billing
       if (!isSubscriptionActive(organization?.stripe?.subscription)) {
         return ErrorResponse(
@@ -107,7 +116,7 @@ export async function POST(
     // Build instruction if present
     let instruction = workflow.instruction ?? "";
     Object.keys(body).forEach((key) => {
-      instruction = instruction.replace(`{{${key}}}`, body[key]);
+      instruction = instruction.replaceAll(`{{${key}}}`, body[key] ?? "");
     });
 
     let providerModelId = modelToProviderId[workflow.model] ?? workflow.model;
@@ -249,7 +258,7 @@ export async function POST(
   } catch (error: any) {
     console.error("Error in public workflow stream:", error);
     return ErrorResponse(
-      error?.message || "Failed to stream workflow",
+      "Failed to stream workflow",
       500,
       ErrorCodes.InternalServerError,
     );

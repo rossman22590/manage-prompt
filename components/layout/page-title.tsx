@@ -2,6 +2,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import type { JSX, PropsWithChildren } from "react";
 import { buttonVariants } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 interface Props {
   title: string;
@@ -12,53 +13,32 @@ interface Props {
   actions?: JSX.Element;
 }
 
-export default function PageTitle({
-  title,
-  subTitle,
-  backUrl,
-  actionLink,
-  actionLabel,
-  children,
-  actions,
-}: PropsWithChildren<Props>) {
+export default function PageTitle({ title, subTitle, backUrl, actionLink, actionLabel, children, actions }: PropsWithChildren<Props>) {
   return (
-    <div className="flex min-h-[180px] items-center justify-center border-b pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0">
-      <div className="flex w-full max-w-7xl items-center justify-between">
-        <div className="relative flex w-full flex-col">
-          {backUrl ? (
-            <Link
-              href={backUrl}
-              className="text-md absolute -top-8 left-0 -ml-2 mr-2 flex w-[76px] items-center p-0.5 px-2 font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-200 rounded-md"
-              prefetch={false}
-            >
-              <ArrowLeftIcon
-                className="h-4 w-4 flex-shrink-0"
-                aria-hidden="true"
-              />
-              <span className="ml-1">Back</span>
-            </Link>
-          ) : null}
-
-          <h1 className="flex-1 text-3xl tracking-tighter lg:text-4xl font-bold">
-            {title}
-          </h1>
-          {subTitle ? (
-            <p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
-          ) : null}
-          <div className="block w-full pt-2 space-x-2">{children}</div>
-        </div>
-
-        {actionLink && actionLabel ? (
-          <Link
-            href={actionLink}
-            className={`${buttonVariants({ size: "sm" })} bg-pink-500 hover:bg-pink-600 text-white border-pink-500`}
-            prefetch={false}
-          >
-            {actionLabel}
+    <div className="border-b border-border/60 bg-background/60 backdrop-blur-sm">
+      <div className="mx-auto max-w-screen-2xl px-4 lg:px-8 pt-6 pb-7">
+        {backUrl && (
+          <Link href={backUrl} prefetch={false} className="group mb-4 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeftIcon className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+            Back
           </Link>
-        ) : null}
-
-        {actions ?? null}
+        )}
+        <div className="flex items-start justify-between gap-6">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h1>
+            {subTitle && <p className="mt-1.5 text-sm text-muted-foreground">{subTitle}</p>}
+            {children && <div className="mt-4 flex flex-wrap items-center gap-2">{children}</div>}
+          </div>
+          {actionLink && actionLabel && (
+            <Link
+              href={actionLink} prefetch={false}
+              className={cn(buttonVariants({ size: "sm" }), "shrink-0 rounded-xl bg-primary text-primary-foreground shadow-glow-xs hover:shadow-glow-sm font-semibold transition-all duration-200")}
+            >
+              {actionLabel}
+            </Link>
+          )}
+          {actions ?? null}
+        </div>
       </div>
     </div>
   );

@@ -57,9 +57,9 @@ export default async function WorkflowTests(props: Props) {
   return (
     <>
       {/* Toolbar*/}
-      <PageSection bottomMargin className="-mt-4">
-        <div className="flex flex-col justify-center">
-          <div className="flex justify-between">
+      <PageSection bottomMargin className="mt-4">
+        <div className="flex flex-col justify-center px-4 py-2">
+          <div className="flex justify-between items-center">
             <div className="isolate inline-flex sm:space-x-3">
               <span className="inline-flex space-x-1">
                 <WorkflowBranchPicker branches={branches} workflow={workflow} />

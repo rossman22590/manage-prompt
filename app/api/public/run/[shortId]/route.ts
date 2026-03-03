@@ -5,6 +5,9 @@ import { modelToProviderId } from "@/data/workflow";
 import { isSubscriptionActive, hasExceededSpendLimit } from "@/lib/utils/stripe";
 import type Stripe from "stripe";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
+import { redis } from "@/lib/utils/redis";
+
+export const maxDuration = 300;
 
 export async function POST(
   req: NextRequest,
@@ -39,7 +42,7 @@ export async function POST(
     const organization = workflow.organization;
 
     // Block if credits are 0 (regardless of subscription status)
-    if (organization?.credits === 0) {
+    if ((organization?.credits ?? 0) <= 0) {
       // If no subscription, block with invalid billing
       if (!isSubscriptionActive(organization?.stripe?.subscription)) {
         return ErrorResponse(
@@ -71,21 +74,21 @@ export async function POST(
       );
     }
 
-    // Generate a temporary token for streaming (simple approach - no storage needed)
-    // The token is just for basic validation, the workflow owner's credits will be used
-    const token = `pub_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-    
-    const baseUrl = process.env.APP_BASE_URL || 
-                    process.env.NEXT_PUBLIC_APP_BASE_URL || 
-                    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
-    
+    const token = `pub_${crypto.randomUUID()}`;
+    await redis.set(token, { shortId: params.shortId }, { ex: 60 });
+
+    const baseUrl =
+      process.env.APP_BASE_URL ||
+      process.env.NEXT_PUBLIC_APP_BASE_URL ||
+      "http://localhost:3000";
+
     const streamUrl = `${baseUrl}/api/public/run/${params.shortId}/stream?token=${token}`;
 
     return NextResponse.json({ streamUrl });
   } catch (error: any) {
     console.error("Error in public workflow run:", error);
     return ErrorResponse(
-      error?.message || "Failed to run workflow",
+      "Failed to run workflow",
       500,
       ErrorCodes.InternalServerError,
     );
