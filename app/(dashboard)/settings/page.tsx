@@ -1,4 +1,4 @@
-﻿import PageSection from "@/components/core/page-section";
+import PageSection from "@/components/core/page-section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import { EditableValue } from "@/components/form/editable-text";
 import PageTitle from "@/components/layout/page-title";
@@ -95,9 +95,9 @@ export default async function Settings() {
                   Credits
                 </dt>
                 <dd className="mt-1 flex min-w-0 flex-col gap-2 sm:mt-0 sm:flex-auto sm:flex-row sm:items-center sm:justify-between sm:gap-x-6">
-                  <div className="text-gray-900 dark:text-gray-200">
+                  <span className="inline-flex items-center rounded-full bg-pink-500 px-4 py-1.5 text-sm font-semibold text-white">
                     {organization?.credits.toLocaleString() ?? 0} credits left
-                  </div>
+                  </span>
                   {!subscription ? <UpgradeButton /> : null}
                 </dd>
               </div>
