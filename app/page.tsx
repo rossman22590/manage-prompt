@@ -62,14 +62,43 @@ const steps = [
   { icon: Rocket,   title: "Deploy & call",   desc: "Hit your REST endpoint — it's live instantly" },
 ];
 
-const pricingPerks = ["Unlimited workflows", "Every major AI model", "Streaming responses", "Email support"];
+const pricingPerksBase = ["Unlimited workflows", "Every major AI model", "Streaming responses", "Community support"];
+const pricingPerksPro  = ["Unlimited workflows", "Every major AI model", "Streaming responses", "Priority email support", "Higher rate limits", "Usage analytics"];
+const pricingPerksEnt  = ["Unlimited workflows", "Every major AI model", "Streaming responses", "Dedicated support", "Priority model routing", "99.9% uptime SLA", "Custom rate limits", "SSO & team management"];
 
 const faqs: FAQ[] = [
-  { q: "What is AI Tutor API?",           a: "A multi-model AI gateway: one REST endpoint to access OpenAI, Anthropic, Google, Meta, Mixtral and more. Build once, swap models without code changes." },
-  { q: "Which models are supported?",     a: "GPT5, Gemini 3, Sonnet 4.5, and many more. New models added within days of release." },
-  { q: "How does pricing work?",          a: "Pay-as-you-go with credit packs. Enterprise plan at $150/10M tokens with priority routing and SLA. No monthly minimums." },
-  { q: "Is there a free trial?",          a: "Yes — every account starts with free credits so you can make real API calls before spending a cent." },
-  { q: "How fast can I integrate?",       a: "Under 10 minutes. Point your existing OpenAI SDK at our base URL, swap in your key, done. We also have dedicated SDKs and Postman collections." },
+  {
+    q: "What exactly is AI Tutor API and how does it work?",
+    a: "AI Tutor API is a multi-model AI gateway that gives you a single REST endpoint to access 50+ AI models from OpenAI, Anthropic, Google, Meta, xAI, and more. You create \"workflows\" in our visual builder — each workflow is a reusable AI pipeline with a model, prompt template, and input variables. Once published, each workflow gets its own API endpoint. You send a POST request with your inputs, and we handle model routing, rate limiting, billing, and streaming. Think of it as Stripe for AI: one integration, every model, zero infrastructure."
+  },
+  {
+    q: "Which AI models can I use?",
+    a: "We support 50+ models across all major providers: GPT-5, GPT-4.1, and GPT-4o from OpenAI; Claude Sonnet 4.5, Opus 4.5, and Haiku from Anthropic; Gemini 2.5 Pro and Flash from Google; Grok 3 and 4.1 from xAI; Perplexity Sonar for web-grounded answers; plus open-source models like Llama 3, Mistral, DeepSeek, Qwen 2.5, and Command R+. New models are added within days of release. You can switch models on any workflow without changing your client code."
+  },
+  {
+    q: "How does pricing and billing work?",
+    a: "We offer three tiers: Starter (free — get started with free credits), Pro ($50 for 2,500 credits with priority support and higher rate limits), and Enterprise ($150/10M tokens with SLAs, dedicated support, and custom rate limits). Credits are deducted per workflow run based on token usage. You can set spend limits to cap usage, and unused credits never expire. There are no monthly minimums or hidden fees — you only pay for what you use."
+  },
+  {
+    q: "How do I integrate the API into my application?",
+    a: "Integration takes under 10 minutes. Create a workflow in the dashboard, publish it, then grab your API key from Settings. Make a POST request to /api/v1/run/{workflow_id} with your inputs — that's it. For real-time streaming, generate a single-use token via /api/v1/token and call the /stream endpoint. We provide code examples in Python, Node.js, and cURL, and the API is compatible with the Vercel AI SDK's useChat hook for React apps."
+  },
+  {
+    q: "Is there real-time streaming support?",
+    a: "Yes. Every workflow can stream responses token-by-token as the model generates them. This is a two-step flow: first generate a secure, single-use token from /api/v1/token (authenticated with your API key), then call the /stream endpoint with that token. The stream is plain text over HTTP — compatible with fetch ReadableStream, Python requests with stream=True, curl --no-buffer, and the Vercel AI SDK. Tokens are consumed on first use and auto-expire."
+  },
+  {
+    q: "How secure is the API?",
+    a: "Security is built in at every layer. API keys (sk_...) authenticate server-side requests. Streaming uses single-use tokens stored in Redis with a configurable TTL (max 300 seconds), so your API key never touches the client. Rate limiting is server-derived (not spoofable by clients) with a fail-closed design — if Redis goes down, requests are blocked, not allowed through. All billing checks enforce credits ≤ 0 blocking, and error messages are generic to prevent information leakage."
+  },
+  {
+    q: "Can I use my own API keys for model providers?",
+    a: "Yes. With Bring Your Own Key (BYOK), you can add your own OpenAI, Anthropic, or Google API keys in Settings. Your keys are encrypted at rest and used directly for model calls, giving you zero markup on provider costs. If you don't provide a key, we route through our shared infrastructure with usage billed via credits."
+  },
+  {
+    q: "What are some common use cases?",
+    a: "Developers use AI Tutor API for chatbots and customer support agents, content generation tools (blog posts, product descriptions, summaries), educational platforms with personalized tutoring, internal tools that summarize documents or extract data, code generation and review assistants, and any application that needs intelligent text generation. Check our Workflows Guide for detailed examples and templates."
+  },
 ];
 
 const codeExamples: Record<CodeLang, string> = {
@@ -274,10 +303,10 @@ export default function Home() {
               href="/workflows"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "group relative overflow-hidden rounded-2xl bg-primary text-primary-foreground",
+                "group relative overflow-hidden rounded-2xl btn-primary-hover",
                 "px-8 text-[14px] font-semibold",
                 "shadow-glow-sm hover:shadow-glow-md",
-                "transition-all duration-300 active:scale-[0.97]"
+                "active:scale-[0.97]"
               )}
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -479,9 +508,9 @@ export default function Home() {
                 href="/workflows"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "rounded-2xl bg-primary text-primary-foreground font-semibold",
+                  "rounded-2xl btn-primary-hover font-semibold",
                   "shadow-glow-sm hover:shadow-glow-md",
-                  "px-8 transition-all duration-300 active:scale-[0.97]"
+                  "px-8 active:scale-[0.97]"
                 )}
               >
                 Get started
@@ -532,9 +561,7 @@ export default function Home() {
           <Reveal delay={0.5}>
             <div className="mt-14 text-center">
               <Link
-                href="https://support.myapps.ai/introduction"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/workflows-guide"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
                   "rounded-2xl border-border/70 bg-card font-semibold",
@@ -542,7 +569,7 @@ export default function Home() {
                   "transition-all duration-300"
                 )}
               >
-                View all docs
+                Learn more
               </Link>
             </div>
           </Reveal>
@@ -724,15 +751,15 @@ export default function Home() {
             </div>
           </Reveal>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Free */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Starter */}
             <Reveal delay={0.1}>
               <motion.div
                 whileHover={{ y: -6 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="flex flex-col rounded-3xl border border-border/60 bg-card p-8 sm:p-10 transition-shadow duration-300 hover:shadow-card-hover"
               >
-                <h3 className="text-xl font-bold text-foreground">Pay as you go</h3>
+                <h3 className="text-xl font-bold text-foreground">Starter</h3>
                 <p className="mt-2 text-sm text-muted-foreground">Start free, buy credit packs when needed.</p>
                 <div className="mt-8 mb-8">
                   <span className="text-5xl font-extrabold text-foreground">$0</span>
@@ -740,7 +767,7 @@ export default function Home() {
                 </div>
                 <div className="border-t border-border/60 pt-6 mb-8">
                   <ul className="space-y-3">
-                    {pricingPerks.map((p) => (
+                    {pricingPerksBase.map((p) => (
                       <li key={p} className="flex items-center gap-2.5 text-sm text-foreground/80">
                         <CheckIcon className="h-4 w-4 shrink-0 text-primary" />
                         {p}
@@ -761,8 +788,8 @@ export default function Home() {
               </motion.div>
             </Reveal>
 
-            {/* Enterprise */}
-            <Reveal delay={0.2}>
+            {/* Pro */}
+            <Reveal delay={0.15}>
               <motion.div
                 whileHover={{ y: -6 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -770,19 +797,19 @@ export default function Home() {
               >
                 <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.06)_0%,transparent_50%)]" />
                 <div className="flex items-center gap-3 relative">
-                  <h3 className="text-xl font-bold text-foreground">Enterprise</h3>
+                  <h3 className="text-xl font-bold text-foreground">Pro</h3>
                   <span className="rounded-full bg-primary/10 ring-1 ring-primary/20 px-2.5 py-1 text-[10px] font-bold text-primary uppercase tracking-wider">
                     Popular
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground relative">Priority routing, SLAs, and dedicated infra.</p>
+                <p className="mt-2 text-sm text-muted-foreground relative">For teams shipping AI-powered products.</p>
                 <div className="mt-8 mb-8 relative">
-                  <span className="text-5xl font-extrabold text-foreground">$150</span>
-                  <span className="text-sm text-muted-foreground ml-1">/10M tokens</span>
+                  <span className="text-5xl font-extrabold text-foreground">$50</span>
+                  <span className="text-sm text-muted-foreground ml-1">/2,500 credits</span>
                 </div>
                 <div className="border-t border-border/60 pt-6 mb-8 relative">
                   <ul className="space-y-3">
-                    {["Priority model routing", "99.9% uptime SLA", "Dedicated support", ...pricingPerks].map((p) => (
+                    {pricingPerksPro.map((p) => (
                       <li key={p} className="flex items-center gap-2.5 text-sm text-foreground/80">
                         <CheckIcon className="h-4 w-4 shrink-0 text-primary" />
                         {p}
@@ -794,11 +821,47 @@ export default function Home() {
                   href="/billing"
                   className={cn(
                     buttonVariants({ size: "lg" }),
-                    "relative mt-auto w-full rounded-2xl bg-primary text-primary-foreground font-semibold",
-                    "shadow-glow-sm hover:shadow-glow-md transition-all duration-300"
+                    "relative mt-auto w-full rounded-2xl btn-primary-hover font-semibold",
+                    "shadow-glow-sm hover:shadow-glow-md"
                   )}
                 >
-                  Start enterprise plan
+                  Get Pro
+                </Link>
+              </motion.div>
+            </Reveal>
+
+            {/* Enterprise */}
+            <Reveal delay={0.2}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex flex-col rounded-3xl border border-border/60 bg-card p-8 sm:p-10 transition-shadow duration-300 hover:shadow-card-hover"
+              >
+                <h3 className="text-xl font-bold text-foreground">Enterprise</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Dedicated infrastructure and SLAs.</p>
+                <div className="mt-8 mb-8">
+                  <span className="text-5xl font-extrabold text-foreground">$150</span>
+                  <span className="text-sm text-muted-foreground ml-1">/10M tokens</span>
+                </div>
+                <div className="border-t border-border/60 pt-6 mb-8">
+                  <ul className="space-y-3">
+                    {pricingPerksEnt.map((p) => (
+                      <li key={p} className="flex items-center gap-2.5 text-sm text-foreground/80">
+                        <CheckIcon className="h-4 w-4 shrink-0 text-primary" />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link
+                  href="/billing"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "mt-auto w-full rounded-2xl border-border/70 font-semibold",
+                    "hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary transition-all duration-300"
+                  )}
+                >
+                  Contact sales
                 </Link>
               </motion.div>
             </Reveal>
@@ -836,10 +899,13 @@ export default function Home() {
       {/* ── CTA BANNER ───────────────────────────────────────────────────── */}
       <section className="pb-28 px-6">
         <Reveal>
-          <div className="mx-auto max-w-5xl relative overflow-hidden rounded-[2rem] bg-primary p-12 sm:p-20 text-center">
+          <div
+            className="mx-auto max-w-5xl relative overflow-hidden rounded-[2rem] p-12 sm:p-20 text-center"
+            style={{ background: "linear-gradient(135deg, hsl(292 84% 38%) 0%, hsl(270 60% 28%) 50%, hsl(262 70% 32%) 100%)" }}
+          >
             {/* Ambient circles */}
             <div className="pointer-events-none absolute -top-20 -left-20 h-80 w-80 rounded-full bg-white/[0.06] blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-primary/[0.15] blur-3xl" />
 
             {/* Beam */}
             <div className="pointer-events-none absolute top-0 left-0 right-0 h-px overflow-hidden">
@@ -847,34 +913,35 @@ export default function Home() {
             </div>
 
             <h2 className="relative text-display-sm sm:text-display-md text-white font-extrabold tracking-tight">
-              Get Ready to get started?
+              Ready to ship your next
               <br />
-              <span className="opacity-90">What can be said can be solved.</span>
+              <span className="text-gradient">AI-powered product?</span>
             </h2>
+            <p className="relative mt-4 text-base text-white/60 max-w-lg mx-auto">
+              Join developers building intelligent applications with one API call. Start free, scale when you&apos;re ready.
+            </p>
             <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/workflows"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "rounded-2xl bg-white text-primary font-bold px-10",
-                  "shadow-lg hover:shadow-xl hover:bg-white/95",
+                  "rounded-2xl bg-white text-neutral-900 font-bold px-10",
+                  "shadow-lg hover:shadow-xl hover:bg-white/90",
                   "transition-all duration-300 active:scale-[0.97]"
                 )}
               >
                 Start building free
               </Link>
               <Link
-                href="https://support.myapps.ai/introduction"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/workflows-guide"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "rounded-2xl border-white/30 bg-white/10 text-white font-bold px-10",
-                  "hover:bg-white/20 hover:border-white/50",
+                  "rounded-2xl border-white/25 bg-white/[0.08] text-white font-bold px-10",
+                  "hover:bg-white/[0.15] hover:border-white/40",
                   "transition-all duration-300 active:scale-[0.97]"
                 )}
               >
-                View docs
+                How it works
               </Link>
             </div>
           </div>

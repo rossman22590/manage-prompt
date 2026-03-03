@@ -15,7 +15,7 @@
 
 ## Contact us
 
-If you want to learn more about this project or have any questions, send us an email at [hello+manageprompt@techulus.com](mailto:hello+manageprompt@techulus.com)
+If you want to learn more about this project or have any questions, send us an email at [support@mytsi.org](mailto:support@mytsi.org)
 
 ## Built with
 

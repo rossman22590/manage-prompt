@@ -5,18 +5,18 @@ import logo from "../../public/images/logo.png";
 
 const cols = {
   product: [
-    { name: "Workflows",       href: "/workflows" },
-    { name: "Pricing",         href: "/pricing" },
-    { name: "About Workflows", href: "/workflows-guide" },
+    { name: "Workflows",    href: "/workflows" },
+    { name: "How it Works", href: "/workflows-guide" },
+    { name: "Pricing",      href: "/#pricing" },
   ],
   developers: [
-    { name: "Documentation", href: "https://support.myapps.ai/aitutor-api/aitutor-api-info", external: true },
-    { name: "API Reference", href: "https://support.myapps.ai/aitutor-api/aitutor-api-info", external: true },
+    { name: "Documentation", href: "https://support.myapps.ai", external: true },
+    { name: "API Reference", href: "https://support.myapps.ai", external: true },
   ],
   company: [
-    { name: "Support", href: "https://support.myapps.ai/aitutor-api/aitutor-api-info", external: true },
-    { name: "Privacy", href: "/#" },
-    { name: "Terms",   href: "/#" },
+    { name: "Support", href: "https://support.myapps.ai", external: true },
+    { name: "Privacy", href: "/privacy" },
+    { name: "Terms",   href: "/terms" },
   ],
 };
 

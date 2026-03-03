@@ -9,9 +9,9 @@ import logo from "../../public/images/logo.png";
 import { ThemeToggle } from "../core/theme-toggle";
 
 const navLinks = [
-  { name: "Docs",      href: "https://support.myapps.ai", external: true },
-  { name: "Pricing",   href: "#pricing" },
-  { name: "Support",   href: "https://support.myapps.ai", external: true },
+  { name: "How it Works", href: "/workflows-guide" },
+  { name: "Pricing",      href: "#pricing" },
+  { name: "Docs",         href: "https://support.myapps.ai", external: true },
 ];
 
 export function Header() {
@@ -83,18 +83,12 @@ export function Header() {
               prefetch={false}
               className={cn(
                 "relative hidden md:inline-flex items-center overflow-hidden rounded-xl px-4 py-2",
-                "bg-primary text-primary-foreground text-[13px] font-semibold",
+                "btn-primary-hover text-[13px] font-semibold",
                 "shadow-glow-xs hover:shadow-glow-sm",
-                "transition-all duration-300 hover:brightness-110 active:scale-[0.97]"
+                "active:scale-[0.97]"
               )}
             >
               <span className="relative z-10">Start building</span>
-              <span
-                className="pointer-events-none absolute inset-0 -z-0 opacity-0 hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)",
-                }}
-              />
             </Link>
 
             {/* Mobile hamburger */}
