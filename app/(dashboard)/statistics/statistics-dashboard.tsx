@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { motion, useInView } from "framer-motion";
 import {
   Activity,
-  ArrowUpRight,
   BarChart3,
   Clock,
   Cpu,
@@ -13,7 +12,6 @@ import {
   Key,
   Layers,
   Sparkles,
-  TrendingUp,
   Zap,
 } from "lucide-react";
 import React, { useRef } from "react";
@@ -44,18 +42,70 @@ const Reveal = ({
   );
 };
 
-const formatNumber = (n: number): string => {
+const fmt = (n: number): string => {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toLocaleString();
 };
 
-const hourLabel = (hour: number): string => {
-  if (hour === 0) return "12am";
-  if (hour === 12) return "12pm";
-  if (hour < 12) return `${hour}am`;
-  return `${hour - 12}pm`;
+const hr = (h: number): string => {
+  if (h === 0) return "12am";
+  if (h === 12) return "12pm";
+  return h < 12 ? `${h}am` : `${h - 12}pm`;
 };
+
+const CardHeader = ({
+  icon: Icon,
+  title,
+  sub,
+  right,
+}: {
+  icon: React.ElementType;
+  title: string;
+  sub: string;
+  right?: React.ReactNode;
+}) => (
+  <div className="flex items-center justify-between mb-5">
+    <div className="flex items-center gap-2.5">
+      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20">
+        <Icon className="h-4 w-4 text-pink-500" />
+      </div>
+      <div>
+        <h3 className="text-sm font-bold text-foreground">{title}</h3>
+        <p className="text-[11px] text-muted-foreground">{sub}</p>
+      </div>
+    </div>
+    {right}
+  </div>
+);
+
+const BarChart = ({
+  items,
+  delayBase = 0.5,
+}: {
+  items: { key: string; pct: number; highlight: boolean; tooltip: string }[];
+  delayBase?: number;
+}) => (
+  <div className="flex items-end gap-[3px] h-28">
+    {items.map((bar, i) => (
+      <motion.div
+        key={bar.key}
+        initial={{ height: 0 }}
+        animate={{ height: `${Math.max(bar.pct, 3)}%` }}
+        transition={{ duration: 0.6, delay: delayBase + i * 0.015, ease }}
+        className={cn(
+          "flex-1 rounded-t-sm cursor-default transition-colors duration-200",
+          bar.highlight
+            ? "bg-pink-500"
+            : "bg-pink-300/40 dark:bg-pink-500/25 hover:bg-pink-400/60 dark:hover:bg-pink-500/40"
+        )}
+        title={bar.tooltip}
+        role="img"
+        aria-label={bar.tooltip}
+      />
+    ))}
+  </div>
+);
 
 type Props = {
   totalCalls: number;
@@ -85,37 +135,16 @@ export default function StatisticsDashboard({
   recentRuns,
   activeKeyCount,
 }: Props) {
-  const maxDayCalls = Math.max(...callsByDay.map((d) => d.total), 1);
-  const maxHourCalls = Math.max(...callsByHour.map((h) => h.calls), 1);
-
-  const statCards = [
-    {
-      label: "Total Calls",
-      value: formatNumber(totalCalls),
-      icon: Zap,
-      barWidth: Math.min((totalCalls / Math.max(totalCalls, 1)) * 100, 100),
-    },
-    {
-      label: "Total Tokens",
-      value: formatNumber(totalTokens),
-      icon: Layers,
-      barWidth: Math.min((totalTokens / Math.max(totalTokens, 1)) * 100, 100),
-    },
-    {
-      label: "Success Rate",
-      value: `${successRate.toFixed(1)}%`,
-      icon: Activity,
-      barWidth: successRate,
-    },
-    {
-      label: "API Keys",
-      value: activeKeyCount.toString(),
-      icon: Key,
-      barWidth: Math.min(activeKeyCount * 20, 100),
-    },
-  ];
-
+  const maxDay = Math.max(...callsByDay.map((d) => d.total), 1);
+  const maxHour = Math.max(...callsByHour.map((h) => h.calls), 1);
   const hasData = totalCalls > 0;
+
+  const stats = [
+    { label: "Total Calls", value: fmt(totalCalls), icon: Zap },
+    { label: "Total Tokens", value: fmt(totalTokens), icon: Layers },
+    { label: "Success Rate", value: `${successRate.toFixed(1)}%`, icon: Activity },
+    { label: "API Keys", value: activeKeyCount.toString(), icon: Key },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -124,336 +153,230 @@ export default function StatisticsDashboard({
         subTitle="Monitor your API performance and usage — last 30 days"
       />
 
-      <div className="mx-auto max-w-screen-2xl px-4 lg:px-8 py-8">
-        {/* Header */}
-        <Reveal>
-          <div className="mb-8 flex items-center gap-2">
-            <Activity className="h-5 w-5 text-pink-500" />
-            <span className="text-sm font-semibold text-foreground">
-              Dashboard
-            </span>
-            <span className="ml-2 flex items-center gap-1.5 rounded-full bg-pink-500/10 px-2.5 py-1 text-[11px] font-semibold text-pink-600 dark:text-pink-400 ring-1 ring-pink-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-pulse" />
-              Last 30 days
-            </span>
-          </div>
-        </Reveal>
-
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          {statCards.map((stat, i) => (
-            <Reveal key={stat.label} delay={i * 0.08}>
-              <motion.div
-                whileHover={{ y: -4, scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-6 transition-shadow duration-300 hover:shadow-card-hover"
-              >
-                <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-pink-500/[0.06] blur-2xl transition-all duration-500 group-hover:bg-pink-500/[0.12]" />
-
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-500/10 ring-1 ring-pink-500/20 transition-all duration-300 group-hover:ring-pink-500/40 group-hover:shadow-[0_0_12px_hsl(330_81%_60%/0.15)]">
-                    <stat.icon className="h-5 w-5 text-pink-500" />
+      <div className="mx-auto max-w-screen-xl px-4 lg:px-8 py-8 space-y-5">
+        {/* ── Stat cards ── */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.06}>
+              <div className="group relative rounded-2xl border border-border/60 bg-card px-5 py-5 transition-shadow duration-300 hover:shadow-card-hover overflow-hidden">
+                <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-pink-500/[0.06] blur-2xl transition-all duration-500 group-hover:bg-pink-500/[0.12]" />
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20">
+                    <s.icon className="h-4 w-4 text-pink-500" />
                   </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {s.label}
+                  </p>
                 </div>
-
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {stat.label}
+                <p className="text-2xl font-extrabold tracking-tight text-foreground">
+                  {s.value}
                 </p>
-                <p className="mt-1 text-3xl font-extrabold tracking-tight text-foreground">
-                  {stat.value}
-                </p>
-
-                <div className="mt-4 h-1.5 rounded-full bg-pink-100 dark:bg-pink-950/40 overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${stat.barWidth}%` }}
-                    transition={{
-                      duration: 1.2,
-                      delay: 0.4 + i * 0.15,
-                      ease,
-                    }}
-                    className="h-full rounded-full bg-gradient-to-r from-pink-400 to-pink-600"
-                  />
-                </div>
-              </motion.div>
+              </div>
             </Reveal>
           ))}
         </div>
 
-        {/* Calls by Day (traffic chart) + Active Models */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 mb-8">
-          {/* Traffic chart */}
-          <Reveal delay={0.1} className="lg:col-span-2">
-            <div className="rounded-2xl border border-border/60 bg-card p-6 h-full">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20">
-                    <BarChart3 className="h-4 w-4 text-pink-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">
-                      Calls per Day
-                    </h3>
-                    <p className="text-[11px] text-muted-foreground">
-                      Last 30 days
-                    </p>
-                  </div>
-                </div>
-              </div>
-
+        {/* ── Two charts side by side ── */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          {/* API Traffic (30 days) */}
+          <Reveal delay={0.1}>
+            <div className="rounded-2xl border border-border/60 bg-card p-5">
+              <CardHeader
+                icon={BarChart3}
+                title="API Traffic"
+                sub="Calls per day — 30 days"
+                right={
+                  hasData ? (
+                    <div className="text-right">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Today</p>
+                      <p className="text-sm font-bold text-foreground">
+                        {fmt(callsByDay[callsByDay.length - 1]?.total ?? 0)}
+                      </p>
+                    </div>
+                  ) : undefined
+                }
+              />
               {hasData ? (
                 <>
-                  <div className="flex items-end gap-[3px] h-40">
-                    {callsByDay.map((day, i) => {
-                      const pct = (day.total / maxDayCalls) * 100;
-                      return (
-                        <motion.div
-                          key={day.date}
-                          initial={{ height: 0 }}
-                          animate={{ height: `${Math.max(pct, 2)}%` }}
-                          transition={{
-                            duration: 0.6,
-                            delay: 0.5 + i * 0.02,
-                            ease,
-                          }}
-                          className={cn(
-                            "flex-1 rounded-t-sm transition-colors duration-200 cursor-default",
-                            i === callsByDay.length - 1
-                              ? "bg-pink-500"
-                              : "bg-pink-300/40 dark:bg-pink-500/25 hover:bg-pink-400/60 dark:hover:bg-pink-500/40"
-                          )}
-                          title={`${day.date}: ${day.total} calls`}
-                          role="img"
-                          aria-label={`${day.date}: ${day.total} calls`}
-                        />
-                      );
-                    })}
-                  </div>
-                  <div className="mt-4 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span>
-                      {callsByDay[0]?.date ?? ""}
-                    </span>
-                    <span>
-                      {callsByDay[callsByDay.length - 1]?.date ?? ""}
-                    </span>
+                  <BarChart
+                    items={callsByDay.map((d, i) => ({
+                      key: d.date,
+                      pct: (d.total / maxDay) * 100,
+                      highlight: i === callsByDay.length - 1,
+                      tooltip: `${d.date}: ${d.total} calls`,
+                    }))}
+                  />
+                  <div className="mt-2.5 flex justify-between text-[10px] font-mono text-muted-foreground">
+                    <span>{callsByDay[0]?.date ?? ""}</span>
+                    <span>{callsByDay[callsByDay.length - 1]?.date ?? ""}</span>
                   </div>
                 </>
               ) : (
-                <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
-                  No API calls yet. Run a workflow to see traffic data.
+                <div className="flex items-center justify-center h-28 text-sm text-muted-foreground">
+                  No API calls yet
                 </div>
               )}
             </div>
           </Reveal>
 
-          {/* Active Models */}
-          <Reveal delay={0.2}>
-            <div className="rounded-2xl border border-border/60 bg-card p-6 h-full">
-              <div className="flex items-center gap-2.5 mb-6">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20">
-                  <Cpu className="h-4 w-4 text-pink-500" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">
-                    Active Models
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground">
-                    {activeModels.length} model{activeModels.length !== 1 && "s"} used
-                  </p>
-                </div>
-              </div>
-
-              {activeModels.length > 0 ? (
-                <div className="space-y-3">
-                  {activeModels.map((model, i) => (
-                    <motion.div
-                      key={model.name}
-                      initial={{ opacity: 0, x: 12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        duration: 0.4,
-                        delay: 0.6 + i * 0.08,
-                        ease,
-                      }}
-                      className="group rounded-xl border border-border/40 bg-background/50 p-3.5 transition-all duration-200 hover:border-pink-300/40 dark:hover:border-pink-500/30 hover:bg-pink-50/30 dark:hover:bg-pink-950/10"
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2.5">
-                          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                          <span className="text-sm font-bold text-foreground">
-                            {model.label}
-                          </span>
-                        </div>
-                        <span className="text-[11px] font-mono font-medium text-muted-foreground">
-                          {formatNumber(model.calls)} calls
-                        </span>
-                      </div>
-                      <div className="h-1 rounded-full bg-pink-100 dark:bg-pink-950/40 overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{
-                            width: `${(model.calls / (activeModels[0]?.calls || 1)) * 100}%`,
-                          }}
-                          transition={{
-                            duration: 0.8,
-                            delay: 0.8 + i * 0.1,
-                            ease,
-                          }}
-                          className="h-full rounded-full bg-gradient-to-r from-pink-400 to-pink-500"
-                        />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+          {/* Peak Hours (24h) */}
+          <Reveal delay={0.15}>
+            <div className="rounded-2xl border border-border/60 bg-card p-5">
+              <CardHeader
+                icon={Clock}
+                title="Peak Hours"
+                sub="24h distribution (UTC)"
+                right={
+                  hasData
+                    ? (() => {
+                        const peak = callsByHour.reduce((a, b) => (b.calls > a.calls ? b : a), callsByHour[0]);
+                        return (
+                          <div className="text-right">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Peak</p>
+                            <p className="text-sm font-bold text-pink-500">
+                              {hr(peak.hour)} <span className="text-foreground/60 font-normal">({fmt(peak.calls)})</span>
+                            </p>
+                          </div>
+                        );
+                      })()
+                    : undefined
+                }
+              />
+              {hasData ? (
+                <>
+                  <BarChart
+                    items={callsByHour.map((e) => ({
+                      key: String(e.hour),
+                      pct: (e.calls / maxHour) * 100,
+                      highlight: e.calls === maxHour && e.calls > 0,
+                      tooltip: `${hr(e.hour)}: ${e.calls} calls`,
+                    }))}
+                    delayBase={0.55}
+                  />
+                  <div className="mt-2.5 flex justify-between text-[10px] font-mono text-muted-foreground">
+                    <span>12am</span>
+                    <span>6am</span>
+                    <span>12pm</span>
+                    <span>6pm</span>
+                    <span>11pm</span>
+                  </div>
+                </>
               ) : (
-                <div className="flex items-center justify-center h-32 text-sm text-muted-foreground">
-                  No models used yet
+                <div className="flex items-center justify-center h-28 text-sm text-muted-foreground">
+                  No data yet
                 </div>
               )}
             </div>
           </Reveal>
         </div>
 
-        {/* Usage by Hour + Recent Runs */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 mb-8">
-          {/* Usage by Hour */}
-          <Reveal delay={0.15}>
-            <div className="rounded-2xl border border-border/60 bg-card p-6">
-              <div className="flex items-center gap-2.5 mb-6">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20">
-                  <TrendingUp className="h-4 w-4 text-pink-500" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">
-                    Usage by Hour
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground">
-                    Request distribution (UTC)
-                  </p>
-                </div>
-              </div>
-
-              {hasData ? (
-                <div className="space-y-2">
-                  {callsByHour
-                    .filter((_, i) => i % 2 === 0)
-                    .map((entry, i) => (
+        {/* ── Active Models + Recent Runs ── */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          {/* Active Models */}
+          <Reveal delay={0.2}>
+            <div className="rounded-2xl border border-border/60 bg-card p-5">
+              <CardHeader
+                icon={Cpu}
+                title="Active Models"
+                sub={`${activeModels.length} model${activeModels.length !== 1 ? "s" : ""} used`}
+              />
+              {activeModels.length > 0 ? (
+                <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
+                  {activeModels.map((model, i) => {
+                    const maxCalls = activeModels[0]?.calls ?? 1;
+                    const pct = (model.calls / maxCalls) * 100;
+                    return (
                       <motion.div
-                        key={entry.hour}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3, delay: 0.6 + i * 0.04 }}
-                        className="flex items-center gap-3"
+                        key={model.name}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.35, delay: 0.5 + i * 0.06, ease }}
+                        className="group flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-pink-50/40 dark:hover:bg-pink-950/10"
                       >
-                        <span className="w-10 text-[11px] font-mono text-muted-foreground text-right shrink-0">
-                          {hourLabel(entry.hour)}
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                        <span className="flex-1 truncate text-[13px] font-medium text-foreground">
+                          {model.label}
                         </span>
-                        <div className="flex-1 h-5 rounded-md bg-pink-100/60 dark:bg-pink-950/30 overflow-hidden">
+                        <div className="hidden sm:block w-20 h-1 rounded-full bg-pink-100 dark:bg-pink-950/40 overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{
-                              width: `${maxHourCalls > 0 ? (entry.calls / maxHourCalls) * 100 : 0}%`,
-                            }}
-                            transition={{
-                              duration: 0.8,
-                              delay: 0.7 + i * 0.04,
-                              ease,
-                            }}
-                            className="h-full rounded-md bg-gradient-to-r from-pink-400 to-pink-500"
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.8, delay: 0.7 + i * 0.06, ease }}
+                            className="h-full rounded-full bg-pink-400"
                           />
                         </div>
-                        <span className="w-10 text-[11px] font-mono font-medium text-foreground text-right shrink-0">
-                          {entry.calls}
+                        <span className="shrink-0 w-12 text-right text-[11px] font-mono text-muted-foreground">
+                          {fmt(model.calls)}
                         </span>
                       </motion.div>
-                    ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
-                  No data yet
+                <div className="flex items-center justify-center h-28 text-sm text-muted-foreground">
+                  No models used yet
                 </div>
               )}
             </div>
           </Reveal>
 
           {/* Recent Runs */}
-          <Reveal delay={0.2}>
-            <div className="rounded-2xl border border-border/60 bg-card p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/10 ring-1 ring-pink-500/20">
-                    <Globe className="h-4 w-4 text-pink-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">
-                      Recent Runs
-                    </h3>
-                    <p className="text-[11px] text-muted-foreground">
-                      Latest API executions
-                    </p>
-                  </div>
-                </div>
-                <Sparkles className="h-4 w-4 text-pink-400/60" />
-              </div>
-
+          <Reveal delay={0.25}>
+            <div className="rounded-2xl border border-border/60 bg-card p-5">
+              <CardHeader
+                icon={Globe}
+                title="Recent Runs"
+                sub="Latest API executions"
+                right={<Sparkles className="h-4 w-4 text-pink-400/50" />}
+              />
               {recentRuns.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-1.5 max-h-[260px] overflow-y-auto">
                   {recentRuns.map((run, i) => (
                     <motion.div
                       key={run.id}
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.3,
-                        delay: 0.7 + i * 0.06,
-                        ease,
-                      }}
-                      className="flex items-center justify-between rounded-xl border border-border/40 bg-background/50 px-4 py-3 transition-all duration-200 hover:border-pink-300/40 dark:hover:border-pink-500/30"
+                      transition={{ duration: 0.3, delay: 0.6 + i * 0.05, ease }}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-pink-50/40 dark:hover:bg-pink-950/10"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="shrink-0 rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                          200
-                        </span>
-                        <span className="truncate text-[12px] font-mono text-foreground/80">
-                          /v1/run/{run.workflowShortId}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 shrink-0 ml-4">
-                        <span className="hidden sm:inline text-[11px] font-medium text-pink-500/80">
-                          {run.modelLabel}
-                        </span>
-                        <span className="text-[11px] font-mono text-muted-foreground w-16 text-right">
-                          {formatNumber(run.tokens)} tok
-                        </span>
-                        <span className="text-[10px] text-muted-foreground w-20 text-right">
-                          {new Date(run.createdAt).toLocaleDateString(
-                            undefined,
-                            { month: "short", day: "numeric" }
-                          )}
-                        </span>
-                      </div>
+                      <span className="shrink-0 rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                        200
+                      </span>
+                      <span className="flex-1 truncate text-[12px] font-mono text-foreground/80">
+                        {run.workflowShortId}
+                      </span>
+                      <span className="hidden sm:inline shrink-0 text-[11px] font-medium text-pink-500/70">
+                        {run.modelLabel}
+                      </span>
+                      <span className="shrink-0 w-14 text-right text-[11px] font-mono text-muted-foreground">
+                        {fmt(run.tokens)} tok
+                      </span>
+                      <span className="shrink-0 w-16 text-right text-[10px] text-muted-foreground">
+                        {new Date(run.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
                     </motion.div>
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
-                  No runs yet. Execute a workflow to see activity.
+                <div className="flex items-center justify-center h-28 text-sm text-muted-foreground">
+                  No runs yet
                 </div>
               )}
             </div>
           </Reveal>
         </div>
 
-        {/* Bottom summary bar */}
-        <Reveal delay={0.25}>
-          <div className="relative overflow-hidden rounded-2xl border border-pink-200/60 dark:border-pink-500/20 bg-gradient-to-r from-pink-50 via-pink-50/50 to-white dark:from-pink-950/30 dark:via-pink-950/10 dark:to-card p-6">
-            <div className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-pink-400/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-pink-300/10 blur-2xl" />
-
+        {/* ── Summary strip ── */}
+        <Reveal delay={0.3}>
+          <div className="relative overflow-hidden rounded-2xl border border-pink-200/60 dark:border-pink-500/20 bg-gradient-to-r from-pink-50 via-pink-50/50 to-white dark:from-pink-950/30 dark:via-pink-950/10 dark:to-card px-6 py-5">
+            <div className="pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full bg-pink-400/10 blur-3xl" />
             <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-500/15 ring-1 ring-pink-500/30">
-                  <Sparkles className="h-5 w-5 text-pink-500" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-pink-500/15 ring-1 ring-pink-500/30">
+                  <Sparkles className="h-4 w-4 text-pink-500" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">
@@ -461,27 +384,22 @@ export default function StatisticsDashboard({
                   </p>
                   <p className="text-[12px] text-muted-foreground">
                     {hasData
-                      ? `${formatNumber(totalCalls)} calls across ${activeModels.length} model${activeModels.length !== 1 ? "s" : ""} this month`
+                      ? `${fmt(totalCalls)} calls across ${activeModels.length} model${activeModels.length !== 1 ? "s" : ""} this month`
                       : "Create a workflow and make your first API call"}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
                 {[
-                  { label: "Total Calls", value: formatNumber(totalCalls) },
-                  {
-                    label: "Tokens Used",
-                    value: formatNumber(totalTokens),
-                  },
+                  { label: "Total Calls", value: fmt(totalCalls) },
+                  { label: "Tokens Used", value: fmt(totalTokens) },
                   { label: "API Keys", value: activeKeyCount.toString() },
                 ].map((item) => (
                   <div key={item.label} className="text-right">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       {item.label}
                     </p>
-                    <p className="text-sm font-bold text-foreground">
-                      {item.value}
-                    </p>
+                    <p className="text-sm font-bold text-foreground">{item.value}</p>
                   </div>
                 ))}
               </div>
