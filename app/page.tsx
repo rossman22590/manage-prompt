@@ -92,8 +92,8 @@ const faqs: FAQ[] = [
     a: "Security is built in at every layer. API keys (sk_...) authenticate server-side requests. Streaming uses single-use tokens stored in Redis with a configurable TTL (max 300 seconds), so your API key never touches the client. Rate limiting is server-derived (not spoofable by clients) with a fail-closed design — if Redis goes down, requests are blocked, not allowed through. All billing checks enforce credits ≤ 0 blocking, and error messages are generic to prevent information leakage."
   },
   {
-    q: "Can I use my own API keys for model providers?",
-    a: "Yes. With Bring Your Own Key (BYOK), you can add your own OpenAI, Anthropic, or Google API keys in Settings. Your keys are encrypted at rest and used directly for model calls, giving you zero markup on provider costs. If you don't provide a key, we route through our shared infrastructure with usage billed via credits."
+    q: "Can I version or roll back my workflows?",
+    a: "Yes. Every workflow supports versioning. You can iterate on prompts and settings in the dashboard, test in the console, and publish when ready. Previous versions are kept so you can roll back instantly if needed. Your API endpoint stays the same — only the published version changes, so client code doesn't need updates."
   },
   {
     q: "What are some common use cases?",
