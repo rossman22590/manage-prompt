@@ -21,7 +21,7 @@ import { translateInputs } from "@/lib/utils/workflow";
 import { waitUntil } from "@vercel/functions";
 import type Stripe from "stripe";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const estimateTokenCount = (input: string, output: string) => {
   const inputWordCount = input.trim()

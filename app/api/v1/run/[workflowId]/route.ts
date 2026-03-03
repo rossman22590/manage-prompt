@@ -21,7 +21,7 @@ import { waitUntil } from "@vercel/functions";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const estimateTokenCount = (input: string, output: string) => {
   const inputWordCount = input.trim()
