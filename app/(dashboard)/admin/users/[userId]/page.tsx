@@ -5,6 +5,14 @@ import PageSection from "@/components/core/page-section";
 import PageTitle from "@/components/layout/page-title";
 import { Badge } from "@/components/ui/badge";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   Table,
   TableBody,
   TableCell,
@@ -18,6 +26,7 @@ import { prisma } from "@/lib/utils/db";
 
 type Props = {
   params: Promise<{ userId: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 type CombinedTransaction = {
@@ -35,9 +44,16 @@ type CombinedTransaction = {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function AdminUserDetailsPage({ params }: Props) {
+const TRANSACTIONS_PER_PAGE = 50;
+
+export default async function AdminUserDetailsPage({
+  params,
+  searchParams,
+}: Props) {
   await requireSuperAdmin();
-  const { userId } = await params;
+  const [{ userId }, query] = await Promise.all([params, searchParams]);
+  const requestedPage = Number.parseInt(query.page ?? "1", 10);
+  const currentPage = Number.isNaN(requestedPage) || requestedPage < 1 ? 1 : requestedPage;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -173,6 +189,16 @@ export default async function AdminUserDetailsPage({ params }: Props) {
   const allTransactions = [...stripeTransactions, ...usageTransactions].sort(
     (a, b) => b.date.getTime() - a.date.getTime(),
   );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(allTransactions.length / TRANSACTIONS_PER_PAGE),
+  );
+  const pageNumber = Math.min(currentPage, totalPages);
+  const pageStart = (pageNumber - 1) * TRANSACTIONS_PER_PAGE;
+  const paginatedTransactions = allTransactions.slice(
+    pageStart,
+    pageStart + TRANSACTIONS_PER_PAGE,
+  );
 
   const currentCredits = organization?.credits ?? 0;
 
@@ -221,7 +247,8 @@ export default async function AdminUserDetailsPage({ params }: Props) {
                 Transactions and usage
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Subscription, payments, and workflow credit usage events.
+                Subscription, payments, and workflow credit usage events. Showing{" "}
+                {TRANSACTIONS_PER_PAGE} per page.
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -238,7 +265,7 @@ export default async function AdminUserDetailsPage({ params }: Props) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {allTransactions.length === 0 ? (
+                  {paginatedTransactions.length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={7}
@@ -248,7 +275,7 @@ export default async function AdminUserDetailsPage({ params }: Props) {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    allTransactions.map((transaction) => (
+                    paginatedTransactions.map((transaction) => (
                       <TableRow key={transaction.id}>
                         <TableCell className="whitespace-nowrap">
                           <div className="flex flex-col">
@@ -287,7 +314,7 @@ export default async function AdminUserDetailsPage({ params }: Props) {
                         <TableCell className="hidden md:table-cell">
                           {transaction.workflowId && transaction.workflowName ? (
                             <Link
-                              href={`/workflows/${transaction.workflowId}`}
+                              href={`/admin/workflows/${transaction.workflowId}`}
                               className="text-pink-600 hover:text-pink-700 dark:text-pink-400 dark:hover:text-pink-300"
                             >
                               {transaction.workflowName}
@@ -334,6 +361,47 @@ export default async function AdminUserDetailsPage({ params }: Props) {
                 </TableBody>
               </Table>
             </div>
+            {totalPages > 1 ? (
+              <div className="border-t border-gray-200 dark:border-gray-800 px-4 py-4">
+                <Pagination>
+                  <PaginationContent>
+                    {pageNumber > 1 ? (
+                      <PaginationItem>
+                        <PaginationPrevious
+                          href={`/admin/users/${user.id}?page=${pageNumber - 1}`}
+                        />
+                      </PaginationItem>
+                    ) : null}
+
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, index) => {
+                      const startPage = Math.max(
+                        1,
+                        Math.min(pageNumber - 2, totalPages - 4),
+                      );
+                      const page = startPage + index;
+                      return (
+                        <PaginationItem key={`admin-user-page-${page}`}>
+                          <PaginationLink
+                            href={`/admin/users/${user.id}?page=${page}`}
+                            isActive={page === pageNumber}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}
+
+                    {pageNumber < totalPages ? (
+                      <PaginationItem>
+                        <PaginationNext
+                          href={`/admin/users/${user.id}?page=${pageNumber + 1}`}
+                        />
+                      </PaginationItem>
+                    ) : null}
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            ) : null}
           </div>
         </div>
       </PageSection>
