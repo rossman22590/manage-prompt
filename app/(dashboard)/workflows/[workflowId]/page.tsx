@@ -60,9 +60,9 @@ export default async function WorkflowEditor(props: Props) {
   return (
     <>
       {/* Toolbar*/}
-      <PageSection bottomMargin className="-mt-4">
-        <div className="flex flex-col justify-center">
-          <div className="flex justify-between">
+      <PageSection bottomMargin className="mt-4">
+        <div className="flex flex-col justify-center px-4 py-2">
+          <div className="flex justify-between items-center">
             {/* Left buttons */}
             <div className="isolate inline-flex sm:space-x-3">
               <span className="inline-flex space-x-1">
@@ -91,6 +91,13 @@ export default async function WorkflowEditor(props: Props) {
             {/* Right buttons */}
             <nav aria-label="Pagination">
               <span className="isolate inline-flex sm:space-x-3">
+                <Link
+                  href={`/workflows/${workflow.id}/edit`}
+                  className={buttonVariants({ variant: "default", size: "sm" })}
+                  prefetch={false}
+                >
+                  Edit
+                </Link>
                 <form action={toggleWorkflowState}>
                   <input
                     className="hidden"

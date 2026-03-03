@@ -1,1182 +1,887 @@
-﻿"use client"
+"use client";
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { buttonVariants } from "@/components/ui/button";
-import { AnimatePresence, motion } from 'framer-motion';
-import { Bot, BrainIcon, CheckIcon, ChevronDownIcon, CodeIcon, FileText, LogIn, MinusCircle, Network, PlusCircle, Rocket, ShieldCheckIcon, Sparkles, Terminal, Variable, Workflow, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion, useInView, useScroll, useTransform } from "framer-motion";
+import {
+  ArrowRight, Bot, BrainIcon, CheckIcon, ChevronRight, CodeIcon, Copy, FileText, LogIn,
+  MinusCircle, Network, PlusCircle, Rocket, ShieldCheckIcon,
+  Sparkles, Terminal, Variable, Workflow, Zap,
+} from "lucide-react";
 import Link from "next/link";
-import React, { useState } from 'react';
+import React, { useRef, useState } from "react";
+import { AiOutlineOpenAI } from "react-icons/ai";
+import { DiRubyRough } from "react-icons/di";
 import {
-  AiOutlineOpenAI
-} from "react-icons/ai";
-import {
-  DiRubyRough
-} from "react-icons/di";
-import {
-  RiCodeSSlashLine,
-  RiJavascriptLine,
-  RiMistFill,
-  RiNextjsFill,
-  RiNodejsLine,
-  RiReactjsLine
+  RiCodeSSlashLine, RiJavascriptLine, RiMistFill,
+  RiNextjsFill, RiNodejsLine, RiReactjsLine,
 } from "react-icons/ri";
-import {
-  SiAnthropic,
-  SiGoogle,
-  SiMeta,
-  SiMixcloud
-} from "react-icons/si";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { SiAnthropic, SiGoogle, SiMeta, SiMixcloud } from "react-icons/si";
 
-type Feature = {
-  name: string;
-  description: string;
-  icon: React.ElementType;
-};
+/* ═══════════════════════════════════════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════════════════════════════════════ */
+type CodeLang = "python" | "javascript" | "curl";
+type FAQ = { q: string; a: string };
 
-
-const modelIcons = [
-  { name: "OpenAI", Icon: AiOutlineOpenAI },
-  { name: "Google", Icon: SiGoogle  },
-  { name: "Meta", Icon: SiMeta },
-  { name: "Anthropic", Icon: SiAnthropic  },
-  { name: "Mixtral", Icon: SiMixcloud },
-  { name: "And more...", Icon: RiMistFill   },
+const providers = [
+  { name: "OpenAI",    Icon: AiOutlineOpenAI },
+  { name: "Google",    Icon: SiGoogle },
+  { name: "Meta",      Icon: SiMeta },
+  { name: "Anthropic", Icon: SiAnthropic },
+  { name: "Mixtral",   Icon: SiMixcloud },
+  { name: "More",      Icon: RiMistFill },
 ];
 
-
-const techIcons = [
-  { name: "React", Icon: RiReactjsLine, color: "#CF9FFF" },
-  { name: "Node.js", Icon: RiNodejsLine, color: "#CF9FFF" },
-  { name: "Python", Icon: RiNextjsFill , color: "#CF9FFF" },
-  { name: "Ruby", Icon: DiRubyRough , color: "#CF9FFF" }, // Using Gatsby icon as a placeholder for Ruby
-  { name: "JavaScript", Icon: RiJavascriptLine, color: "#CF9FFF" },
-  { name: "C#", Icon: RiCodeSSlashLine, color: "#CF9FFF" },
+const techStack = [
+  { name: "React",      Icon: RiReactjsLine },
+  { name: "Node.js",    Icon: RiNodejsLine },
+  { name: "Next.js",    Icon: RiNextjsFill },
+  { name: "Ruby",       Icon: DiRubyRough },
+  { name: "JavaScript", Icon: RiJavascriptLine },
+  { name: "Any Lang",   Icon: RiCodeSSlashLine },
 ];
 
-type FAQItem = {
-  question: string;
-  answer: string;
-};
-
-type CodeLanguage = 'python' | 'javascript' | 'curl';
-
-const features: Feature[] = [
-  {
-    name: "Advanced AI",
-    description: "Leverage cutting-edge AI models to provide personalized learning experiences for your users.",
-    icon: BrainIcon,
-  },
-  {
-    name: "Seamless Integration",
-    description: "Easily integrate AI Tutor into your existing applications with our robust API and comprehensive documentation.",
-    icon: CodeIcon,
-  },
-  {
-    name: "Secure and Scalable",
-    description: "Built with enterprise-grade security and designed to scale with your growing user base.",
-    icon: ShieldCheckIcon,
-  },
+const features = [
+  { title: "Multi-Model Intelligence", desc: "GPT5, Gemini 3, Sonnet 4.5 — one unified endpoint for every major AI model.", icon: BrainIcon },
+  { title: "Ship in Minutes",          desc: "Drop-in REST API with SDKs for every language. Go from zero to production in under 10 minutes.", icon: CodeIcon },
+  { title: "Enterprise Security",      desc: "Single-use tokens, rate limiting, IP allowlists, and SOC-2 grade infrastructure from day one.", icon: ShieldCheckIcon },
+  { title: "Real-time Streaming",      desc: "Token-by-token streaming responses for instant, snappy UX your users will love.", icon: Zap },
+  { title: "Composable Workflows",     desc: "Chain prompts, models, and branching logic into reusable, versioned AI pipelines.", icon: Workflow },
+  { title: "Infinite Scale",           desc: "Auto-scaling infrastructure handles millions of requests. Zero cold starts, zero ops burden.", icon: Network },
 ];
 
-const includedFeatures: string[] = [
-  "Unlimited workflows",
-  "Models by OpenAI, Meta, Google, Mixtral and Anthropic",
-  "Email support",
+const steps = [
+  { icon: LogIn,    title: "Sign up",        desc: "Create your free account in 30 seconds" },
+  { icon: Workflow, title: "Create workflow", desc: "Use the visual builder or import a template" },
+  { icon: Variable, title: "Define inputs",   desc: "Set dynamic variables for flexible reuse" },
+  { icon: FileText, title: "Write prompts",   desc: "Craft system + user prompts with our editor" },
+  { icon: Bot,      title: "Choose model",    desc: "Pick from GPT5, Gemini 3, Sonnet 4.5 and more" },
+  { icon: Rocket,   title: "Deploy & call",   desc: "Hit your REST endpoint — it's live instantly" },
 ];
 
-const faqItems: FAQItem[] = [
+const pricingPerks = ["Unlimited workflows", "Every major AI model", "Streaming responses", "Email support"];
+
+const faqs: FAQ[] = [
+  { q: "What is AI Tutor API?",           a: "A multi-model AI gateway: one REST endpoint to access OpenAI, Anthropic, Google, Meta, Mixtral and more. Build once, swap models without code changes." },
+  { q: "Which models are supported?",     a: "GPT5, Gemini 3, Sonnet 4.5, and many more. New models added within days of release." },
+  { q: "How does pricing work?",          a: "Pay-as-you-go with credit packs. Enterprise plan at $150/10M tokens with priority routing and SLA. No monthly minimums." },
+  { q: "Is there a free trial?",          a: "Yes — every account starts with free credits so you can make real API calls before spending a cent." },
+  { q: "How fast can I integrate?",       a: "Under 10 minutes. Point your existing OpenAI SDK at our base URL, swap in your key, done. We also have dedicated SDKs and Postman collections." },
+];
+
+const codeExamples: Record<CodeLang, string> = {
+  python: `import requests
+
+response = requests.post(
+    "https://api.aitutor.com/v1/run/wf_abc123",
+    headers={"Authorization": "Bearer your_api_key"},
+    json={"question": "Explain quantum entanglement"}
+)
+
+print(response.json()["output"])`,
+
+  javascript: `const res = await fetch(
+  "https://api.aitutor.com/v1/run/wf_abc123",
   {
-    question: "What is AI Tutor API?",
-    answer: "AI Tutor API is a powerful, multi-model language learning platform that allows developers to integrate advanced AI tutoring capabilities into their applications."
-  },
-  {
-    question: "Which language models are supported?",
-    answer: "We support a wide range of models including those from OpenAI, Google, Meta, Anthropic, Mixtral, and more. Our API provides a unified interface to access all these models."
-  },
-  {
-    question: "How does pricing work?",
-    answer: "Our pricing is based on the number of tokens processed. We charge $0.01 per 1,000 tokens, which is approximately 750 words. We offer a pay-as-you-go model with no long-term commitments."
-  },
-  {
-    question: "Is there a free trial available?",
-    answer: "Yes, we offer a free trial with a limited number of tokens so you can test our API and see how it fits your needs. Sign up on our website to start your free trial."
-  },
-  {
-    question: "How can I integrate AI Tutor API into my application?",
-    answer: "We provide comprehensive documentation and SDKs for popular programming languages. Our API is RESTful and easy to integrate. Check our documentation for detailed integration guides."
+    method: "POST",
+    headers: {
+      Authorization: "Bearer your_api_key",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      question: "Explain quantum entanglement",
+    }),
   }
-];
-
-const codeExamples: Record<CodeLanguage, string> = {
-  python: `
-import requests
-
-API_KEY = "your_api_key_here"
-API_URL = "https://api.aitutor.com/v1/generate"
-
-prompt = "Explain the concept of quantum entanglement"
-
-response = requests.post(API_URL, 
-    headers={"Authorization": f"Bearer {API_KEY}"},
-    json={"prompt": prompt, "max_tokens": 150}
-)
-
-if response.status_code == 200:
-    print(response.json()['generated_text'])
-else:
-    print("Error:", response.status_code, response.text)
-  `,
-  javascript: `
-const axios = require('axios');
-
-const API_KEY = 'your_api_key_here';
-const API_URL = 'https://api.aitutor.com/v1/generate';
-
-const prompt = 'Explain the concept of quantum entanglement';
-
-axios.post(API_URL, 
-  { prompt: prompt, max_tokens: 150 },
-  { headers: { 'Authorization': \`Bearer \${API_KEY}\` } }
-)
-.then(response => {
-  console.log(response.data.generated_text);
-})
-.catch(error => {
-  console.error('Error:', error.response.status, error.response.data);
-});
-  `,
-  curl: `
-curl -X POST https://api.aitutor.com/v1/generate \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer your_api_key_here" \\
-  -d '{
-    "prompt": "Explain the concept of quantum entanglement",
-    "max_tokens": 150
-  }'
-  `
-};
-
-const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay }}
-  >
-    {children}
-  </motion.div>
 );
 
-const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; toggleOpen: () => void }> = ({ item, isOpen, toggleOpen }) => (
-  <div className="mb-4">
-    <button
-      onClick={toggleOpen}
-      className="flex justify-between items-center w-full p-4 bg-purple-50 dark:bg-[#1a1a1a] rounded-lg focus:outline-none"
+const { output } = await res.json();
+console.log(output);`,
+
+  curl: `curl -X POST https://api.aitutor.com/v1/run/wf_abc123 \\
+  -H "Authorization: Bearer your_api_key" \\
+  -H "Content-Type: application/json" \\
+  -d '{"question":"Explain quantum entanglement"}'`,
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRIMITIVES
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ease = [0.22, 1, 0.36, 1] as const;
+
+const Reveal = ({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, delay, ease }}
+      className={className}
     >
-      <span className="text-lg font-semibold text-gray-900 dark:text-gray-200">{item.question}</span>
-      {isOpen ? <MinusCircle className="h-5 w-5 text-purple-600 dark:text-pink-500" /> : <PlusCircle className="h-5 w-5 text-purple-600 dark:text-pink-500" />}
+      {children}
+    </motion.div>
+  );
+};
+
+const Badge = ({ children }: { children: React.ReactNode }) => (
+  <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.06] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
+    <span className="h-1.5 w-1.5 rounded-full bg-primary animate-dot-pulse" />
+    {children}
+  </span>
+);
+
+const FAQRow = ({ faq, open, toggle }: { faq: FAQ; open: boolean; toggle: () => void }) => (
+  <div className="group border-b border-border/60 last:border-0">
+    <button
+      type="button"
+      onClick={toggle}
+      className="flex w-full items-center justify-between gap-4 py-6 text-left transition-colors"
+    >
+      <span className="text-[15px] font-semibold text-foreground group-hover:text-primary transition-colors duration-200">
+        {faq.q}
+      </span>
+      <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.2 }}>
+        <PlusCircle className={cn("h-5 w-5 shrink-0 transition-colors duration-200", open ? "text-primary" : "text-muted-foreground")} />
+      </motion.div>
     </button>
-    <AnimatePresence>
-      {isOpen && (
+    <AnimatePresence initial={false}>
+      {open && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="p-4 bg-white dark:bg-black"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="overflow-hidden"
         >
-          <p className="text-gray-600 dark:text-gray-400">{item.answer}</p>
+          <p className="pb-6 text-sm leading-relaxed text-muted-foreground">{faq.a}</p>
         </motion.div>
       )}
     </AnimatePresence>
   </div>
 );
 
+const CopyButton = ({ code }: { code: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      aria-label="Copy code"
+      className={cn(
+        "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-mono font-medium transition-all duration-200",
+        copied
+          ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30"
+          : "bg-white/[0.06] text-white/40 hover:bg-white/[0.10] hover:text-white/70 ring-1 ring-white/10"
+      )}
+    >
+      {copied ? <CheckIcon className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      {copied ? "Copied!" : "Copy"}
+    </button>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGE
+   ═══════════════════════════════════════════════════════════════════════════ */
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<CodeLanguage>('python');
+  const [lang, setLang]       = useState<CodeLang>("python");
 
-  const toggleFaq = (index: number) => {
-    setOpenFaq(prevOpen => prevOpen === index ? null : index);
-  };
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY     = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 dark:from-black dark:to-black text-gray-800 dark:text-gray-200 overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Header />
 
-      <main>
-        {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden dark:bg-black">
-          {/* Background animation */}
-          <div className="absolute inset-0 z-0">
-            <div className="relative h-full w-full">
-              {['purple', 'pink'].map((color, index) => (
-                <div 
-                  key={color}
-                  className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-${color}-200 via-${color}-100 to-transparent dark:from-black dark:via-black dark:to-transparent opacity-${70 - index * 15} dark:opacity-0 animate-pulse`}
-                  style={{ animationDelay: `${-index * 2}s` }}
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section ref={heroRef} className="relative flex min-h-[100svh] items-center justify-center overflow-hidden pt-24 pb-32">
+        {/* Background radials */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 h-[900px] w-[900px] rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.08)_0%,transparent_70%)]" />
+          <div className="absolute top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,hsl(262_83%_58%/0.05)_0%,transparent_70%)]" />
+        </div>
+
+        {/* Grid */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 opacity-[0.025] dark:opacity-[0.04]"
+          style={{
+            backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+          }}
+        />
+
+        <motion.div
+          style={{ y: heroY, scale: heroScale }}
+          className="relative z-10 mx-auto max-w-4xl px-6 text-center"
+        >
+          {/* Status pill */}
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, ease }}
+          >
+            <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-border/70 bg-card px-4 py-2 text-[12px] font-medium text-muted-foreground shadow-float">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-dot-pulse" />
+              Now supporting GPT5 &middot; Gemini 3 &middot; Sonnet 4.5
+              <ChevronRight className="h-3 w-3 text-primary" />
+            </div>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease }}
+            className="text-display-lg sm:text-display-xl tracking-tight"
+          >
+            <span className="text-foreground">The only platform{" "}</span>
+            <br className="hidden sm:block" />
+            <span className="text-foreground">powered by </span>
+            <span className="text-gradient">advanced AI</span>
+          </motion.h1>
+
+          {/* Sub */}
+          <motion.p
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25, ease }}
+            className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-muted-foreground"
+          >
+            One endpoint, every AI model, zero infrastructure.
+            Ship intelligent features your users love — in minutes, not months.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4, ease }}
+            className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          >
+            <Link
+              href="/workflows"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "group relative overflow-hidden rounded-2xl bg-primary text-primary-foreground",
+                "px-8 text-[14px] font-semibold",
+                "shadow-glow-sm hover:shadow-glow-md",
+                "transition-all duration-300 active:scale-[0.97]"
+              )}
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Start building free
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </span>
+            </Link>
+            <Link
+              href="https://support.myapps.ai/introduction"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "rounded-2xl border-border/70 bg-card px-8 text-[14px] font-semibold",
+                "hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary",
+                "transition-all duration-300 active:scale-[0.97]"
+              )}
+            >
+              Read the docs
+            </Link>
+          </motion.div>
+
+          {/* Hero floating card (dashboard mockup hint) */}
+          <motion.div
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.6, ease }}
+            className="mt-16 mx-auto max-w-3xl"
+          >
+            <div className="relative rounded-2xl border border-border/60 bg-card p-1.5 shadow-float-lg">
+              {/* Beam across top */}
+              <div className="pointer-events-none absolute -top-px left-0 right-0 h-px overflow-hidden rounded-t-2xl">
+                <div className="animate-beam absolute h-full w-1/4 bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+              </div>
+
+              {/* Mini browser chrome */}
+              <div className="flex items-center gap-1.5 rounded-t-xl bg-muted/50 px-4 py-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
+                <div className="ml-3 flex-1 rounded-lg bg-background/60 px-3 py-1 text-[10px] font-mono text-muted-foreground">
+                  api.aitutor.com/v1/run/wf_abc123
+                </div>
+              </div>
+
+              {/* Mock dashboard */}
+              <div className="rounded-b-xl bg-background p-6">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {["Total Calls", "Avg Latency", "Success Rate"].map((label, i) => (
+                    <div key={label} className="rounded-xl border border-border/60 bg-card p-4">
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+                      <p className="mt-1 text-xl font-bold text-foreground">
+                        {["1.2M", "142ms", "99.9%"][i]}
+                      </p>
+                      <div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${[78, 45, 99][i]}%` }}
+                          transition={{ duration: 1.2, delay: 1 + i * 0.15, ease }}
+                          className="h-full rounded-full bg-primary"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-1 rounded-xl border border-border/60 bg-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-2 w-2 rounded-full bg-primary" />
+                      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Live Traffic</span>
+                    </div>
+                    <div className="flex items-end gap-1 h-12">
+                      {[35, 52, 28, 64, 44, 72, 56, 80, 48, 92, 60, 76].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${h}%` }}
+                          transition={{ duration: 0.6, delay: 1.3 + i * 0.05, ease }}
+                          className="flex-1 rounded-sm bg-primary/30"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-48 rounded-xl border border-border/60 bg-card p-4">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Active Models</p>
+                    <div className="space-y-2">
+                      {["GPT5", "Gemini 3", "Sonnet 4.5"].map((m) => (
+                        <div key={m} className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          <span className="text-xs text-foreground">{m}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Social proof */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.6 }}
+            className="mt-8 text-[12px] text-muted-foreground"
+          >
+            Trusted by developers &middot; Pay-as-you-go &middot; No lock-in
+          </motion.p>
+        </motion.div>
+      </section>
+
+      {/* ── PROVIDER TICKER ──────────────────────────────────────────────── */}
+      <section className="border-y border-border/60 bg-muted/30 py-10 overflow-hidden">
+        <Reveal>
+          <p className="text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-8">
+            Unified access to every major AI provider
+          </p>
+        </Reveal>
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            {providers.map((m, i) => (
+              <Reveal key={m.name} delay={i * 0.06}>
+                <motion.div
+                  whileHover={{ y: -4, scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="group flex flex-col items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-4 py-5 cursor-default"
+                >
+                  <m.Icon className="h-7 w-7 text-muted-foreground transition-colors duration-300 group-hover:text-primary" />
+                  <span className="text-[11px] font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                    {m.name}
+                  </span>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURES GRID ────────────────────────────────────────────────── */}
+      <section className="py-28 sm:py-40">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center mb-20">
+              <Badge>Platform</Badge>
+              <h2 className="mt-6 text-display-sm sm:text-display-md text-foreground">
+                We help you build complex{" "}
+                <span className="font-serif italic text-primary">automations</span>{" "}
+                in the simplest way.
+              </h2>
+              <p className="mt-5 text-base text-muted-foreground leading-relaxed max-w-xl mx-auto">
+                Stop wrestling with API keys, rate limits, and model inconsistencies.
+                We abstract the complexity so you can focus on your product.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <Reveal key={f.title} delay={i * 0.08}>
+                <motion.div
+                  whileHover={{ y: -6 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="group relative flex flex-col rounded-2xl border border-border/60 bg-card p-7 transition-shadow duration-300 hover:shadow-card-hover"
+                >
+                  {/* Corner glow on hover */}
+                  <div className="pointer-events-none absolute -top-px -right-px h-24 w-24 rounded-tr-2xl bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.08)_0%,transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                  <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[0.08] ring-1 ring-primary/15 transition-all duration-300 group-hover:ring-primary/40 group-hover:shadow-glow-xs">
+                    <f.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-base font-bold text-foreground mb-2">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BOLD STATEMENT ────────────────────────────────────────────────── */}
+      <section className="border-y border-border/60 surface-raised py-28 sm:py-36">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <Reveal>
+            <h2 className="text-display-sm sm:text-display-md text-foreground leading-[1.15]">
+              Our goal is to build a world where{" "}
+              <span className="font-serif italic text-primary">technology</span>{" "}
+              serves humanity
+            </h2>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <p className="mt-8 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Our platform harnesses the power of AI to streamline processes and optimize outcomes.
+              One API call is all it takes to unlock the full potential of every major language model.
+            </p>
+          </Reveal>
+          <Reveal delay={0.3}>
+            <div className="mt-10">
+              <Link
+                href="/workflows"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "rounded-2xl bg-primary text-primary-foreground font-semibold",
+                  "shadow-glow-sm hover:shadow-glow-md",
+                  "px-8 transition-all duration-300 active:scale-[0.97]"
+                )}
+              >
+                Get started
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
+      <section className="py-28 sm:py-40">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center mb-20">
+              <Badge>How it works</Badge>
+              <h2 className="mt-6 text-display-sm sm:text-display-md text-foreground">
+                We&apos;ll help you get started
+              </h2>
+              <p className="mt-5 text-base text-muted-foreground max-w-lg mx-auto">
+                Six simple steps from signup to production — no infrastructure needed.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {steps.map((s, i) => (
+              <Reveal key={s.title} delay={i * 0.08}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="group relative flex flex-col rounded-2xl border border-border/60 bg-card p-7 transition-shadow duration-300 hover:shadow-card-hover"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/[0.08] ring-1 ring-primary/15 transition-all duration-300 group-hover:ring-primary/40 group-hover:shadow-glow-xs">
+                      <s.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="font-mono text-[11px] font-bold text-primary/40">
+                      Step {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3 className="text-[15px] font-bold text-foreground mb-1.5">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={0.5}>
+            <div className="mt-14 text-center">
+              <Link
+                href="https://support.myapps.ai/introduction"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "rounded-2xl border-border/70 bg-card font-semibold",
+                  "hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary",
+                  "transition-all duration-300"
+                )}
+              >
+                View all docs
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── CODE EXAMPLES ────────────────────────────────────────────────── */}
+      <section className="border-y border-border/60 surface-raised py-28 sm:py-40">
+        <div className="mx-auto max-w-4xl px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center mb-16">
+              <Badge>Integration</Badge>
+              <h2 className="mt-6 text-display-sm sm:text-display-md text-foreground">
+                Integrate in minutes
+              </h2>
+              <p className="mt-5 text-base text-muted-foreground max-w-lg mx-auto">
+                A familiar REST API that works with every language. Copy, paste, ship.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            {/* Outer glow wrapper */}
+            <div className="relative">
+              <div className="pointer-events-none absolute -inset-[1px] rounded-[1.4rem] bg-gradient-to-b from-white/10 via-primary/10 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 -z-10 rounded-[1.4rem] blur-2xl opacity-40 bg-gradient-to-b from-primary/20 to-transparent" />
+
+              {/* Editor window */}
+              <div
+                className="relative rounded-[1.35rem] overflow-hidden shadow-float-lg"
+                style={{ background: "#0d1117", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                {/* Title bar */}
+                <div
+                  className="relative flex items-center justify-between px-5 py-3.5"
+                  style={{ background: "#161b22", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  {/* Traffic lights */}
+                  <div className="flex items-center gap-2">
+                    <span className="h-3 w-3 rounded-full bg-[#ff5f57] ring-1 ring-black/20" />
+                    <span className="h-3 w-3 rounded-full bg-[#febc2e] ring-1 ring-black/20" />
+                    <span className="h-3 w-3 rounded-full bg-[#28c840] ring-1 ring-black/20" />
+                  </div>
+
+                  {/* Language tabs — centered */}
+                  <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(255,255,255,0.04)" }}>
+                    {(Object.keys(codeExamples) as CodeLang[]).map((l) => {
+                      const label = l === "curl" ? "cURL" : l.charAt(0).toUpperCase() + l.slice(1);
+                      const isActive = lang === l;
+                      return (
+                        <button
+                          key={l}
+                          type="button"
+                          onClick={() => setLang(l)}
+                          aria-label={`Show ${label} example`}
+                          className={cn(
+                            "relative px-4 py-1.5 rounded-lg text-[12px] font-mono font-medium transition-all duration-200 select-none",
+                            isActive ? "text-white" : "text-white/35 hover:text-white/65"
+                          )}
+                        >
+                          {isActive && (
+                            <motion.span
+                              layoutId="editor-tab"
+                              className="absolute inset-0 rounded-lg"
+                              style={{ background: "rgba(255,255,255,0.09)", boxShadow: "0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(255,255,255,0.08)" }}
+                              transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                            />
+                          )}
+                          <span className="relative">{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Copy button */}
+                  <CopyButton code={codeExamples[lang]} />
+                </div>
+
+                {/* Code area */}
+                <div className="relative overflow-x-auto">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={lang}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.18 }}
+                    >
+                      <pre
+                        className="overflow-x-auto px-6 py-7 text-[0.875rem] leading-[1.85]"
+                        style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace", color: "#c9d1d9" }}
+                      >
+                        {codeExamples[lang].split("\n").map((line, i) => (
+                          <div key={i} className="flex gap-5">
+                            <span
+                              className="select-none shrink-0 text-right w-5 text-[0.78rem] leading-[1.85]"
+                              style={{ color: "#3d444d" }}
+                            >
+                              {i + 1}
+                            </span>
+                            <span>{line}</span>
+                          </div>
+                        ))}
+                      </pre>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Bottom fade-out */}
+                  <div
+                    className="pointer-events-none absolute bottom-0 left-0 right-0 h-8"
+                    style={{ background: "linear-gradient(to top, #0d1117, transparent)" }}
+                  />
+                </div>
+
+                {/* Status bar */}
+                <div
+                  className="flex items-center justify-between px-5 py-2"
+                  style={{ background: "#161b22", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80" />
+                    <span className="font-mono text-[10px] text-white/25">api.aitutor.com</span>
+                  </div>
+                  <div className="flex items-center gap-4 font-mono text-[10px] text-white/20">
+                    <span>UTF-8</span>
+                    <span>{lang === "curl" ? "Shell" : lang === "javascript" ? "JavaScript" : "Python 3"}</span>
+                    <span>LF</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── INTEGRATIONS ─────────────────────────────────────────────────── */}
+      <section className="py-28 sm:py-40">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center mb-14">
+              <Badge>Integrations</Badge>
+              <h2 className="mt-6 text-display-sm sm:text-display-md text-foreground">
+                Works with your stack
+              </h2>
+            </div>
+          </Reveal>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            {techStack.map((t, i) => (
+              <Reveal key={t.name} delay={i * 0.06}>
+                <motion.div
+                  whileHover={{ y: -3, scale: 1.04 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-5 py-3.5 cursor-default"
+                >
+                  <t.Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                  <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                    {t.name}
+                  </span>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ──────────────────────────────────────────────────────── */}
+      <section id="pricing" className="border-y border-border/60 surface-raised py-28 sm:py-40">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center mb-16">
+              <Badge>Pricing</Badge>
+              <h2 className="mt-6 text-display-sm sm:text-display-md text-foreground">
+                Simple, transparent pricing
+              </h2>
+              <p className="mt-5 text-base text-muted-foreground max-w-lg mx-auto">
+                No surprises. Pay for what you use, scale when you&apos;re ready.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Free */}
+            <Reveal delay={0.1}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex flex-col rounded-3xl border border-border/60 bg-card p-8 sm:p-10 transition-shadow duration-300 hover:shadow-card-hover"
+              >
+                <h3 className="text-xl font-bold text-foreground">Pay as you go</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Start free, buy credit packs when needed.</p>
+                <div className="mt-8 mb-8">
+                  <span className="text-5xl font-extrabold text-foreground">$0</span>
+                  <span className="text-sm text-muted-foreground ml-1">/month</span>
+                </div>
+                <div className="border-t border-border/60 pt-6 mb-8">
+                  <ul className="space-y-3">
+                    {pricingPerks.map((p) => (
+                      <li key={p} className="flex items-center gap-2.5 text-sm text-foreground/80">
+                        <CheckIcon className="h-4 w-4 shrink-0 text-primary" />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link
+                  href="/workflows"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "mt-auto w-full rounded-2xl border-border/70 font-semibold",
+                    "hover:border-primary/40 hover:bg-primary/[0.04] hover:text-primary transition-all duration-300"
+                  )}
+                >
+                  Get started free
+                </Link>
+              </motion.div>
+            </Reveal>
+
+            {/* Enterprise */}
+            <Reveal delay={0.2}>
+              <motion.div
+                whileHover={{ y: -6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="relative flex flex-col rounded-3xl border-2 border-primary/40 bg-card p-8 sm:p-10 transition-shadow duration-300 hover:shadow-glow-md"
+              >
+                <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.06)_0%,transparent_50%)]" />
+                <div className="flex items-center gap-3 relative">
+                  <h3 className="text-xl font-bold text-foreground">Enterprise</h3>
+                  <span className="rounded-full bg-primary/10 ring-1 ring-primary/20 px-2.5 py-1 text-[10px] font-bold text-primary uppercase tracking-wider">
+                    Popular
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground relative">Priority routing, SLAs, and dedicated infra.</p>
+                <div className="mt-8 mb-8 relative">
+                  <span className="text-5xl font-extrabold text-foreground">$150</span>
+                  <span className="text-sm text-muted-foreground ml-1">/10M tokens</span>
+                </div>
+                <div className="border-t border-border/60 pt-6 mb-8 relative">
+                  <ul className="space-y-3">
+                    {["Priority model routing", "99.9% uptime SLA", "Dedicated support", ...pricingPerks].map((p) => (
+                      <li key={p} className="flex items-center gap-2.5 text-sm text-foreground/80">
+                        <CheckIcon className="h-4 w-4 shrink-0 text-primary" />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link
+                  href="/billing"
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "relative mt-auto w-full rounded-2xl bg-primary text-primary-foreground font-semibold",
+                    "shadow-glow-sm hover:shadow-glow-md transition-all duration-300"
+                  )}
+                >
+                  Start enterprise plan
+                </Link>
+              </motion.div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <section className="py-28 sm:py-40">
+        <div className="mx-auto max-w-3xl px-6 lg:px-8">
+          <Reveal>
+            <div className="text-center mb-14">
+              <Badge>FAQ</Badge>
+              <h2 className="mt-6 text-display-sm text-foreground">
+                Frequently asked questions
+              </h2>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div className="rounded-3xl border border-border/60 bg-card px-8 sm:px-10 py-3">
+              {faqs.map((faq, i) => (
+                <FAQRow
+                  key={i}
+                  faq={faq}
+                  open={openFaq === i}
+                  toggle={() => setOpenFaq(openFaq === i ? null : i)}
                 />
               ))}
             </div>
-          </div>
-
-          {/* Content */}
-          <AnimatedSection>
-            <div className="relative z-10 text-center px-6 max-w-4xl">
-              <h1 className="text-6xl sm:text-8xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 animate-gradient-x">
-                AI Tutor API
-              </h1>
-              <p className="mt-6 text-xl sm:text-2xl leading-8 text-gray-600 dark:text-gray-400">
-                Revolutionize learning with AI-driven technology that powers AI Tutor. Empower your applications with our cutting-edge AI Tutor API.
-              </p>
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Link
-                  href="https://aitutor-api.vercel.app/workflows"
-                  className={buttonVariants({ variant: "default", size: "lg", className: "bg-purple-600 dark:bg-pink-500 hover:bg-purple-700 dark:hover:bg-pink-600 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
-                >
-                  Get started
-                </Link>
-                <Link
-                  href="https://support.myapps.ai/introduction"
-                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 dark:text-pink-500 border-purple-600 dark:border-pink-500 hover:bg-purple-100 dark:hover:bg-pink-950/30 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
-                >
-                  Documentation
-                </Link>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          {/* Scroll indicator */}
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          >
-            <ChevronDownIcon className="h-10 w-10 text-purple-600 dark:text-pink-500 opacity-70" />
-          </motion.div>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-white dark:!bg-black">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-50 to-white dark:from-transparent dark:to-transparent opacity-50 dark:opacity-0" />
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">Powerful Features</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
-                  Build Intelligent Systems
-                </p>
-              </div>
-            </AnimatedSection>
-            <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-              <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-                {features.map((feature, index) => (
-                  <AnimatedSection key={feature.name} delay={index * 0.2}>
-                    <div className="flex flex-col bg-purple-50 dark:bg-[#1a1a1a] rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:shadow-purple-200 dark:hover:shadow-gray-900 transform hover:scale-105">
-                      <dt className="flex items-center gap-x-3 text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200">
-                        <feature.icon className="h-8 w-8 flex-none text-purple-600 dark:text-pink-500" aria-hidden="true" />
-                        {feature.name}
-                      </dt>
-                      <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-400">
-                        <p className="flex-auto">{feature.description}</p>
-                      </dd>
-                    </div>
-                  </AnimatedSection>
-                ))}
-              </dl>
-            </div>
-          </div>
-        </section>
-
-      {/* Multi LLM API Section */}
-<section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-[#1a0a1a]">
-  <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-    <AnimatedSection>
-      <div className="mx-auto max-w-2xl lg:text-center">
-        <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">Multi LLM API</h2>
-        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
-          One API, Multiple Language Models
-        </p>
-        <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-          Access a wide range of language models through a single, unified API. Simplify your workflow and leverage the power of multiple AI models.
-        </p>
-      </div>
-    </AnimatedSection>
-    <AnimatedSection delay={0.2}>
-      <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {modelIcons.map((model, index) => (
-          <motion.div
-            key={model.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="flex flex-col items-center p-6 bg-white dark:bg-[#1a1a1a] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-          >
-            <model.Icon className="h-12 w-12 text-purple-600 dark:text-pink-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{model.name}</h3>
-          </motion.div>
-        ))}
-      </div>
-    </AnimatedSection>
-  </div>
-</section>
-
-        {/* AI Workflows Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-b from-white to-purple-50 dark:bg-black">
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">AI Workflows</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
-                  Streamline Your AI Processes
-                </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                  Create powerful AI workflows that combine multiple language models and custom logic to solve complex problems.
-                </p>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
-              <div className="mt-16 relative">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-gray-300 dark:border-gray-800" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-gradient-to-r from-purple-50 via-white to-purple-50 dark:from-gray-950 dark:via-black dark:to-gray-950 px-6 text-lg font-semibold leading-6 text-gray-900 dark:text-gray-200">
-                    Workflow Example
-                  </span>
-                </div>
-              </div>
-              <div className="mt-8 flex flex-col items-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="w-full max-w-4xl bg-white dark:bg-[#1a1a1a] rounded-lg shadow-xl overflow-hidden"
-                >
-                  <div className="px-6 py-8">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-200 mb-6">Advanced Question Answering Workflow</h3>
-                    <div className="space-y-6">
-                      {[
-                        { step: 1, title: "Log In", description: "Access your AI Tutor API dashboard", icon: "LogIn" },
-                        { step: 2, title: "Create Workflow", description: "Design your AI tutoring process flow", icon: "Workflow" },
-                        { step: 3, title: "Choose Variables", description: "Define input parameters for your workflow", icon: "Variable" },
-                        { step: 4, title: "Craft Prompt", description: "Write effective prompts for AI models", icon: "FileText" },
-                        { step: 5, title: "Select Model", description: "Choose from various AI models (e.g., GPT-4, Gemini, Claude)", icon: "Bot" },
-                        { step: 6, title: "Test & Deploy", description: "Validate and launch your AI tutoring workflow", icon: "Rocket" },
-                      ].map((item, index) => {
-                        const iconMap: Record<string, () => React.JSX.Element> = {
-                          LogIn: () => <LogIn className="h-5 w-5 text-white" />,
-                          Workflow: () => <Workflow className="h-5 w-5 text-white" />,
-                          Variable: () => <Variable className="h-5 w-5 text-white" />,
-                          FileText: () => <FileText className="h-5 w-5 text-white" />,
-                          Bot: () => <Bot className="h-5 w-5 text-white" />,
-                          Rocket: () => <Rocket className="h-5 w-5 text-white" />,
-                        };
-                        const IconComponent = iconMap[item.icon];
-                        
-                        return (
-                        <div key={item.step} className="flex items-start">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center">
-                            {IconComponent && <IconComponent />}
-                          </div>
-                          <div className="ml-4 flex-1">
-                            <h4 className="text-lg font-medium text-gray-900 dark:text-gray-200">{item.title}</h4>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{item.description}</p>
-                          </div>
-                          {index < 5 && (
-                            <div className="ml-4 flex-shrink-0 h-full">
-                              <div className="w-px h-full bg-gray-200 dark:bg-gray-800 mx-auto"></div>
-                            </div>
-                          )}
-                        </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.4}>
-              <div className="mt-16 text-center">
-                <Link
-                  href="https://support.myapps.ai/introduction"
-                  className={buttonVariants({ variant: "outline", size: "lg", className: "text-purple-600 dark:text-pink-500 border-purple-600 dark:border-pink-500 hover:bg-purple-100 dark:hover:bg-pink-950/30 px-8 py-4 text-lg rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg" })}
-                >
-                  Learn More About Workflows
-                </Link>
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
-
-        {/* API Usage Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-white dark:!bg-[#1a0a1a]">
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">API Usage</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
-                  Integrate AI Tutor in Minutes
-                </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                  Our API is designed for easy integration. Here's a quick example of how to use it in different languages.
-                </p>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
-              <div className="mt-16">
-                <div className="flex justify-center space-x-4 mb-8">
-                  {(Object.keys(codeExamples) as CodeLanguage[]).map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => setActiveTab(lang)}
-                      className={`px-4 py-2 rounded-lg ${activeTab === lang ? 'bg-purple-600 dark:bg-pink-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
-                    >
-                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
-                    </button>
-                  ))}
-                </div>
-                <div className="bg-gray-900 rounded-lg overflow-hidden">
-                  <SyntaxHighlighter language={activeTab} style={tomorrow} showLineNumbers>
-                    {codeExamples[activeTab]}
-                  </SyntaxHighlighter>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
-
-        {/* API Features Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-black">
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">API Features</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
-                  Powerful Capabilities at Your Fingertips
-                </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                  Explore the advanced features of our AI Tutor API that set it apart from the rest.
-                </p>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
-              <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  { name: "Multi-Model Support", description: "Access various AI models through a single API", icon: BrainIcon },
-                  { name: "Real-time Responses", description: "Get instant AI-generated answers for your applications", icon: Zap },
-                  { name: "Custom Workflows", description: "Create and deploy complex AI workflows with ease", icon: Workflow },
-                  { name: "Contextual Understanding", description: "AI that comprehends and maintains context in conversations", icon: Sparkles },
-                  { name: "Language Agnostic", description: "Integrate with any programming language of your choice", icon: Terminal },
-                  { name: "Scalable Infrastructure", description: "Built to handle millions of requests effortlessly", icon: Network },
-                ].map((feature, index) => (
-                  <motion.div
-                    key={feature.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="flex flex-col items-center p-6 bg-white dark:bg-[#1a1a1a] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                  >
-                    <feature.icon className="h-12 w-12 text-purple-600 dark:text-pink-500 mb-4" />
-                    <h3 className="text-lg font-semibold text-center text-gray-900 dark:text-gray-200">{feature.name}</h3>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 text-center">{feature.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
-
-        {/* Pricing Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-purple-50 dark:!bg-[#1a0a1a]">
-          <div className="absolute inset-0 bg-gradient-to-t from-white to-purple-50 dark:from-transparent dark:to-transparent opacity-50 dark:opacity-0"></div>
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl sm:text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">Simple, transparent pricing</h2>
-                <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                  Prices are per 10 Million  tokens.
-                </p>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
-              <div className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-2">
-                {/* Pay as you go Card */}
-                <div className="rounded-3xl ring-1 ring-purple-200 dark:ring-gray-800 bg-white dark:bg-black shadow-xl">
-                  <div className="p-8 sm:p-10">
-                    <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">Pay as you go</h3>
-                    <p className="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
-                      Start with our flexible pay-as-you-go plan. Perfect for testing and small projects.
-                    </p>
-                    <div className="mt-10 flex items-center gap-x-4">
-                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600 dark:text-pink-500">What&apos;s included</h4>
-                      <div className="h-px flex-auto bg-purple-200 dark:bg-gray-800" />
-                    </div>
-                    <ul
-                      role="list"
-                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-400"
-                    >
-                      {includedFeatures.map((feature) => (
-                        <li key={feature} className="flex gap-x-3 items-center">
-                          <CheckIcon className="h-6 w-5 flex-none text-purple-600 dark:text-pink-500" aria-hidden="true" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="rounded-2xl bg-purple-50 dark:bg-[#1a1a1a] py-10 text-center ring-1 ring-inset ring-purple-200 dark:ring-gray-800">
-                    <div className="mx-auto max-w-xs px-8">
-                      <p className="text-base font-semibold text-gray-600 dark:text-gray-400">Pay as you go</p>
-                      <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                        <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-200">$0</span>
-                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-gray-400">/month</span>
-                      </p>
-                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Buy credit packs as needed</p>
-                      <Link
-                        href="https://aitutor-api.vercel.app/console/workflows"
-                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 dark:bg-pink-500 hover:bg-purple-700 dark:hover:bg-pink-600 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
-                      >
-                        Get started
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Enterprise Card */}
-                <div className="rounded-3xl ring-2 ring-purple-500 dark:ring-pink-500 bg-white dark:bg-black shadow-xl">
-                  <div className="p-8 sm:p-10">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-200">Enterprise AI Tutor API Plan</h3>
-                      <span className="rounded-full bg-purple-100 dark:bg-pink-900/30 px-3 py-1 text-xs font-semibold text-purple-600 dark:text-pink-400">Popular</span>
-                    </div>
-                    <p className="mt-6 text-base leading-7 text-gray-600 dark:text-gray-400">
-                      Get access to our powerful AI Tutor API with all the features you need to create intelligent tutoring systems.
-                    </p>
-                    <div className="mt-10 flex items-center gap-x-4">
-                      <h4 className="flex-none text-sm font-semibold leading-6 text-purple-600 dark:text-pink-500">What&apos;s included</h4>
-                      <div className="h-px flex-auto bg-purple-200 dark:bg-gray-800" />
-                    </div>
-                    <ul
-                      role="list"
-                      className="mt-8 space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-400"
-                    >
-                      {includedFeatures.map((feature) => (
-                        <li key={feature} className="flex gap-x-3 items-center">
-                          <CheckIcon className="h-6 w-5 flex-none text-purple-600 dark:text-pink-500" aria-hidden="true" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="rounded-2xl bg-purple-50 dark:bg-[#1a1a1a] py-10 text-center ring-1 ring-inset ring-purple-200 dark:ring-gray-800">
-                    <div className="mx-auto max-w-xs px-8">
-                      <p className="text-base font-semibold text-gray-600 dark:text-gray-400">Billed Monthly</p>
-                      <p className="mt-6 flex items-baseline justify-center gap-x-2">
-                        <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-200">$150</span>
-                        <span className="text-sm font-semibold leading-6 tracking-wide text-gray-600 dark:text-gray-400">/10M tokens</span>
-                      </p>
-                      <Link
-                        href="/billing"
-                        className={buttonVariants({ variant: "default", size: "lg", className: "mt-10 bg-purple-600 dark:bg-pink-500 hover:bg-purple-700 dark:hover:bg-pink-600 text-white w-full rounded-full transition-all duration-300 ease-in-out transform hover:scale-105" })}
-                      >
-                        Get started
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-white dark:!bg-black">
-          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-            <AnimatedSection>
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">FAQ</h2>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-5xl">
-                  Frequently Asked Questions
-                </p>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection delay={0.2}>
-              <div className="mt-16 max-w-3xl mx-auto">
-                {faqItems.map((item, index) => (
-                  <FAQItem
-                    key={index}
-                    item={item}
-                    isOpen={openFaq === index}
-                    toggleOpen={() => toggleFaq(index)}
-                  />
-                ))}
-              </div>
-            </AnimatedSection>
-          </div>
-        </section>
-
-        {/* Integration Section */}
-        <section className="py-24 sm:py-32 relative overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:bg-[#1a0a1a]">
-        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="mx-auto max-w-2xl lg:text-center">
-              <h2 className="text-base font-semibold leading-7 text-purple-600 dark:text-pink-500">Easy Integration</h2>
-              <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-                Integrate with Your Favorite Tools
-              </p>
-              <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
-                Our API seamlessly integrates with a wide range of development tools and platforms, making it easy to incorporate AI into your existing workflows.
-              </p>
-            </div>
-          </AnimatedSection>
-          <AnimatedSection delay={0.2}>
-            <div className="mt-16 flex flex-wrap justify-center gap-8">
-              {techIcons.map((tech, index) => (
-                <motion.div
-                  key={tech.name}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex flex-col items-center justify-center w-32 h-32 bg-white dark:bg-[#1a1a1a] rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110 border border-gray-200 dark:border-gray-800"
-                >
-                  <tech.Icon className="text-4xl mb-2 text-gray-900 dark:text-white" />
-                  <span className="text-sm font-semibold text-gray-800 dark:text-white">{tech.name}</span>
-                </motion.div>
-              ))}
-            </div>
-          </AnimatedSection>
+          </Reveal>
         </div>
       </section>
-      </main>
 
-      <Footer />
+      {/* ── CTA BANNER ───────────────────────────────────────────────────── */}
+      <section className="pb-28 px-6">
+        <Reveal>
+          <div className="mx-auto max-w-5xl relative overflow-hidden rounded-[2rem] bg-primary p-12 sm:p-20 text-center">
+            {/* Ambient circles */}
+            <div className="pointer-events-none absolute -top-20 -left-20 h-80 w-80 rounded-full bg-white/[0.06] blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-white/[0.04] blur-2xl" />
 
-      <style jsx global>{`
-        @keyframes gradient-x {
-          0%, 100% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-        }
-        .animate-gradient-x {
-          animation: gradient-x 15s ease infinite;
-          background-size: 200% 200%;
-        }
-      `}</style>
+            {/* Beam */}
+            <div className="pointer-events-none absolute top-0 left-0 right-0 h-px overflow-hidden">
+              <div className="animate-beam absolute h-full w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+            </div>
+
+            <h2 className="relative text-display-sm sm:text-display-md text-white font-extrabold tracking-tight">
+              Get Ready to get started?
+              <br />
+              <span className="opacity-90">What can be said can be solved.</span>
+            </h2>
+            <div className="relative mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/workflows"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "rounded-2xl bg-white text-primary font-bold px-10",
+                  "shadow-lg hover:shadow-xl hover:bg-white/95",
+                  "transition-all duration-300 active:scale-[0.97]"
+                )}
+              >
+                Start building free
+              </Link>
+              <Link
+                href="https://support.myapps.ai/introduction"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "rounded-2xl border-white/30 bg-white/10 text-white font-bold px-10",
+                  "hover:bg-white/20 hover:border-white/50",
+                  "transition-all duration-300 active:scale-[0.97]"
+                )}
+              >
+                View docs
+              </Link>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      <Footer isHome />
     </div>
   );
 }
-
-
-// import { Footer } from "@/components/layout/footer";
-// import { Header } from "@/components/layout/header";
-// import { buttonVariants } from "@/components/ui/button";
-// import { SITE_METADATA } from "@/data/marketing";
-// import promoImage from "@/public/images/promo.png";
-// import {
-//   CheckIcon,
-//   CloudArrowUpIcon,
-//   LockClosedIcon,
-//   ServerIcon,
-// } from "@heroicons/react/20/solid";
-// import Image from "next/image";
-// import Link from "next/link";
-
-// export const revalidate = 86400;
-
-// const pricingIncludedFeatures = [
-//   "Unlimited workflows",
-//   "Unlimited chatbots",
-//   "Models by OpenAI, Meta, Google, Mixtral and Anthropic",
-//   "Email support",
-// ];
-
-// const features = [
-//   {
-//     name: "Deploy instantly.",
-//     description:
-//       "Using our workflows, you can tweak prompts, update models, and deliver changes to your users instanty.",
-//     icon: CloudArrowUpIcon,
-//   },
-//   {
-//     name: "Security controls.",
-//     description:
-//       "Filter and control malicious requests with our security features such as single use tokens and rate limiting.",
-//     icon: LockClosedIcon,
-//   },
-//   {
-//     name: "Several models to choose from.",
-//     description:
-//       "Use multiple models using the same API, models from OpenAI, Meta, Google, Mixtral and Anthropic.",
-//     icon: ServerIcon,
-//   },
-// ];
-
-// async function getGitHubStars(): Promise<string> {
-//   try {
-//     const response = await fetch(
-//       "https://api.github.com/repos/techulus/manage-prompt",
-//       {
-//         headers: {
-//           Accept: "application/vnd.github+json",
-//         },
-//       },
-//     );
-
-//     if (!response?.ok) {
-//       return "-";
-//     }
-
-//     const json = await response.json();
-
-//     return parseInt(json["stargazers_count"]).toLocaleString();
-//   } catch (error) {
-//     return "-";
-//   }
-// }
-
-// export default async function Home() {
-//   const stars = await getGitHubStars();
-
-//   return (
-//     <div className="h-full">
-//       <Header />
-
-//       <div className="relative isolate px-6 pt-14 lg:px-8">
-//         <div
-//           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-//           aria-hidden="true"
-//         >
-//           <div
-//             className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#2563eb] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-//             style={{
-//               clipPath:
-//                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-//             }}
-//           />
-//         </div>
-//         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-//           <div className="text-center">
-//             <h1 className="text-4xl text-hero py-4 tracking-tighter text-gray-900 sm:text-6xl hero text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-700">
-//               {SITE_METADATA.TAGLINE}
-//             </h1>
-//             <p className="pt-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
-//               {SITE_METADATA.DESCRIPTION}
-//             </p>
-//             <div className="mt-10 flex flex-col space-y-4 md:space-y-0 md:flex-row items-center justify-center gap-x-6">
-//               <Link
-//                 href="/console/workflows"
-//                 className={buttonVariants({ variant: "default" })}
-//                 prefetch={false}
-//               >
-//                 Get started
-//               </Link>
-//               <Link
-//                 href="https://github.com/techulus/manage-prompt"
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="flex"
-//                 prefetch={false}
-//               >
-//                 <div className="flex h-10 w-10 items-center justify-center space-x-2 rounded-md border border-muted bg-muted">
-//                   <svg
-//                     xmlns="http://www.w3.org/2000/svg"
-//                     fill="currentColor"
-//                     viewBox="0 0 24 24"
-//                     className="h-4 w-4 text-foreground"
-//                   >
-//                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
-//                   </svg>
-//                 </div>
-//                 <div className="flex items-center">
-//                   <div className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-muted border-y-transparent"></div>
-//                   <div className="flex h-10 items-center rounded-md border border-muted bg-muted px-4 font-medium">
-//                     {stars} stars on GitHub
-//                   </div>
-//                 </div>
-//               </Link>
-//             </div>
-//           </div>
-//         </div>
-//         <div
-//           className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-//           aria-hidden="true"
-//         >
-//           <div
-//             className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#2563eb] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-//             style={{
-//               clipPath:
-//                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-//             }}
-//           />
-//         </div>
-//       </div>
-
-//       <div className="overflow-hidden bg-secondary dark:bg-slate-900 py-24 sm:py-32">
-//         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-//           <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-//             <div className="lg:pr-8 lg:pt-4">
-//               <div className="lg:max-w-lg">
-//                 <h2 className="text-base font-semibold leading-7 text-primary">
-//                   Build faster
-//                 </h2>
-//                 <p className="mt-2 text-3xl tracking-tighter text-accent-foreground sm:text-4xl font-bold text-hero">
-//                   Building blocks for your next AI project
-//                 </p>
-//                 <p className="mt-6 text-lg leading-8 text-foreground">
-//                   We provide the tools to help you build and deploy your AI
-//                   projects faster. We take care of the infrastructure so you can
-//                   focus on what you do best.
-//                 </p>
-//                 <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-accent-foreground lg:max-w-none">
-//                   {features.map((feature) => (
-//                     <div key={feature.name} className="relative pl-9">
-//                       <dt className="inline font-semibold text-foreground">
-//                         <feature.icon
-//                           className="absolute left-1 top-1 h-5 w-5 text-primary"
-//                           aria-hidden="true"
-//                         />
-//                         {feature.name}
-//                       </dt>{" "}
-//                       <dd className="inline">{feature.description}</dd>
-//                     </div>
-//                   ))}
-//                 </dl>
-//               </div>
-//             </div>
-//             <Image
-//               src={promoImage}
-//               alt="Product screenshot"
-//               className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-white/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
-//             />
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="py-24 sm:py-32">
-//         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-//           <div className="mx-auto max-w-2xl sm:text-center">
-//             <h2 className="text-3xl font-bold tracking-tighter text-primary sm:text-4xl text-hero">
-//               Pay as you go
-//             </h2>
-//             <p className="mt-6 text-lg leading-8 text-foreground-accent">
-//               Only pay for what you use. No long-term contracts. No hidden fees.
-//             </p>
-//           </div>
-//           <div className="mx-auto mt-16 max-w-2xl rounded-3xl ring-1 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
-//             <div className="p-8 sm:p-10 lg:flex-auto">
-//               <h3 className="text-lg font-bold tracking-tighter text-primary">
-//                 Prices are per 1,000 tokens. You can think of tokens as pieces
-//                 of words, where 1,000 tokens is about 750 words.
-//               </h3>
-//               <div className="mt-6 flex items-center gap-x-4">
-//                 <h4 className="flex-none text-sm font-semibold leading-6 text-primary">
-//                   What&apos;s included
-//                 </h4>
-//                 <div className="h-px flex-auto bg-primary" />
-//               </div>
-//               <ul
-//                 role="list"
-//                 className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-foreground sm:grid-cols-2 sm:gap-4"
-//               >
-//                 {pricingIncludedFeatures.map((feature) => (
-//                   <li key={feature} className="flex gap-x-3">
-//                     <CheckIcon
-//                       className="h-6 w-5 flex-none text-primary"
-//                       aria-hidden="true"
-//                     />
-//                     {feature}
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-//             <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-//               <div className="rounded-2xl bg-secondary py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
-//                 <div className="mx-auto max-w-xs px-8">
-//                   <p className="text-md font-semibold text-primary-muted">
-//                     Billed Monthly
-//                   </p>
-//                   <p className="mt-6 flex items-baseline justify-center gap-x-2">
-//                     <span className="text-5xl font-bold tracking-tighter text-foreground">
-//                       $0.01
-//                     </span>
-//                     <span className="text-md font-semibold leading-6 tracking-wide text-primary">
-//                       /1K tokens
-//                     </span>
-//                   </p>
-//                   <Link
-//                     href="/console/workflows"
-//                     className={buttonVariants({
-//                       variant: "default",
-//                       className: "mt-8",
-//                     })}
-//                     prefetch={false}
-//                   >
-//                     Get Started
-//                   </Link>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <Footer isHome />
-//     </div>
-//   );
-// }
-// import { Footer } from "@/components/layout/footer";
-// import { Header } from "@/components/layout/header";
-// import { buttonVariants } from "@/components/ui/button";
-// import { SITE_METADATA } from "@/data/marketing";
-// import promoImage from "@/public/images/promo.png";
-// import { CheckIcon, CloudCog, LockIcon, ServerCog } from "lucide-react";
-
-// import Image from "next/image";
-// import Link from "next/link";
-
-// export const revalidate = 86400;
-
-// const pricingIncludedFeatures = [
-//   "Unlimited workflows",
-//   "Unlimited chatbots",
-//   "Models by OpenAI, Meta, Google, Mixtral, Anthropic and xAI",
-//   "Email support",
-// ];
-
-// const features = [
-//   {
-//     name: "Deploy instantly.",
-//     description:
-//       "Using our workflows, you can tweak prompts, update models, and deliver changes to your users instanty.",
-//     icon: CloudCog,
-//   },
-//   {
-//     name: "Security controls.",
-//     description:
-//       "Filter and control malicious requests with our security features such as single use tokens and rate limiting.",
-//     icon: LockIcon,
-//   },
-//   {
-//     name: "Several models to choose from.",
-//     description:
-//       "Use multiple models using the same API, models from OpenAI, Meta, Google, Mixtral and Anthropic.",
-//     icon: ServerCog,
-//   },
-// ];
-
-// async function getGitHubStars(): Promise<string> {
-//   try {
-//     const response = await fetch(
-//       "https://api.github.com/repos/techulus/manage-prompt",
-//       {
-//         headers: {
-//           Accept: "application/vnd.github+json",
-//         },
-//       }
-//     );
-
-//     if (!response?.ok) {
-//       return "-";
-//     }
-
-//     const json = await response.json();
-
-//     return Number.parseInt(json.stargazers_count).toLocaleString();
-//   } catch (error) {
-//     return "-";
-//   }
-// }
-
-// export default async function Home() {
-//   const stars = await getGitHubStars();
-
-//   return (
-//     <div className="h-full">
-//       <Header />
-
-//       <div className="relative isolate px-6 pt-14 lg:px-8">
-//         <div
-//           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-//           aria-hidden="true"
-//         >
-//           <div
-//             className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#2563eb] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-//             style={{
-//               clipPath:
-//                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-//             }}
-//           />
-//         </div>
-//         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-//           <div className="text-center">
-//             <h1 className="text-4xl text-hero py-4 tracking-tight text-gray-900 sm:text-6xl hero text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-700">
-//               {SITE_METADATA.TAGLINE}
-//             </h1>
-//             <p className="pt-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
-//               {SITE_METADATA.DESCRIPTION}
-//             </p>
-//             <div className="mt-10 flex flex-col space-y-4 md:space-y-0 md:flex-row items-center justify-center gap-x-6">
-//               <Link
-//                 href="/workflows"
-//                 className={buttonVariants({ variant: "default" })}
-//                 prefetch={false}
-//               >
-//                 Get started
-//               </Link>
-//               <Link
-//                 href="https://github.com/techulus/manage-prompt"
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="flex"
-//                 prefetch={false}
-//               >
-//                 <div className="flex h-10 w-10 items-center justify-center space-x-2 border border-muted bg-muted">
-//                   <svg
-//                     xmlns="http://www.w3.org/2000/svg"
-//                     fill="currentColor"
-//                     viewBox="0 0 24 24"
-//                     className="h-4 w-4 text-foreground"
-//                   >
-//                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-//                   </svg>
-//                 </div>
-//                 <div className="flex items-center">
-//                   <div className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-muted border-y-transparent" />
-//                   <div className="flex h-10 items-center border border-muted bg-muted px-4 font-medium">
-//                     {stars} stars on GitHub
-//                   </div>
-//                 </div>
-//               </Link>
-//             </div>
-//           </div>
-//         </div>
-//         <div
-//           className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-//           aria-hidden="true"
-//         >
-//           <div
-//             className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#2563eb] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-//             style={{
-//               clipPath:
-//                 "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-//             }}
-//           />
-//         </div>
-//       </div>
-
-//       <div className="overflow-hidden bg-secondary dark:bg-slate-900 py-24 sm:py-32">
-//         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-//           <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-//             <div className="lg:pr-8 lg:pt-4">
-//               <div className="lg:max-w-lg">
-//                 <h2 className="text-base font-semibold leading-7 text-primary">
-//                   Build faster
-//                 </h2>
-//                 <p className="mt-2 text-3xl tracking-tight text-accent-foreground sm:text-4xl font-bold text-hero">
-//                   Building blocks for your next AI project
-//                 </p>
-//                 <p className="mt-6 text-lg leading-8 text-foreground">
-//                   We provide the tools to help you build and deploy your AI
-//                   projects faster. We take care of the infrastructure so you can
-//                   focus on what you do best.
-//                 </p>
-//                 <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-accent-foreground lg:max-w-none">
-//                   {features.map((feature) => (
-//                     <div key={feature.name} className="relative pl-9">
-//                       <dt className="inline font-semibold text-foreground">
-//                         <feature.icon
-//                           className="absolute left-1 top-1 h-5 w-5 text-primary"
-//                           aria-hidden="true"
-//                         />
-//                         {feature.name}
-//                       </dt>{" "}
-//                       <dd className="inline">{feature.description}</dd>
-//                     </div>
-//                   ))}
-//                 </dl>
-//               </div>
-//             </div>
-//             <Image
-//               src={promoImage}
-//               alt="Product screenshot"
-//               className="w-[48rem] max-w-none shadow-xl ring-1 ring-white/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
-//             />
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="py-24 sm:py-32">
-//         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-//           <div className="mx-auto max-w-2xl sm:text-center">
-//             <h2 className="text-3xl font-bold tracking-tight text-primary sm:text-4xl text-hero">
-//               Pay as you go
-//             </h2>
-//             <p className="mt-6 text-lg leading-8 text-foreground-accent">
-//               Only pay for what you use. No long-term contracts. No hidden fees.
-//             </p>
-//           </div>
-//           <div className="mx-auto mt-16 max-w-2xl ring-1 sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
-//             <div className="p-8 sm:p-10 lg:flex-auto">
-//               <h3 className="text-lg font-bold tracking-tight text-primary">
-//                 Prices are per 1,000 tokens. You can think of tokens as pieces
-//                 of words, where 1,000 tokens is about 750 words.
-//               </h3>
-//               <div className="mt-6 flex items-center gap-x-4">
-//                 <h4 className="flex-none text-sm font-semibold leading-6 text-primary">
-//                   What&apos;s included
-//                 </h4>
-//                 <div className="h-px flex-auto bg-primary" />
-//               </div>
-//               <ul className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6 text-foreground sm:grid-cols-2 sm:gap-4">
-//                 {pricingIncludedFeatures.map((feature) => (
-//                   <li key={feature} className="flex gap-x-3">
-//                     <CheckIcon
-//                       className="h-6 w-5 flex-none text-primary"
-//                       aria-hidden="true"
-//                     />
-//                     {feature}
-//                   </li>
-//                 ))}
-//               </ul>
-//             </div>
-//             <div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-//               <div className="bg-secondary py-10 text-center ring-1 ring-inset ring-gray-900/5 lg:flex lg:flex-col lg:justify-center lg:py-16">
-//                 <div className="mx-auto max-w-xs px-8">
-//                   <p className="text-md font-semibold text-primary-muted">
-//                     Billed Monthly
-//                   </p>
-//                   <p className="mt-6 flex items-baseline justify-center gap-x-2">
-//                     <span className="text-5xl font-bold tracking-tight text-foreground">
-//                       $0.01
-//                     </span>
-//                     <span className="text-md leading-6 tracking-wide text-primary">
-//                       /1K tokens
-//                     </span>
-//                   </p>
-//                   <p className="mt-2 flex items-baseline justify-center gap-x-2">
-//                     <span className="text-md leading-6 tracking-tight text-green-600 dark:text-green-400">
-//                       Get 50% off first year
-//                     </span>
-//                   </p>
-//                   <Link
-//                     href="/workflows"
-//                     className={buttonVariants({
-//                       variant: "default",
-//                       className: "mt-8",
-//                     })}
-//                     prefetch={false}
-//                   >
-//                     Get Started
-//                   </Link>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <Footer isHome />
-//     </div>
-//   );
-// }

@@ -6,6 +6,8 @@ import { isSubscriptionActive, hasExceededSpendLimit } from "@/lib/utils/stripe"
 import type Stripe from "stripe";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 
+export const maxDuration = 120;
+
 export async function POST(
   req: NextRequest,
   props: { params: Promise<{ shortId: string }> },

@@ -14,9 +14,11 @@ export default function PageSection({
   return (
     <div
       className={cn(
-        "mx-4 flex max-w-7xl flex-col border bg-white dark:bg-black lg:mx-auto rounded-md overflow-x-hidden",
-        topInset ? "-mt-6" : "",
-        bottomMargin ? "mb-6" : "",
+        "mx-4 flex max-w-screen-2xl flex-col overflow-x-hidden",
+        "rounded-2xl border border-border/60 bg-card shadow-sm",
+        "lg:mx-auto",
+        topInset && "-mt-6",
+        bottomMargin && "mb-6",
         className,
       )}
     >

@@ -34,8 +34,6 @@ export default async function WorkflowLayout(props: Props) {
       <PageTitle
         title={workflow.name}
         backUrl="/workflows"
-        actionLabel="Edit"
-        actionLink={`/workflows/${workflow.id}/edit`}
       />
       {props.children}
     </div>

@@ -9,6 +9,8 @@ import { streamText } from "ai";
 import { NextRequest } from "next/server";
 import type Stripe from "stripe";
 
+export const maxDuration = 120;
+
 const getOpenRouterHeaders = () => {
   const appUrl =
     process.env.APP_BASE_URL ||

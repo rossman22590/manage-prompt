@@ -40,8 +40,8 @@ export default async function WorkflowRunDetails(props: Props) {
 
   return (
     <>
-      <PageSection topInset>
-        <ul className="divide-y">
+      <PageSection className="mt-4">
+        <ul className="divide-y divide-border/60">
           {workflowRuns.map((run) => (
             <WorkflowRunItem
               key={run.id}
