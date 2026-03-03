@@ -99,7 +99,7 @@ export const translateInputs = async ({
       const pageContent = await webpageParser.getContent(
         inputValues[input.name],
       );
-      content = content.replace(`{{${input.name}}}`, pageContent);
+      content = content.replaceAll(`{{${input.name}}}`, pageContent);
     } else if (input.type === WorkflowInputType.image) {
       const imageData = inputValues[input.name];
       if (imageData) {
@@ -111,7 +111,7 @@ export const translateInputs = async ({
             mediaType: getMediaType(imageData),
             isDataUrl: true,
           });
-          content = content.replace(`{{${input.name}}}`, '[IMAGE]');
+          content = content.replaceAll(`{{${input.name}}}`, '[IMAGE]');
         } else if (isValidImageUrl(imageData)) {
           // Valid image URL
           imageParts.push({
@@ -119,11 +119,11 @@ export const translateInputs = async ({
             mediaType: getMediaType(imageData),
             isDataUrl: false,
           });
-          content = content.replace(`{{${input.name}}}`, '[IMAGE]');
+          content = content.replaceAll(`{{${input.name}}}`, '[IMAGE]');
         }
       }
     } else {
-      content = content.replace(`{{${input.name}}}`, inputValues[input.name]);
+      content = content.replaceAll(`{{${input.name}}}`, inputValues[input.name] ?? "");
     }
   }
   return { content, imageParts };

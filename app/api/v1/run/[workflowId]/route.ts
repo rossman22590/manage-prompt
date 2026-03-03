@@ -66,8 +66,7 @@ export async function POST(
     }
 
     // Rate limit
-    const rateLimitKey =
-      req.headers.get("x-user-id") ?? `key_${key.ownerId}_${key.id}`;
+    const rateLimitKey = `key_${key.ownerId}_${key.id}`;
     const {
       success: keyRateLimitSuccess,
       limit,
@@ -81,7 +80,7 @@ export async function POST(
     const organization = key.organization;
     
     // Block if credits are 0 (regardless of subscription status)
-    if (organization?.credits === 0) {
+    if ((organization?.credits ?? 0) <= 0) {
       // If no subscription, block with invalid billing
       if (!isSubscriptionActive(organization?.stripe?.subscription)) {
         return ErrorResponse(
