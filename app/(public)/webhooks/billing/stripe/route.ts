@@ -1,10 +1,25 @@
 import { prisma } from "@/lib/utils/db";
+import { getCreditsForCreditPackPriceId } from "@/data/credit-packs";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const secret = process.env.STRIPE_WEBHOOK_SECRET || "";
+
+function getRawDataObject(rawData: unknown): Record<string, unknown> {
+  if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
+    return {};
+  }
+  return rawData as Record<string, unknown>;
+}
+
+function getProcessedSessionIds(rawData: unknown): string[] {
+  const object = getRawDataObject(rawData);
+  const value = object.processedCreditCheckoutSessionIds;
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === "string");
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -53,6 +68,98 @@ export async function POST(req: Request) {
             subscriptionId: updatedSubscription.id,
             subscription: JSON.parse(JSON.stringify(updatedSubscription)),
           },
+        });
+        break;
+      }
+      case "checkout.session.completed": {
+        const session: Stripe.Checkout.Session = event.data.object;
+        if (session.mode !== "payment" || session.payment_status !== "paid") {
+          break;
+        }
+
+        const customerId =
+          typeof session.customer === "string" ? session.customer : null;
+        if (!customerId) {
+          break;
+        }
+
+        const stripeRecord = await prisma.stripe.findUnique({
+          where: {
+            customerId,
+          },
+          select: {
+            ownerId: true,
+          },
+        });
+
+        if (!stripeRecord) {
+          break;
+        }
+
+        let creditsToAdd = Number(session.metadata?.creditPackCredits ?? 0);
+        if (!Number.isFinite(creditsToAdd) || creditsToAdd <= 0) {
+          const priceIdFromMetadata = session.metadata?.creditPackPriceId;
+          if (priceIdFromMetadata) {
+            creditsToAdd = getCreditsForCreditPackPriceId(priceIdFromMetadata);
+          }
+        }
+
+        if (!Number.isFinite(creditsToAdd) || creditsToAdd <= 0) {
+          const lineItems = await stripe.checkout.sessions.listLineItems(
+            session.id,
+            { limit: 10 },
+          );
+          const firstPriceId = lineItems.data[0]?.price?.id;
+          if (firstPriceId) {
+            creditsToAdd = getCreditsForCreditPackPriceId(firstPriceId);
+          }
+        }
+
+        if (!Number.isFinite(creditsToAdd) || creditsToAdd <= 0) {
+          console.warn(
+            `Credit pack checkout session ${session.id} had no known price mapping.`,
+          );
+          break;
+        }
+
+        await prisma.$transaction(async (tx) => {
+          const org = await tx.organization.findUnique({
+            where: {
+              id: stripeRecord.ownerId,
+            },
+            select: {
+              id: true,
+              rawData: true,
+            },
+          });
+
+          if (!org) return;
+
+          const processedIds = getProcessedSessionIds(org.rawData);
+          if (processedIds.includes(session.id)) {
+            return;
+          }
+
+          const rawDataObject = getRawDataObject(org.rawData);
+          await tx.organization.update({
+            where: {
+              id: org.id,
+            },
+            data: {
+              credits: {
+                increment: Math.round(creditsToAdd),
+              },
+              rawData: {
+                ...rawDataObject,
+                processedCreditCheckoutSessionIds: [...processedIds, session.id],
+                lastCreditTopUp: {
+                  sessionId: session.id,
+                  creditsAdded: Math.round(creditsToAdd),
+                  at: new Date().toISOString(),
+                },
+              },
+            },
+          });
         });
         break;
       }

@@ -9,25 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { CREDIT_PACKS } from "@/data/credit-packs";
 import { CreditCard, Sparkles } from "lucide-react";
-
-const CREDIT_PACKS = [
-  {
-    name: "Starter Pack",
-    price: 25,
-    priceId: "price_1QzO922D5LvztGUlhIuJKycE",
-    credits: 1000, // You can adjust this
-    description: "Perfect for getting started",
-  },
-  {
-    name: "Pro Pack",
-    price: 50,
-    priceId: "price_1QzO922D5LvztGUl0dxarHwk",
-    credits: 2500, // You can adjust this
-    description: "Best value for power users",
-    popular: true,
-  },
-];
 
 interface CreditPackModalProps {
   open: boolean;

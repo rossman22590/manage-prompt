@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/utils/db";
+import { getCreditsForCreditPackPriceId } from "@/data/credit-packs";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -133,6 +134,7 @@ export async function getCreditPackCheckoutSession(
   customerId: string,
   priceId: string,
 ): Promise<string> {
+  const creditsToAdd = getCreditsForCreditPackPriceId(priceId);
   const { url } = await stripe.checkout.sessions.create({
     customer: customerId,
     billing_address_collection: "auto",
@@ -143,6 +145,18 @@ export async function getCreditPackCheckoutSession(
       },
     ],
     mode: "payment",
+    metadata: {
+      creditPackPriceId: priceId,
+      creditPackCredits: String(creditsToAdd),
+      purchaseType: "credit_pack",
+    },
+    payment_intent_data: {
+      metadata: {
+        creditPackPriceId: priceId,
+        creditPackCredits: String(creditsToAdd),
+        purchaseType: "credit_pack",
+      },
+    },
     success_url: `${process.env.APP_BASE_URL}/settings?payment_success=true`,
     cancel_url: `${process.env.APP_BASE_URL}/settings?payment_canceled=true`,
   });
