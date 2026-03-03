@@ -183,27 +183,30 @@ export async function POST(
         ? (rawResult as any).citations || []
         : [];
 
+    // Await run persistence so we never return success without storing the run.
+    // waitUntil can be torn down on cold start / first run before background work finishes.
+    await prisma.workflowRun.create({
+      data: {
+        result,
+        rawRequest: JSON.parse(JSON.stringify({ model, content })),
+        rawResult: JSON.parse(JSON.stringify(rawResult)),
+        totalTokenCount,
+        user: {
+          connect: {
+            id: key.ownerId,
+          },
+        },
+        workflow: {
+          connect: {
+            id: workflow.id,
+          },
+        },
+      },
+    });
+
     waitUntil(
       Promise.all([
         reportUsage(organization?.id, subscription, totalTokenCount),
-        prisma.workflowRun.create({
-          data: {
-            result,
-            rawRequest: JSON.parse(JSON.stringify({ model, content })),
-            rawResult: JSON.parse(JSON.stringify(rawResult)),
-            totalTokenCount,
-            user: {
-              connect: {
-                id: key.ownerId,
-              },
-            },
-            workflow: {
-              connect: {
-                id: workflow.id,
-              },
-            },
-          },
-        }),
         workflow.cacheControlTtl
           ? cacheWorkflowResult(
               params.workflowId,

@@ -173,7 +173,7 @@ export async function POST(
       template: workflow.template,
     });
 
-    const onFinish = async (evt: any) => {
+    const onFinish = (evt: any) => {
       const output = evt.text ?? "";
 
       const inputWordCount = content.split(" ").length;
@@ -183,7 +183,7 @@ export async function POST(
         ? reportedTokens
         : Math.floor((inputWordCount + outWordCount) * 0.6);
 
-      Promise.all([
+      const runPromise = Promise.all([
         reportUsage(organization.id, subscription, totalTokens ?? 0),
         prisma.workflowRun.create({
           data: {
@@ -214,6 +214,8 @@ export async function POST(
       ]).catch((error) => {
         console.error(error);
       });
+
+      waitUntil(runPromise);
     };
 
     if (!process.env.OPENROUTER_API_KEY) {

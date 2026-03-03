@@ -3,6 +3,7 @@ import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { hasExceededSpendLimit, isSubscriptionActive, reportUsage } from "@/lib/utils/stripe";
 import { translateInputs } from "@/lib/utils/workflow";
+import { waitUntil } from "@vercel/functions";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { streamText } from "ai";
 import { NextRequest } from "next/server";
@@ -173,11 +174,26 @@ export async function POST(
         topP: modelSettings.topP ?? 1,
         frequencyPenalty: modelSettings.frequencyPenalty ?? 0,
         presencePenalty: modelSettings.presencePenalty ?? 0,
-        onFinish: async (result) => {
+        onFinish: (result) => {
+          const output = result.text ?? "";
           const totalTokens = result.usage?.totalTokens ?? 0;
-          if (totalTokens > 0) {
-            await reportUsage(organization.id, subscription, totalTokens);
-          }
+          const runPromise = Promise.all([
+            totalTokens > 0
+              ? reportUsage(organization.id, subscription, totalTokens)
+              : null,
+            prisma.workflowRun.create({
+              data: {
+                result: output,
+                rawRequest: JSON.parse(
+                  JSON.stringify({ model: providerModelId, content }),
+                ),
+                rawResult: JSON.parse(JSON.stringify({ result: output })),
+                totalTokenCount: totalTokens,
+                workflow: { connect: { id: workflow.id } },
+              },
+            }),
+          ]).catch((err) => console.error("Public run onFinish:", err));
+          waitUntil(runPromise);
         },
       });
 
@@ -200,11 +216,26 @@ export async function POST(
       topP: modelSettings.topP ?? 1,
       frequencyPenalty: modelSettings.frequencyPenalty ?? 0,
       presencePenalty: modelSettings.presencePenalty ?? 0,
-      onFinish: async (result) => {
+      onFinish: (result) => {
+        const output = result.text ?? "";
         const totalTokens = result.usage?.totalTokens ?? 0;
-        if (totalTokens > 0) {
-          await reportUsage(organization.id, subscription, totalTokens);
-        }
+        const runPromise = Promise.all([
+          totalTokens > 0
+            ? reportUsage(organization.id, subscription, totalTokens)
+            : null,
+          prisma.workflowRun.create({
+            data: {
+              result: output,
+              rawRequest: JSON.parse(
+                JSON.stringify({ model: providerModelId, content }),
+              ),
+              rawResult: JSON.parse(JSON.stringify({ result: output })),
+              totalTokenCount: totalTokens,
+              workflow: { connect: { id: workflow.id } },
+            },
+          }),
+        ]).catch((err) => console.error("Public run onFinish:", err));
+        waitUntil(runPromise);
       },
     });
 
