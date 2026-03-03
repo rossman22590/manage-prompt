@@ -19,7 +19,6 @@ import {
   Layers,
   Mail,
   Network,
-  Play,
   Rocket,
   ShieldCheck,
   Sparkles,
@@ -1340,7 +1339,11 @@ export default function WorkflowsGuidePage() {
                 <div className="animate-beam absolute h-full w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
               </div>
 
-              <Play className="mx-auto h-12 w-12 text-white/20 mb-6" />
+              <div className="relative flex justify-center mb-6">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur-sm">
+                  <Workflow className="h-7 w-7 text-white/90" />
+                </div>
+              </div>
 
               <h2 className="relative text-display-sm sm:text-display-md text-white font-extrabold tracking-tight">
                 Ready to build your
