@@ -1,7 +1,7 @@
 import type { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
 import { hasWebSearch, modelToProviderId } from "@/data/workflow";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { generateText, streamText } from "ai";
+import { generateObject, generateText, jsonSchema, streamObject, streamText } from "ai";
 
 const getOpenRouterHeaders = () => {
   // Try multiple env vars for app URL
@@ -19,6 +19,24 @@ const getOpenRouterHeaders = () => {
   };
   
   return headers;
+};
+
+const buildReasoningProviderOptions = (settings?: ModelSettings) => {
+  if (!settings?.reasoningEffort || settings.reasoningEffort === "none") return undefined;
+  return {
+    openrouter: {
+      reasoning: { effort: settings.reasoningEffort },
+    },
+  };
+};
+
+const parseStructuredOutputSchema = (settings?: ModelSettings) => {
+  if (!settings?.structuredOutputSchema) return null;
+  try {
+    return jsonSchema(JSON.parse(settings.structuredOutputSchema));
+  } catch {
+    return null;
+  }
 };
 
 export const getCompletion = async (
@@ -114,7 +132,24 @@ export const getCompletion = async (
     topP: settings?.topP ?? 1,
     frequencyPenalty: settings?.frequencyPenalty ?? 0,
     presencePenalty: settings?.presencePenalty ?? 0,
+    providerOptions: buildReasoningProviderOptions(settings),
   };
+
+  const schema = parseStructuredOutputSchema(settings);
+  if (schema) {
+    const completion = await generateObject({
+      model: openrouter(providerModelId),
+      headers: getOpenRouterHeaders(),
+      schema,
+      ...modelParams,
+    });
+
+    return {
+      result: JSON.stringify(completion.object),
+      rawResult: completion,
+      totalTokenCount: completion.usage?.totalTokens ?? 0,
+    };
+  }
 
   const completion = await generateText({
     model: openrouter(providerModelId),
@@ -226,7 +261,29 @@ export const getStreamingCompletion = async (
     topP: settings?.topP ?? 1,
     frequencyPenalty: settings?.frequencyPenalty ?? 0,
     presencePenalty: settings?.presencePenalty ?? 0,
+    providerOptions: buildReasoningProviderOptions(settings),
   };
+
+  const responseHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "*",
+  };
+
+  const schema = parseStructuredOutputSchema(settings);
+  if (schema) {
+    const completion = streamObject({
+      model: openrouter(providerModelId),
+      headers: getOpenRouterHeaders(),
+      schema,
+      ...modelParams,
+      onFinish: onFinish
+        ? (evt) => onFinish({ text: JSON.stringify(evt.object), usage: evt.usage })
+        : undefined,
+    });
+
+    return completion.toTextStreamResponse({ headers: responseHeaders });
+  }
 
   const completion = streamText({
     model: openrouter(providerModelId),
@@ -235,11 +292,5 @@ export const getStreamingCompletion = async (
     onFinish,
   });
 
-  return completion.toTextStreamResponse({
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "*",
-    },
-  });
+  return completion.toTextStreamResponse({ headers: responseHeaders });
 };
