@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import type { AIModel } from "@/data/workflow";
+import {
+  hasReasoning,
+  hasStructuredOutput,
+  hasWebSearch,
+} from "@/data/workflow";
 import {
   Card,
   CardContent,
@@ -19,8 +25,6 @@ import {
 } from "../../ui/select";
 import { Slider } from "../../ui/slider";
 import { Switch } from "../../ui/switch";
-import { hasWebSearch, hasStructuredOutput, hasReasoning } from "@/data/workflow";
-import type { AIModel } from "@/data/workflow";
 
 export type ModelSettings = {
   temperature?: number;
@@ -39,7 +43,11 @@ type Props = {
   model?: AIModel;
 };
 
-export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) {
+export function WorkflowModelSettings({
+  defaultValue,
+  onChange,
+  model,
+}: Props) {
   const [temperature, setTemperature] = useState(
     defaultValue?.temperature ?? 1,
   );
@@ -61,9 +69,9 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
     defaultValue?.structuredOutputSchema ?? "",
   );
   const [schemaError, setSchemaError] = useState<string | null>(null);
-  const [reasoningEffort, setReasoningEffort] = useState<ModelSettings["reasoningEffort"]>(
-    defaultValue?.reasoningEffort ?? "none",
-  );
+  const [reasoningEffort, setReasoningEffort] = useState<
+    ModelSettings["reasoningEffort"]
+  >(defaultValue?.reasoningEffort ?? "none");
 
   const triggerChange = useCallback(
     (val: any) => {
@@ -74,7 +82,9 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
         frequencyPenalty,
         presencePenalty,
         enableWebSearch,
-        structuredOutputSchema: structuredOutputEnabled ? structuredOutputSchema : undefined,
+        structuredOutputSchema: structuredOutputEnabled
+          ? structuredOutputSchema
+          : undefined,
         reasoningEffort,
         ...val,
       });
@@ -195,7 +205,8 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
               <div className="flex flex-col space-y-1">
                 <Label htmlFor="web-search">Enable Web Search</Label>
                 <CardDescription>
-                  Enable real-time web search for this model. This will append :online to the model ID.
+                  Enable real-time web search for this model. This will append
+                  :online to the model ID.
                 </CardDescription>
               </div>
               <Switch
@@ -213,9 +224,12 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
             <div className="flex flex-col space-y-1.5">
               <div className="flex items-center justify-between space-x-2">
                 <div className="flex flex-col space-y-1">
-                  <Label htmlFor="structured-output">Enable Structured Output</Label>
+                  <Label htmlFor="structured-output">
+                    Enable Structured Output
+                  </Label>
                   <CardDescription>
-                    Force the model to return JSON matching a schema you provide.
+                    Force the model to return JSON matching a schema you
+                    provide.
                   </CardDescription>
                 </div>
                 <Switch
@@ -279,7 +293,8 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
                 </SelectContent>
               </Select>
               <CardDescription>
-                Higher effort spends more time reasoning before answering, at higher cost and latency.
+                Higher effort spends more time reasoning before answering, at
+                higher cost and latency.
               </CardDescription>
             </div>
           )}

@@ -1,6 +1,18 @@
 ﻿"use client";
 
 import {
+  AlertTriangle,
+  Braces,
+  BrainCircuit,
+  Eye,
+  Globe,
+  Layers,
+} from "lucide-react";
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import slugify from "slugify";
+import { toast } from "sonner";
+import {
   AIModels,
   AIModelToLabel,
   getDeprecationInfo,
@@ -18,11 +30,6 @@ import {
   WorkflowInputTypeToLabel,
 } from "@/data/workflow";
 import type { Workflow } from "@/generated/prisma-client/client";
-import { AlertTriangle, Braces, BrainCircuit, Eye, Globe, Layers } from "lucide-react";
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import slugify from "slugify";
-import { toast } from "sonner";
 import { SaveButton } from "../../form/button";
 import { Button, buttonVariants } from "../../ui/button";
 import { Input } from "../../ui/input";
@@ -56,7 +63,16 @@ interface Props {
 }
 
 const COMPANY_ORDER: ModelCompany[] = [
-  "OpenAI", "Anthropic", "Google", "xAI", "Perplexity", "Meta", "Mistral", "DeepSeek", "Qwen", "Cohere",
+  "OpenAI",
+  "Anthropic",
+  "Google",
+  "xAI",
+  "Perplexity",
+  "Meta",
+  "Mistral",
+  "DeepSeek",
+  "Qwen",
+  "Cohere",
 ];
 
 const parseInputs = (
@@ -97,7 +113,7 @@ export function WorkflowForm({
 
   const filteredModels = useMemo(() => {
     return AIModels.filter((m) =>
-      AIModelToLabel[m].toLowerCase().includes(modelSearch.toLowerCase())
+      AIModelToLabel[m].toLowerCase().includes(modelSearch.toLowerCase()),
     );
   }, [modelSearch]);
 
@@ -244,7 +260,9 @@ export function WorkflowForm({
                                     <Braces className="h-4 w-4 text-pink-500 dark:text-pink-400 cursor-help" />
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Supports structured (JSON schema) output</p>
+                                    <p>
+                                      Supports structured (JSON schema) output
+                                    </p>
                                   </TooltipContent>
                                 </Tooltip>
                               )}
@@ -271,7 +289,9 @@ export function WorkflowForm({
                           return (
                             <SelectItem key={m} value={m}>
                               <div className="flex items-center gap-2">
-                                <span className="text-muted-foreground">{AIModelToLabel[m]}</span>
+                                <span className="text-muted-foreground">
+                                  {AIModelToLabel[m]}
+                                </span>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <AlertTriangle className="h-4 w-4 text-amber-500 cursor-help" />
@@ -279,7 +299,8 @@ export function WorkflowForm({
                                   <TooltipContent>
                                     <p>
                                       {info?.note}
-                                      {info?.replacement && ` Suggested: ${AIModelToLabel[info.replacement]}.`}
+                                      {info?.replacement &&
+                                        ` Suggested: ${AIModelToLabel[info.replacement]}.`}
                                     </p>
                                   </TooltipContent>
                                 </Tooltip>
@@ -444,7 +465,9 @@ export function WorkflowForm({
                             value={label ?? ""}
                             onChange={(e) => {
                               const newInputs = [...inputs];
-                              const input = newInputs.find((i) => i.name === name);
+                              const input = newInputs.find(
+                                (i) => i.name === name,
+                              );
                               if (input) {
                                 input.label = e.target.value;
                                 setInputs(newInputs);
@@ -460,7 +483,9 @@ export function WorkflowForm({
                             value={type ?? "text"}
                             onValueChange={(val) => {
                               const newInputs = [...inputs];
-                              const input = newInputs.find((i) => i.name === name);
+                              const input = newInputs.find(
+                                (i) => i.name === name,
+                              );
                               if (input) {
                                 input.type = val as WorkflowInputType;
                                 setInputs(newInputs);
@@ -472,8 +497,10 @@ export function WorkflowForm({
                             </SelectTrigger>
                             <SelectContent>
                               {Object.keys(WorkflowInputType).map((type) => {
-                                const isImageType = type === WorkflowInputType.image;
-                                const isDisabled = isImageType && !isVisionCapable(model as any);
+                                const isImageType =
+                                  type === WorkflowInputType.image;
+                                const isDisabled =
+                                  isImageType && !isVisionCapable(model as any);
                                 return (
                                   <SelectItem
                                     key={type}
@@ -919,5 +946,3 @@ export function WorkflowForm({
 //     </form>
 //   );
 // }
-
-

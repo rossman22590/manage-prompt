@@ -40,20 +40,31 @@ async function main() {
     const alreadyDeprecated = Boolean(meta?.deprecated);
 
     if (isLive && alreadyDeprecated) {
-      console.log(`⚠ ${key} (${providerId}) is marked deprecated but IS live again — consider un-deprecating.`);
+      console.log(
+        `⚠ ${key} (${providerId}) is marked deprecated but IS live again — consider un-deprecating.`,
+      );
     } else if (!isLive && !alreadyDeprecated) {
-      console.log(`✗ ${key} (${providerId}) is NOT live and NOT marked deprecated — mark it deprecated.`);
+      console.log(
+        `✗ ${key} (${providerId}) is NOT live and NOT marked deprecated — mark it deprecated.`,
+      );
     } else if (!isLive && alreadyDeprecated) {
-      console.log(`  ${key} (${providerId}) still deprecated, confirmed absent.`);
+      console.log(
+        `  ${key} (${providerId}) still deprecated, confirmed absent.`,
+      );
     }
     // isLive && !alreadyDeprecated: healthy, nothing to print
   }
 
-  console.log("\n=== New models available per curated company (not yet in the catalog) ===");
+  console.log(
+    "\n=== New models available per curated company (not yet in the catalog) ===",
+  );
   const curatedProviderIds = new Set(Object.values(modelToProviderId));
   for (const [company, prefix] of Object.entries(CURATED_COMPANY_PREFIXES)) {
     const newOnes = [...liveIds].filter(
-      (id) => id.startsWith(prefix) && !curatedProviderIds.has(id) && !id.startsWith("~"),
+      (id) =>
+        id.startsWith(prefix) &&
+        !curatedProviderIds.has(id) &&
+        !id.startsWith("~"),
     );
     if (newOnes.length > 0) {
       console.log(`${company}:`);

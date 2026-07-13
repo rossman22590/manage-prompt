@@ -32,7 +32,8 @@ export async function WorkflowItem({ workflow }: Props) {
   });
 
   const areTestsPassing = tests.every((test) => test.status === "pass");
-  const modelLabel = AIModelToLabel[workflow.model as AIModel] || workflow.model;
+  const modelLabel =
+    AIModelToLabel[workflow.model as AIModel] || workflow.model;
   const modelIsDeprecated = isDeprecated(workflow.model as AIModel);
 
   return (
@@ -100,9 +101,7 @@ export async function WorkflowItem({ workflow }: Props) {
           )}
         </div>
       </div>
-      <Badge
-        variant={modelIsDeprecated ? "destructive" : "outline"}
-      >
+      <Badge variant={modelIsDeprecated ? "destructive" : "outline"}>
         {modelLabel}
       </Badge>
       <ChevronRightIcon aria-hidden="true" className="h-5 w-5 flex-none" />
@@ -194,5 +193,3 @@ export async function WorkflowItem({ workflow }: Props) {
 //     </div>
 //   );
 // }
-
-
