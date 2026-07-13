@@ -1,7 +1,7 @@
 ﻿import classNames from "classnames";
 import { ChevronRightIcon, TestTube } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { type AIModel, AIModelToLabel } from "@/data/workflow";
+import { type AIModel, AIModelToLabel, isDeprecated } from "@/data/workflow";
 import type { Workflow } from "@/generated/prisma-client/client";
 import { cn } from "@/lib/utils";
 import { getWorkflowUsage } from "@/lib/utils/analytics";
@@ -33,7 +33,7 @@ export async function WorkflowItem({ workflow }: Props) {
 
   const areTestsPassing = tests.every((test) => test.status === "pass");
   const modelLabel = AIModelToLabel[workflow.model as AIModel] || workflow.model;
-  const isDeprecated = modelLabel.toLowerCase().includes("deprecated");
+  const modelIsDeprecated = isDeprecated(workflow.model as AIModel);
 
   return (
     <div className="relative flex items-center space-x-4 p-4 bg-white hover:bg-gray-50 dark:bg-black dark:hover:bg-[#2a2a2a]">
@@ -101,7 +101,7 @@ export async function WorkflowItem({ workflow }: Props) {
         </div>
       </div>
       <Badge
-        variant={isDeprecated ? "destructive" : "outline"}
+        variant={modelIsDeprecated ? "destructive" : "outline"}
       >
         {modelLabel}
       </Badge>
