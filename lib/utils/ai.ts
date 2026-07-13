@@ -9,7 +9,7 @@ import {
 import type { ModelSettings } from "@/components/console/workflow/workflow-model-settings";
 import { hasWebSearch, modelToProviderId } from "@/data/workflow";
 
-const getOpenRouterHeaders = () => {
+export const getOpenRouterHeaders = () => {
   // Try multiple env vars for app URL
   const appUrl =
     process.env.APP_BASE_URL ||

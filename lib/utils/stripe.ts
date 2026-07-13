@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/utils/db";
 import Stripe from "stripe";
+import { prisma } from "@/lib/utils/db";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-12-15.clover",
@@ -191,7 +191,7 @@ export async function reportUsage(
   // Always deduct credits from database based on actual token usage
   // Convert tokens to credits (1 credit = 100 tokens)
   const creditsToDeduct = Math.max(1, Math.ceil(quantity / 100));
-  
+
   await prisma.organization.update({
     where: {
       id: ownerId,
@@ -234,18 +234,20 @@ export async function reportUsage(
 export function isSubscriptionActive(subscription: any) {
   if (!subscription) return false;
   // Handle both JSON object and parsed object
-  const status = typeof subscription === "string" 
-    ? JSON.parse(subscription)?.status 
-    : subscription?.status;
+  const status =
+    typeof subscription === "string"
+      ? JSON.parse(subscription)?.status
+      : subscription?.status;
   return ["trialing", "active"].includes(status);
 }
 
 export function isSubscriptionCancelled(subscription: any) {
   if (!subscription) return false;
   // Handle both JSON object and parsed object
-  const status = typeof subscription === "string" 
-    ? JSON.parse(subscription)?.status 
-    : subscription?.status;
+  const status =
+    typeof subscription === "string"
+      ? JSON.parse(subscription)?.status
+      : subscription?.status;
   return status === "canceled";
 }
 
@@ -258,7 +260,7 @@ export async function getUpcomingInvoice(
     if (!subscriptionId) {
       return null;
     }
-    
+
     // Use createPreview to get upcoming invoice preview
     const invoice = await stripe.invoices.createPreview({
       customer,
@@ -283,4 +285,47 @@ export async function hasExceededSpendLimit(
     return invoice.amount_due / 100 > spendLimit;
   }
   return false;
+}
+
+export type BillingGateReason =
+  | "no_subscription"
+  | "spend_limit_exceeded"
+  | "zero_credits";
+
+export type BillingGateResult =
+  | { blocked: false }
+  | { blocked: true; reason: BillingGateReason };
+
+/**
+ * Shared 0-credit blocking decision used by every run/chat route. Returns
+ * *which* case applies (no_subscription / spend_limit_exceeded / zero_credits)
+ * without an opinion on response shape or wording — callers differ on both
+ * (owner-facing routes vs. the anonymous public share-link route), so each
+ * call site maps `reason` to its own message and response envelope.
+ */
+export async function checkBillingGate(
+  organization:
+    | {
+        credits?: number | null;
+        spendLimit?: number | null;
+        stripe?: { subscription?: unknown; customerId?: string | null } | null;
+      }
+    | null
+    | undefined,
+): Promise<BillingGateResult> {
+  if ((organization?.credits ?? 0) > 0) {
+    return { blocked: false };
+  }
+  if (!isSubscriptionActive(organization?.stripe?.subscription)) {
+    return { blocked: true, reason: "no_subscription" };
+  }
+  if (
+    await hasExceededSpendLimit(
+      organization?.spendLimit,
+      organization?.stripe?.customerId,
+    )
+  ) {
+    return { blocked: true, reason: "spend_limit_exceeded" };
+  }
+  return { blocked: true, reason: "zero_credits" };
 }

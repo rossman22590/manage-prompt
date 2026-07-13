@@ -4,79 +4,79 @@
     {
       "id": 7,
       "subject": "B1: Agent + AgentRun Prisma models",
-      "status": "pending",
-      "description": "See native task #7 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 1. No dependency on the model-catalog plan — can start immediately."
+      "status": "completed",
+      "description": "See native task #7 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 1. No dependency on the model-catalog plan — can start immediately. Schema edits committed at 9b6c701 (spec + quality review both approved). `npx prisma migrate dev --name add_agents` could NOT be run to completion: no DATABASE_URL is configured anywhere in this worktree (no .env file; .env.sample has DATABASE_URL=\"\"), so the command fails at config-load time with PrismaConfigEnvError. `npx prisma generate`/`validate` were confirmed to work against a scoped, non-persisted dummy DATABASE_URL, proving the schema itself is valid; no migration folder exists under prisma/migrations/. A real DATABASE_URL must be provisioned before `prisma migrate dev --name add_agents` can actually run and be committed (git add prisma/migrations)."
     },
     {
       "id": 8,
       "subject": "B2: Agent data layer (lib/utils/agent.ts, lib/utils/useAgent.ts)",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [7],
-      "description": "See native task #8 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 2."
+      "description": "See native task #8 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 2. Implemented at 3835b00 (Add Agent zod schema and DB query/cache helpers), lint fix at 7bde8e1. Spec review: compliant. Quality review: approved with minor notes (import sort fixed; one harmless redundant Number() cast left as-is, matches pattern in analytics.ts). npx tsc --noEmit clean for these files."
     },
     {
       "id": 9,
       "subject": "B3: Agent server actions",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [8],
-      "description": "See native task #9 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 3."
+      "description": "See native task #9 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 3. Implemented at 3882760 (Add Agent server actions). Spec review: compliant, verbatim match. Quality review: approved with minor notes (no ownership/IDOR check and no NaN guard before mutating by raw id — exact pre-existing pattern inherited from workflows/actions.ts, not a regression; flagged as a separate follow-up task rather than fixed here since it's out of this task's scope and affects both Agent and Workflow actions together)."
     },
     {
       "id": 10,
       "subject": "B4: Extract shared ModelPicker component",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [4],
-      "description": "See native task #10 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 4. Cross-plan dependency: blocked by A4 (native #4) in the model-catalog plan."
+      "description": "See native task #10 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 4. Cross-plan dependency: blocked by A4 (native #4) in the model-catalog plan (now merged). Implemented at c1e4151 (components/console/model-picker.tsx created, workflow-form.tsx updated to use it, plus authorized cleanup deleting ~385 lines of stale commented-out dead code). Spec review: compliant, verbatim. Quality review: approved, no blocking issues."
     },
     {
       "id": 11,
       "subject": "B5: Shared chat core (lib/utils/agent-chat.ts)",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [7, 1, 3],
-      "description": "See native task #11 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 5. Cross-plan dependency: blocked by A1 (native #1) and A3 (native #3) in the model-catalog plan."
+      "description": "See native task #11 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 5. Cross-plan dependency: blocked by A1 (native #1) and A3 (native #3) in the model-catalog plan (now merged). Implemented at f47bc3e (lib/utils/agent-chat.ts created, getOpenRouterHeaders exported from lib/utils/ai.ts). Spec review: compliant, verbatim. Quality review: approved with minor notes (duplication with existing ai.ts helpers buildReasoningProviderOptions/provider-id resolution logic, and fragile Perplexity string-prefix check vs. getModelCompany — flagged as follow-up task_5d0cf5db, not fixed here since plan's literal spec text didn't call for reuse)."
     },
     {
       "id": 12,
       "subject": "B6: Dashboard chat route",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [11],
-      "description": "See native task #12 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 6."
+      "description": "See native task #12 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 6. Implemented at a39ce07 (app/api/agents/[agentId]/chat/route.ts). Spec review: compliant, verbatim (one error-message wording discrepancy vs Workflow routes traced to the plan doc's own text, not a deviation). Quality review: approved with minor notes (unguarded req.json()/no try-catch, unguarded Number(agentId), 4x-duplicated billing-gate logic — flagged as follow-up task_19f6daeb, not fixed here since plan's literal spec text didn't include these guards)."
     },
     {
       "id": 13,
       "subject": "B7: Chat playground UI (agent-chat.tsx)",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [12],
-      "description": "See native task #13 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 7."
+      "description": "See native task #13 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 7. Implemented at 7954be8 (@ai-sdk/react@2.0.213 installed, components/console/agent/agent-chat.tsx created). Quality review found 2 Important bugs (SSR hydration mismatch from reading localStorage during render; incomplete send-guard allowing double-submit/duplicate billed requests) fixed at 76486fa + d08f08f (race-condition self-correction). Re-review empirically verified both fixes via real reproduction harness. One pre-existing minor edge case noted (agentId prop change without remount could leak stale messages into wrong storage key) — unlikely given planned Next.js routing, not fixed, not blocking."
     },
     {
       "id": 14,
       "subject": "B8: Public OpenAI-compatible chat completions API",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [11, 8],
-      "description": "See native task #14 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 8."
+      "description": "See native task #14 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 8. Implemented at 1c9005d (app/api/v1/chat/completions/route.ts). Spec review: compliant, verbatim (cache-hit path correctly still bills/logs). Quality review: approved with minor notes; two concretely-reachable Important issues (mapFinishReason collapsing error/other/unknown into 'stop'; no runtime validation on body.messages causing 500/dead-stream on malformed input incl. real OpenAI multimodal content) flagged as follow-up task_f229fe7e, not fixed here since inherited verbatim from plan's own reference code."
     },
     {
       "id": 15,
       "subject": "B9: Dashboard CRUD pages (list, new, edit, form, item)",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [9, 10],
-      "description": "See native task #15 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 9."
+      "description": "See native task #15 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 9. Implemented at 06486ba (5 files). Caught and fixed a real bug in the plan's own reference code during implementation: <WorkflowSearch/> hardcodes navigation to /workflows, which would have broken search on /agents entirely (navigates away instead of filtering) — fixed at 1d2268e by adding an independent AgentSearch component, zero changes to Workflows. Spec review: compliant. Quality review: approved with minor notes (AgentSearch/WorkflowSearch duplication flagged as follow-up task_68231f75; N+1 getAgentUsage per list item confirmed pre-existing Workflows convention, not new)."
     },
     {
       "id": 16,
       "subject": "B10: Agent detail (chat playground), usage page, API snippet, nav",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [13, 14, 15],
-      "description": "See native task #16 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 10."
+      "description": "See native task #16 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 10. Implemented at 345f8cb (3 files: [agentId]/page.tsx, usage/page.tsx, navbar.tsx) + 681b055 (date-rendering defensive fix, verified against sibling Workflow precedent). Spec review: compliant (confirmed live via real dev-server request that /agents compiles and returns 200 in this worktree, resolving an earlier subagent's false-positive 404 report traced to a stale dev server on a different port/worktree). Quality review: approved with minor notes (stale string-typed getAgentRunStats return type despite runtime Date possibility, flagged as follow-up task_278ee7f9)."
     },
     {
       "id": 17,
       "subject": "B11: Full-feature verification pass (Agents)",
-      "status": "pending",
+      "status": "completed_with_deferrals",
       "blockedBy": [6, 16, 14],
-      "description": "See native task #17 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 11. Cross-plan dependency: blocked by A6 (native #6) in the model-catalog plan."
+      "description": "tsc clean whole-repo (exit 0). biome check . exits 1 but 100% of findings are pre-existing CRLF-format diffs (core.autocrlf=true) and stale import-sort warnings unrelated to and not touching any Agents-plan file (zero actual lint-rule violations anywhere). ModelPicker/Workflow regression check done at code level (no live browser): no stray references to removed symbols, agent-form.tsx and workflow-form.tsx both consume ModelPicker identically. Reasoning-Effort-through-an-Agent and full Publish-gate live checks deferred: magic-link auth wall (no dev bypass) and empty OPENROUTER_API_KEY, matching sibling plan's A6 precedent exactly. Publish-gate auth-rejection paths partially verified for real via curl against a live dev server, but blocked by a newly-discovered, pre-existing (dates to commit b7f28f0, well before this plan), out-of-scope sandbox gap: STRIPE_SECRET_KEY is present but empty in .env, causing lib/utils/stripe.ts's module-level `new Stripe(...)` to throw on every request to any billing-gated route (all v1 APIs, not just Agents) before auth checks run. Route's auth-check code was confirmed correct via static read. Follow-up spawned by the verifying subagent for a lazy-init fix."
     }
   ],
-  "lastUpdated": "2026-07-13"
+  "lastUpdated": "2026-07-13T20:00:00Z-tasks-1-11-done"
 }

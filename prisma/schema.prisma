@@ -24,6 +24,8 @@ model User {
   sessions           Session[]
   Workflow           Workflow[]
   WorkflowRun        WorkflowRun[]
+  Agent              Agent[]
+  AgentRun           AgentRun[]
   accounts           Account[]
   passkeys           Passkey[]
 }
@@ -86,6 +88,7 @@ model Organization {
   SecretKey          SecretKey[]
   UserKeys           UserKey[]
   workflows          Workflow[]
+  agents             Agent[]
   stripe             Stripe?
 }
 
@@ -192,6 +195,39 @@ model WorkflowRun {
   user            User?          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   workflow        Workflow       @relation(fields: [workflowId], references: [id], onDelete: Cascade)
   WorkflowTest    WorkflowTest[]
+}
+
+model Agent {
+  id              Int          @id @default(autoincrement())
+  shortId         String       @unique
+  createdBy       String
+  ownerId         String
+  name            String
+  systemPrompt    String
+  model           String
+  modelSettings   Json?
+  published       Boolean      @default(false)
+  cacheControlTtl Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  user            User         @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  organization    Organization @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  runs            AgentRun[]
+
+  @@index([ownerId])
+}
+
+model AgentRun {
+  id              Int      @id @default(autoincrement())
+  agentId         Int
+  source          String
+  totalTokenCount Int      @default(0)
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  agent           Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  user            User?    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
 }
 
 model Passkey {

@@ -25,8 +25,16 @@ export default function NavBar({ isPublicPage = false, showAdminLink = false }: 
         { name: "Usage",      href: `/workflows/${params.workflowId}/usage`,    current: path === `/workflows/${params.workflowId}/usage` },
       ];
     }
+    if ("agentId" in params) {
+      return [
+        { name: "Chat",  href: `/agents/${params.agentId}`,      current: path === `/agents/${params.agentId}` },
+        { name: "Edit",  href: `/agents/${params.agentId}/edit`, current: path === `/agents/${params.agentId}/edit` },
+        { name: "Usage", href: `/agents/${params.agentId}/usage`, current: path === `/agents/${params.agentId}/usage` },
+      ];
+    }
     const base = [
       { name: "Workflows",  href: "/workflows",  current: path.startsWith("/workflows") },
+      { name: "Agents",     href: "/agents",     current: path.startsWith("/agents") },
       { name: "Statistics", href: "/statistics", current: path === "/statistics" },
       { name: "Settings",   href: "/settings",   current: path === "/settings" },
     ];

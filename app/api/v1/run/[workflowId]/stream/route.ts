@@ -1,4 +1,6 @@
+import { waitUntil } from "@vercel/functions";
 import { type NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 import type { WorkflowInput } from "@/data/workflow";
 import { getStreamingCompletion } from "@/lib/utils/ai";
 import {
@@ -8,28 +10,18 @@ import {
 } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { redis } from "@/lib/utils/redis";
-import {
-  hasExceededSpendLimit,
-  isSubscriptionActive,
-  reportUsage,
-} from "@/lib/utils/stripe";
+import { checkBillingGate, reportUsage } from "@/lib/utils/stripe";
 import {
   cacheWorkflowResult,
   getWorkflowCachedResult,
 } from "@/lib/utils/useWorkflow";
 import { translateInputs } from "@/lib/utils/workflow";
-import { waitUntil } from "@vercel/functions";
-import type Stripe from "stripe";
 
 export const maxDuration = 300;
 
 const estimateTokenCount = (input: string, output: string) => {
-  const inputWordCount = input.trim()
-    ? input.trim().split(/\s+/).length
-    : 0;
-  const outputWordCount = output.trim()
-    ? output.trim().split(/\s+/).length
-    : 0;
+  const inputWordCount = input.trim() ? input.trim().split(/\s+/).length : 0;
+  const outputWordCount = output.trim() ? output.trim().split(/\s+/).length : 0;
   return Math.floor((inputWordCount + outputWordCount) * 0.6);
 };
 
@@ -91,33 +83,19 @@ export async function POST(
     }
 
     // Block if credits are 0 (regardless of subscription status)
-    if ((organization?.credits ?? 0) <= 0) {
-      // If no subscription, block with invalid billing
-      if (!isSubscriptionActive(organization?.stripe?.subscription)) {
-        return ErrorResponse(
-          "Invalid billing. Please contact support.",
-          402,
-          ErrorCodes.InvalidBilling,
-        );
-      }
-      
-      // If has subscription but spend limit exceeded, block with spend limit error
-      if (
-        await hasExceededSpendLimit(
-          organization?.spendLimit,
-          organization?.stripe?.customerId,
-        )
-      ) {
+    const billingGate = await checkBillingGate(organization);
+    if (billingGate.blocked) {
+      if (billingGate.reason === "spend_limit_exceeded") {
         return ErrorResponse(
           "Spend limit exceeded. Please increase your spend limit to continue using the service.",
           402,
           ErrorCodes.SpendLimitReached,
         );
       }
-      
-      // If has subscription but no spend limit exceeded, still block at 0 credits
       return ErrorResponse(
-        "No credits remaining. Please add credits to continue using the service.",
+        billingGate.reason === "no_subscription"
+          ? "Invalid billing. Please contact support."
+          : "No credits remaining. Please add credits to continue using the service.",
         402,
         ErrorCodes.InvalidBilling,
       );
