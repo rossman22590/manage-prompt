@@ -4,22 +4,22 @@
     {
       "id": 7,
       "subject": "B1: Agent + AgentRun Prisma models",
-      "status": "pending",
-      "description": "See native task #7 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 1. No dependency on the model-catalog plan — can start immediately."
+      "status": "completed",
+      "description": "See native task #7 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 1. No dependency on the model-catalog plan — can start immediately. Schema edits committed at 9b6c701 (spec + quality review both approved). `npx prisma migrate dev --name add_agents` could NOT be run to completion: no DATABASE_URL is configured anywhere in this worktree (no .env file; .env.sample has DATABASE_URL=\"\"), so the command fails at config-load time with PrismaConfigEnvError. `npx prisma generate`/`validate` were confirmed to work against a scoped, non-persisted dummy DATABASE_URL, proving the schema itself is valid; no migration folder exists under prisma/migrations/. A real DATABASE_URL must be provisioned before `prisma migrate dev --name add_agents` can actually run and be committed (git add prisma/migrations)."
     },
     {
       "id": 8,
       "subject": "B2: Agent data layer (lib/utils/agent.ts, lib/utils/useAgent.ts)",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [7],
-      "description": "See native task #8 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 2."
+      "description": "See native task #8 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 2. Implemented at 3835b00 (Add Agent zod schema and DB query/cache helpers), lint fix at 7bde8e1. Spec review: compliant. Quality review: approved with minor notes (import sort fixed; one harmless redundant Number() cast left as-is, matches pattern in analytics.ts). npx tsc --noEmit clean for these files."
     },
     {
       "id": 9,
       "subject": "B3: Agent server actions",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [8],
-      "description": "See native task #9 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 3."
+      "description": "See native task #9 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 3. Implemented at 3882760 (Add Agent server actions). Spec review: compliant, verbatim match. Quality review: approved with minor notes (no ownership/IDOR check and no NaN guard before mutating by raw id — exact pre-existing pattern inherited from workflows/actions.ts, not a regression; flagged as a separate follow-up task rather than fixed here since it's out of this task's scope and affects both Agent and Workflow actions together)."
     },
     {
       "id": 10,
