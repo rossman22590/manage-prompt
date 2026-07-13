@@ -106,7 +106,7 @@ export async function getAgentRunStats(
       )::DATE AS date
     )
     SELECT
-      ds.date,
+      ds.date::TEXT AS "date",
       COALESCE(COUNT(ar.id)::INTEGER, 0) AS "total",
       COALESCE(SUM(ar."totalTokenCount")::INTEGER, 0) AS "tokens"
     FROM date_series ds

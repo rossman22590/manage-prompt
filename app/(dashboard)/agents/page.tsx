@@ -1,5 +1,4 @@
 import { AgentItem } from "@/components/console/agent/agent-item";
-import { AgentSearch } from "@/components/console/agent/agent-search";
 import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import {
@@ -10,6 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { WorkflowSearch } from "@/components/workflows/workflow-search";
 import { owner } from "@/lib/hooks/useOwner";
 import { cn } from "@/lib/utils";
 import { AGENT_LIMIT, getAgentsForOwner } from "@/lib/utils/useAgent";
@@ -45,7 +45,7 @@ export default async function Agents(props: Props) {
       />
       <div className="flex max-w-7xl px-4 xl:px-0 sm:mx-auto py-4 space-x-4 items-center">
         <div className="flex-1">
-          <AgentSearch />
+          <WorkflowSearch basePath="/agents" placeholder="Search Agents" />
         </div>
       </div>
       <div className="mx-auto mt-8 flex max-w-7xl flex-col">

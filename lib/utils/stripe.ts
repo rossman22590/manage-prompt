@@ -1,9 +1,21 @@
 import Stripe from "stripe";
 import { prisma } from "@/lib/utils/db";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-12-15.clover",
-});
+// Lazily constructed: `new Stripe()` throws synchronously if given a falsy
+// apiKey. Building this eagerly at module scope meant every route importing
+// from this file — including ones that reject a request before reaching any
+// billing logic (missing bearer token, invalid input, etc.) — would 500 the
+// instant STRIPE_SECRET_KEY is unset, rather than let those earlier checks run.
+let stripeClient: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripeClient) {
+    stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+      apiVersion: "2025-12-15.clover",
+    });
+  }
+  return stripeClient;
+}
 
 export async function createOrRetrieveCustomer(
   ownerId: string,
@@ -26,7 +38,7 @@ export async function createOrRetrieveCustomer(
   if (organization?.stripe?.customerId) {
     try {
       // Verify customer exists in Stripe
-      await stripe.customers.retrieve(organization.stripe.customerId);
+      await getStripe().customers.retrieve(organization.stripe.customerId);
       return organization.stripe.customerId;
     } catch (error: any) {
       // If customer doesn't exist in Stripe, delete the record and create a new one
@@ -50,7 +62,7 @@ export async function createOrRetrieveCustomer(
   const userEmail = organization.createdBy?.email || "";
 
   // Create new customer in Stripe with name and email
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     name: userName,
     email: userEmail || undefined, // Only include email if it exists
     metadata: {
@@ -91,7 +103,7 @@ export async function getCheckoutSession(customerId: string): Promise<string> {
     stripeCustomer?.subscriptionId &&
     !isSubscriptionCancelled(stripeCustomer?.subscription)
   ) {
-    const { url } = await stripe.billingPortal.sessions.create({
+    const { url } = await getStripe().billingPortal.sessions.create({
       customer: customerId,
       return_url: `${process.env.APP_BASE_URL}/settings`,
     });
@@ -103,7 +115,7 @@ export async function getCheckoutSession(customerId: string): Promise<string> {
     return url;
   }
 
-  const { url } = await stripe.checkout.sessions.create({
+  const { url } = await getStripe().checkout.sessions.create({
     customer: customerId,
     billing_address_collection: "auto",
     line_items: [
@@ -133,7 +145,7 @@ export async function getCreditPackCheckoutSession(
   customerId: string,
   priceId: string,
 ): Promise<string> {
-  const { url } = await stripe.checkout.sessions.create({
+  const { url } = await getStripe().checkout.sessions.create({
     customer: customerId,
     billing_address_collection: "auto",
     line_items: [
@@ -158,7 +170,7 @@ export async function getSubscriptionCheckoutSession(
   customerId: string,
   priceId: string,
 ): Promise<string> {
-  const { url } = await stripe.checkout.sessions.create({
+  const { url } = await getStripe().checkout.sessions.create({
     customer: customerId,
     billing_address_collection: "auto",
     line_items: [
@@ -262,7 +274,7 @@ export async function getUpcomingInvoice(
     }
 
     // Use createPreview to get upcoming invoice preview
-    const invoice = await stripe.invoices.createPreview({
+    const invoice = await getStripe().invoices.createPreview({
       customer,
       subscription: subscriptionId,
     });

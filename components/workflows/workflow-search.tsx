@@ -5,10 +5,20 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 
-export function WorkflowSearch() {
+type Props = {
+  basePath?: string;
+  placeholder?: string;
+};
+
+export function WorkflowSearch({
+  basePath = "/workflows",
+  placeholder = "Search Workflows",
+}: Props = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchValue, setSearchValue] = useState(searchParams.get("search") || "");
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || "",
+  );
   const debouncedSearch = useDebounce(searchValue, 100);
 
   useEffect(() => {
@@ -21,15 +31,15 @@ export function WorkflowSearch() {
       } else {
         params.delete("search");
       }
-      router.replace(`/workflows?${params.toString()}`);
+      router.replace(`${basePath}?${params.toString()}`);
     }
-  }, [debouncedSearch, router, searchParams]);
+  }, [debouncedSearch, router, searchParams, basePath]);
 
   return (
     <div className="relative text-gray-600 dark:text-gray-400 focus-within:text-gray-800 dark:focus-within:text-gray-200">
       <Input
         name="search"
-        placeholder="Search Workflows"
+        placeholder={placeholder}
         type="search"
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
@@ -37,4 +47,3 @@ export function WorkflowSearch() {
     </div>
   );
 }
-
