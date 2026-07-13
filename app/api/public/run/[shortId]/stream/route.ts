@@ -1,14 +1,18 @@
-import { hasWebSearch, modelToProviderId, type WorkflowInput } from "@/data/workflow";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { waitUntil } from "@vercel/functions";
+import { streamText } from "ai";
+import type { NextRequest } from "next/server";
+import type Stripe from "stripe";
+import {
+  hasWebSearch,
+  modelToProviderId,
+  type WorkflowInput,
+} from "@/data/workflow";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { redis } from "@/lib/utils/redis";
-import { hasExceededSpendLimit, isSubscriptionActive, reportUsage } from "@/lib/utils/stripe";
+import { checkBillingGate, reportUsage } from "@/lib/utils/stripe";
 import { translateInputs } from "@/lib/utils/workflow";
-import { waitUntil } from "@vercel/functions";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText } from "ai";
-import { NextRequest } from "next/server";
-import type Stripe from "stripe";
 
 export const maxDuration = 300;
 
@@ -72,31 +76,15 @@ export async function POST(
     const organization = workflow.organization;
 
     // Block if credits are 0 (regardless of subscription status)
-    if ((organization?.credits ?? 0) <= 0) {
-      // If no subscription, block with invalid billing
-      if (!isSubscriptionActive(organization?.stripe?.subscription)) {
-        return ErrorResponse(
-          "This workflow is temporarily unavailable. Please contact the workflow owner.",
-          402,
-          ErrorCodes.InvalidBilling,
-        );
-      }
-
-      // If has subscription but spend limit exceeded, block with spend limit error
-      if (
-        await hasExceededSpendLimit(
-          organization?.spendLimit,
-          organization?.stripe?.customerId,
-        )
-      ) {
+    const billingGate = await checkBillingGate(organization);
+    if (billingGate.blocked) {
+      if (billingGate.reason === "spend_limit_exceeded") {
         return ErrorResponse(
           "This workflow is temporarily unavailable due to billing limits.",
           402,
           ErrorCodes.SpendLimitReached,
         );
       }
-
-      // If has subscription but no spend limit exceeded, still block at 0 credits
       return ErrorResponse(
         "This workflow is temporarily unavailable. Please contact the workflow owner.",
         402,
@@ -124,14 +112,18 @@ export async function POST(
     // Only if enableWebSearch is true (defaults to true if not specified)
     // Note: :online works for ANY model on OpenRouter (uses native search if available, otherwise Exa)
     // We enable it for models that have native/built-in web search capabilities
-    const isPerplexityModel = providerModelId.startsWith('perplexity/');
+    const isPerplexityModel = providerModelId.startsWith("perplexity/");
     const modelSettings = (workflow.modelSettings as any) ?? {};
     const shouldEnableWebSearch = modelSettings.enableWebSearch !== false; // Default to true
-    if (hasWebSearch(workflow.model as any) && !isPerplexityModel && shouldEnableWebSearch) {
+    if (
+      hasWebSearch(workflow.model as any) &&
+      !isPerplexityModel &&
+      shouldEnableWebSearch
+    ) {
       // Append :online suffix - uses native search for OpenAI/Gemini, Exa for others
       providerModelId = `${providerModelId}:online`;
     }
-    
+
     const subscription = organization?.stripe
       ?.subscription as unknown as Stripe.Subscription | null;
 
@@ -141,18 +133,23 @@ export async function POST(
 
     // If images are present, use messages format with parts array
     if (imageParts && imageParts.length > 0) {
-      const parts: Array<{ type: 'text' | 'file'; text?: string; url?: string; mediaType?: string }> = [];
-      
+      const parts: Array<{
+        type: "text" | "file";
+        text?: string;
+        url?: string;
+        mediaType?: string;
+      }> = [];
+
       // Split content by [IMAGE] placeholders and add text/file parts
-      const textParts = content.split('[IMAGE]');
+      const textParts = content.split("[IMAGE]");
       for (let i = 0; i < textParts.length; i++) {
         if (textParts[i]) {
-          parts.push({ type: 'text', text: textParts[i] });
+          parts.push({ type: "text", text: textParts[i] });
         }
         if (i < imageParts.length) {
           const imagePart = imageParts[i];
           parts.push({
-            type: 'file',
+            type: "file",
             url: imagePart.url,
             mediaType: imagePart.mediaType,
           });
@@ -160,13 +157,13 @@ export async function POST(
       }
 
       // Build content array in the correct format for Vercel AI SDK
-      const messageContent = parts.map(part => 
-        part.type === 'text' 
-          ? { type: 'text' as const, text: part.text || '' }
-          : { 
-              type: 'image' as const, 
-              image: part.url || ''
-            }
+      const messageContent = parts.map((part) =>
+        part.type === "text"
+          ? { type: "text" as const, text: part.text || "" }
+          : {
+              type: "image" as const,
+              image: part.url || "",
+            },
       );
 
       const completion = streamText({
@@ -174,7 +171,7 @@ export async function POST(
         headers: getOpenRouterHeaders(),
         messages: [
           {
-            role: 'user' as const,
+            role: "user" as const,
             content: messageContent,
           },
         ],
@@ -264,4 +261,3 @@ export async function POST(
     );
   }
 }
-
