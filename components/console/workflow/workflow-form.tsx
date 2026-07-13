@@ -55,6 +55,10 @@ interface Props {
   action: (data: FormData) => Promise<any>;
 }
 
+const COMPANY_ORDER: ModelCompany[] = [
+  "OpenAI", "Anthropic", "Google", "xAI", "Perplexity", "Meta", "Mistral", "DeepSeek", "Qwen", "Cohere",
+];
+
 const parseInputs = (
   inputs: string,
   currentInputs: WorkflowInput[] | null,
@@ -90,10 +94,6 @@ export function WorkflowForm({
   const [showAdvancedModelParams, setShowAdvancedModelParams] = useState(false);
   const [modelSettings, setModelSettings] = useState({});
   const [modelSearch, setModelSearch] = useState("");
-
-  const COMPANY_ORDER: ModelCompany[] = [
-    "OpenAI", "Anthropic", "Google", "xAI", "Perplexity", "Meta", "Mistral", "DeepSeek", "Qwen", "Cohere",
-  ];
 
   const filteredModels = useMemo(() => {
     return AIModels.filter((m) =>
