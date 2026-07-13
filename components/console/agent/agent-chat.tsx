@@ -1,8 +1,8 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
-import { useEffect, useMemo, useState } from "react";
+import { DefaultChatTransport, isTextUIPart, type UIMessage } from "ai";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
@@ -23,10 +23,10 @@ function loadStoredMessages(storageKey: string): UIMessage[] {
 export function AgentChat({ agentId }: Props) {
   const storageKey = `agent-chat:${agentId}`;
   const [input, setInput] = useState("");
-  const initialMessages = useMemo(
-    () => loadStoredMessages(storageKey),
-    [storageKey],
-  );
+  // Guards against the "save to storage" effect running (and stomping real
+  // history with "[]") before the "load from storage" effect below has had a
+  // chance to populate messages from localStorage on mount.
+  const hasLoadedRef = useRef(false);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/agents/${agentId}/chat` }),
@@ -35,14 +35,25 @@ export function AgentChat({ agentId }: Props) {
 
   const { messages, sendMessage, status, setMessages } = useChat({
     transport,
-    messages: initialMessages,
+    messages: [],
   });
 
+  // Load stored messages only after mount (client-only), so the server-
+  // rendered markup and the initial client render both start from an empty
+  // array and never mismatch during hydration.
   useEffect(() => {
+    hasLoadedRef.current = false;
+    setMessages(loadStoredMessages(storageKey));
+    hasLoadedRef.current = true;
+  }, [storageKey, setMessages]);
+
+  useEffect(() => {
+    if (!hasLoadedRef.current) return;
     window.localStorage.setItem(storageKey, JSON.stringify(messages));
   }, [messages, storageKey]);
 
   const handleSend = () => {
+    if (status !== "ready") return;
     if (!input.trim()) return;
     sendMessage({ text: input });
     setInput("");
@@ -70,14 +81,12 @@ export function AgentChat({ agentId }: Props) {
                 : "self-start bg-slate-100 dark:bg-slate-800"
             }`}
           >
-            {message.parts
-              .filter((part) => part.type === "text")
-              .map((part, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: text parts have no stable id and only ever append within a message
-                <p key={i} className="whitespace-pre-wrap">
-                  {(part as { type: "text"; text: string }).text}
-                </p>
-              ))}
+            {message.parts.filter(isTextUIPart).map((part, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: text parts have no stable id and only ever append within a message
+              <p key={i} className="whitespace-pre-wrap">
+                {part.text}
+              </p>
+            ))}
           </div>
         ))}
         {status === "streaming" && (
@@ -96,7 +105,7 @@ export function AgentChat({ agentId }: Props) {
           }}
           placeholder="Send a message..."
         />
-        <Button onClick={handleSend} disabled={status === "streaming"}>
+        <Button onClick={handleSend} disabled={status !== "ready"}>
           Send
         </Button>
       </div>
