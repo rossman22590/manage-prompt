@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AIModels, type AIModel } from "@/data/workflow";
+import { type AIModel, AIModels } from "@/data/workflow";
 
 const zodEnum = <T>(arr: T[]): [T, ...T[]] => arr as [T, ...T[]];
 
