@@ -50,8 +50,8 @@ export default async function AgentUsage(props: Props) {
             {stats
               .filter((s) => s.total > 0)
               .map((s) => (
-                <div key={s.date} className="flex justify-between">
-                  <span>{s.date}</span>
+                <div key={String(s.date)} className="flex justify-between">
+                  <span>{new Date(s.date).toLocaleDateString()}</span>
                   <span>
                     {s.total} runs · {s.tokens} tokens
                   </span>
