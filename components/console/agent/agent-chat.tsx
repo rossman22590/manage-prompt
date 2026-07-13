@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isTextUIPart, type UIMessage } from "ai";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
@@ -23,10 +23,14 @@ function loadStoredMessages(storageKey: string): UIMessage[] {
 export function AgentChat({ agentId }: Props) {
   const storageKey = `agent-chat:${agentId}`;
   const [input, setInput] = useState("");
-  // Guards against the "save to storage" effect running (and stomping real
-  // history with "[]") before the "load from storage" effect below has had a
-  // chance to populate messages from localStorage on mount.
-  const hasLoadedRef = useRef(false);
+  // Guards against the "save to storage" effect stomping real history with
+  // "[]" before the "load from storage" effect below has populated messages.
+  // This must be state (not a ref): setMessages(...) below only schedules an
+  // update, so a ref flipped synchronously in the same effect would appear
+  // "loaded" to the save effect one flush before `messages` itself actually
+  // reflects the loaded value. Using state ties both updates to the same
+  // batched commit, so the save effect only ever observes them together.
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/agents/${agentId}/chat` }),
@@ -42,15 +46,14 @@ export function AgentChat({ agentId }: Props) {
   // rendered markup and the initial client render both start from an empty
   // array and never mismatch during hydration.
   useEffect(() => {
-    hasLoadedRef.current = false;
     setMessages(loadStoredMessages(storageKey));
-    hasLoadedRef.current = true;
+    setHasLoaded(true);
   }, [storageKey, setMessages]);
 
   useEffect(() => {
-    if (!hasLoadedRef.current) return;
+    if (!hasLoaded) return;
     window.localStorage.setItem(storageKey, JSON.stringify(messages));
-  }, [messages, storageKey]);
+  }, [messages, hasLoaded, storageKey]);
 
   const handleSend = () => {
     if (status !== "ready") return;
