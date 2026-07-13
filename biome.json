@@ -3,7 +3,7 @@
   "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/.next", "!**/components/ui", "!**/generated"]
+    "includes": ["**", "!**/.next", "!**/components/ui", "!**/generated", "!**/.claude"]
   },
   "formatter": { "enabled": true, "indentStyle": "space" },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
