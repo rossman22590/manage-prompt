@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import type { AIModel } from "@/data/workflow";
+import {
+  hasReasoning,
+  hasStructuredOutput,
+  hasWebSearch,
+} from "@/data/workflow";
 import {
   Card,
   CardContent,
@@ -10,10 +16,15 @@ import {
 } from "../../ui/card";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../ui/select";
 import { Slider } from "../../ui/slider";
 import { Switch } from "../../ui/switch";
-import { hasWebSearch } from "@/data/workflow";
-import type { AIModel } from "@/data/workflow";
 
 export type ModelSettings = {
   temperature?: number;
@@ -22,6 +33,8 @@ export type ModelSettings = {
   frequencyPenalty?: number;
   presencePenalty?: number;
   enableWebSearch?: boolean;
+  structuredOutputSchema?: string;
+  reasoningEffort?: "none" | "low" | "medium" | "high";
 };
 
 type Props = {
@@ -30,7 +43,11 @@ type Props = {
   model?: AIModel;
 };
 
-export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) {
+export function WorkflowModelSettings({
+  defaultValue,
+  onChange,
+  model,
+}: Props) {
   const [temperature, setTemperature] = useState(
     defaultValue?.temperature ?? 1,
   );
@@ -45,6 +62,16 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
   const [enableWebSearch, setEnableWebSearch] = useState(
     defaultValue?.enableWebSearch ?? true, // Default to true for web search capable models
   );
+  const [structuredOutputEnabled, setStructuredOutputEnabled] = useState(
+    Boolean(defaultValue?.structuredOutputSchema),
+  );
+  const [structuredOutputSchema, setStructuredOutputSchema] = useState(
+    defaultValue?.structuredOutputSchema ?? "",
+  );
+  const [schemaError, setSchemaError] = useState<string | null>(null);
+  const [reasoningEffort, setReasoningEffort] = useState<
+    ModelSettings["reasoningEffort"]
+  >(defaultValue?.reasoningEffort ?? "none");
 
   const triggerChange = useCallback(
     (val: any) => {
@@ -55,10 +82,25 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
         frequencyPenalty,
         presencePenalty,
         enableWebSearch,
+        structuredOutputSchema: structuredOutputEnabled
+          ? structuredOutputSchema
+          : undefined,
+        reasoningEffort,
         ...val,
       });
     },
-    [temperature, maxTokens, topP, frequencyPenalty, presencePenalty, enableWebSearch, onChange],
+    [
+      temperature,
+      maxTokens,
+      topP,
+      frequencyPenalty,
+      presencePenalty,
+      enableWebSearch,
+      structuredOutputEnabled,
+      structuredOutputSchema,
+      reasoningEffort,
+      onChange,
+    ],
   );
 
   return (
@@ -163,7 +205,8 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
               <div className="flex flex-col space-y-1">
                 <Label htmlFor="web-search">Enable Web Search</Label>
                 <CardDescription>
-                  Enable real-time web search for this model. This will append :online to the model ID.
+                  Enable real-time web search for this model. This will append
+                  :online to the model ID.
                 </CardDescription>
               </div>
               <Switch
@@ -174,6 +217,85 @@ export function WorkflowModelSettings({ defaultValue, onChange, model }: Props) 
                   triggerChange({ enableWebSearch: checked });
                 }}
               />
+            </div>
+          )}
+
+          {model && hasStructuredOutput(model) && (
+            <div className="flex flex-col space-y-1.5">
+              <div className="flex items-center justify-between space-x-2">
+                <div className="flex flex-col space-y-1">
+                  <Label htmlFor="structured-output">
+                    Enable Structured Output
+                  </Label>
+                  <CardDescription>
+                    Force the model to return JSON matching a schema you
+                    provide.
+                  </CardDescription>
+                </div>
+                <Switch
+                  id="structured-output"
+                  checked={structuredOutputEnabled}
+                  onCheckedChange={(checked) => {
+                    setStructuredOutputEnabled(checked);
+                    if (!checked) {
+                      setSchemaError(null);
+                      triggerChange({ structuredOutputSchema: undefined });
+                    }
+                  }}
+                />
+              </div>
+              {structuredOutputEnabled && (
+                <>
+                  <textarea
+                    id="structured-output-schema"
+                    className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono shadow-sm"
+                    placeholder='{"type": "object", "properties": {"answer": {"type": "string"}}, "required": ["answer"]}'
+                    value={structuredOutputSchema}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setStructuredOutputSchema(value);
+                      try {
+                        JSON.parse(value);
+                        setSchemaError(null);
+                        triggerChange({ structuredOutputSchema: value });
+                      } catch {
+                        setSchemaError("Invalid JSON — schema was not saved.");
+                      }
+                    }}
+                  />
+                  {schemaError && (
+                    <p className="text-sm text-red-500">{schemaError}</p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {model && hasReasoning(model) && (
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="reasoning-effort">Reasoning Effort</Label>
+              <Select
+                value={reasoningEffort}
+                onValueChange={(value: string) => {
+                  const typedValue = value as ModelSettings["reasoningEffort"];
+                  setReasoningEffort(typedValue);
+                  triggerChange({ reasoningEffort: typedValue });
+                }}
+              >
+                <SelectTrigger id="reasoning-effort" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+              <CardDescription>
+                Higher effort spends more time reasoning before answering, at
+                higher cost and latency.
+              </CardDescription>
             </div>
           )}
         </div>

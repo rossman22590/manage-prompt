@@ -4,45 +4,45 @@
     {
       "id": 1,
       "subject": "A1: Refresh model catalog data (data/workflow.ts)",
-      "status": "pending",
+      "status": "completed",
       "description": "See native task #1 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 1."
     },
     {
       "id": 2,
       "subject": "A2: Dev-only OpenRouter catalog sync script",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [1],
       "description": "See native task #2 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 2."
     },
     {
       "id": 3,
       "subject": "A3: Structured Output + Reasoning Effort settings UI",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [1],
       "description": "See native task #3 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 3."
     },
     {
       "id": 4,
       "subject": "A4: Grouped, badge-rich model picker with deprecated section",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [1],
       "description": "See native task #4 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 4."
     },
     {
       "id": 5,
       "subject": "A5: Wire Structured Output and Reasoning Effort into execution",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [3],
       "description": "See native task #5 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 5."
     },
     {
       "id": 6,
       "subject": "A6: Full-feature verification pass (model catalog)",
-      "status": "pending",
+      "status": "completed_with_deferrals",
       "blockedBy": [2, 3, 4, 5],
-      "description": "See native task #6 (TaskGet) for full Goal/Files/Acceptance Criteria/Verify. Plan doc: Task 6."
+      "description": "tsc + biome clean on all plan-touched files; dev server verified starting/serving. Live authenticated-browser and real-model-completion checks deferred: no OPENROUTER_API_KEY in this sandbox, and workflow-form auth wall (magic-link email) could not be crossed without genuine user-in-chat consent to send a real email. See plan doc Task 6 for original criteria."
     }
   ],
   "crossPlanNotes": "Tasks B4 (native #10) and B5 (native #11) in docs/superpowers/plans/2026-07-13-agents-feature-plan.md.tasks.json depend on A4 (#4) and A1/A3 (#1, #3) respectively.",
-  "lastUpdated": "2026-07-13"
+  "lastUpdated": "2026-07-13T00:00:00Z-all-tasks-done"
 }
