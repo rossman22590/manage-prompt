@@ -1,7 +1,6 @@
 export type AIProvider = "openrouter";
 
 export const AIModelToLabel = {
-  // OpenAI
   "gpt-3.5-turbo": "GPT-3.5 Turbo",
   "gpt-4": "GPT-4",
   "gpt-4-turbo": "GPT-4 Turbo",
@@ -37,8 +36,6 @@ export const AIModelToLabel = {
   "gpt-5.6-sol": "GPT-5.6 Sol",
   "gpt-5.6-sol-pro": "GPT-5.6 Sol Pro",
   o3: "o3",
-
-  // Anthropic
   "claude-sonnet-4.5": "Claude Sonnet 4.5",
   "claude-opus-4.5": "Claude Opus 4.5",
   "claude-haiku-4.5": "Claude Haiku 4.5",
@@ -48,8 +45,6 @@ export const AIModelToLabel = {
   "claude-sonnet-4.6": "Claude Sonnet 4.6",
   "claude-sonnet-5": "Claude Sonnet 5",
   "claude-fable-5": "Claude Fable 5",
-
-  // xAI
   "grok-3": "Grok 3",
   "grok-3-mini": "Grok 3 Mini",
   "grok-3-beta": "Grok Beta",
@@ -60,15 +55,11 @@ export const AIModelToLabel = {
   "grok-4.20": "Grok 4.20",
   "grok-4.3": "Grok 4.3",
   "grok-4.5": "Grok 4.5",
-
-  // Perplexity
   sonar: "Perplexity Sonar",
   "sonar-pro": "Perplexity Sonar Pro",
   "sonar-reasoning-pro": "Perplexity Sonar Reasoning Pro",
   "sonar-reasoning": "Perplexity Sonar Reasoning",
   "sonar-deep-research": "Perplexity Sonar Deep Research",
-
-  // Meta / Llama
   "llama-3.1-8b-instant": "Llama 3.1 8B Instant",
   "llama-3.2-1b-preview": "Llama 3.2 1B Preview",
   "llama-3.2-3b-preview": "Llama 3.2 3B Preview",
@@ -77,15 +68,11 @@ export const AIModelToLabel = {
   "llama3-70b-8192": "Llama 3 70B 8192",
   "llama-4-scout": "Llama 4 Scout",
   "llama-4-maverick": "Llama 4 Maverick",
-
-  // Mistral
   "mistral-large-latest": "Mistral Large",
   "mistral-small-latest": "Mistral Small",
   "mixtral-8x7b-32768": "Mixtral 8x7B",
   "pixtral-12b-2409": "Pixtral 12B",
   "mistral-medium-3.5": "Mistral Medium 3.5",
-
-  // DeepSeek
   "deepseek-r1-distill-llama-70b": "DeepSeek R1 Distill Llama 70B",
   "deepseek-chat-v3-0324": "DeepSeek Chat v3 (Mar 2024)",
   "deepseek-chat-v3.1": "DeepSeek Chat v3.1",
@@ -96,8 +83,6 @@ export const AIModelToLabel = {
   "deepseek-v4-flash": "DeepSeek v4 Flash",
   "deepseek-v4-pro": "DeepSeek v4 Pro",
   "deepseek-r1-0528": "DeepSeek R1 (0528)",
-
-  // Qwen
   "qwen-2.5-7b-instruct": "Qwen 2.5 7B Instruct",
   "qwen-2.5-72b-instruct": "Qwen 2.5 72B Instruct",
   "qwen-2.5-0.5b-instruct": "Qwen 2.5 0.5B Instruct",
@@ -110,14 +95,10 @@ export const AIModelToLabel = {
   "qwen3-32b": "Qwen3 32B",
   "qwen3-max": "Qwen3 Max",
   "qwen3-coder": "Qwen3 Coder",
-
-  // Cohere
   "command-r": "Command R",
   "command-r-plus": "Command R+",
   "command-r7b-08-2024": "Command R7B",
   "command-a": "Command A",
-
-  // Google
   "gemini-2-5-pro": "Gemini 2.5 Pro",
   "gemini-2-5-flash": "Gemini 2.5 Flash",
   "gemini-2-5-flash-lite": "Gemini 2.5 Flash Lite",
@@ -131,6 +112,18 @@ export const AIModelToLabel = {
   "gemini-3.1-flash-lite": "Gemini 3.1 Flash Lite",
   "gemini-3.5-flash": "Gemini 3.5 Flash",
   "gemma-4-31b-it": "Gemma 4 31B",
+  "gemma-4-26b-a4b-it": "Gemma 4 26B A4B",
+  "sonar-pro-search": "Perplexity Sonar Pro Search",
+  "ministral-14b-latest": "Ministral 14B",
+  "ministral-8b-latest": "Ministral 8B",
+  "ministral-3b-latest": "Ministral 3B",
+  "qwen3.5-9b": "Qwen3.5 9B",
+  "qwen3.6-27b": "Qwen3.6 27B",
+  "qwen3.6-35b-a3b": "Qwen3.6 35B A3B",
+  "qwen3.7-max": "Qwen3.7 Max",
+  "qwen3.7-plus": "Qwen3.7 Plus",
+  "qwen3-coder-next": "Qwen3 Coder Next",
+  "north-mini-code": "North Mini Code",
 } as const;
 
 export type AIModel = keyof typeof AIModelToLabel;
@@ -247,6 +240,18 @@ export const modelToProviderId: Record<string | AIModel, string> = {
   "gemini-3.1-flash-lite": "google/gemini-3.1-flash-lite",
   "gemini-3.5-flash": "google/gemini-3.5-flash",
   "gemma-4-31b-it": "google/gemma-4-31b-it",
+  "gemma-4-26b-a4b-it": "google/gemma-4-26b-a4b-it",
+  "sonar-pro-search": "perplexity/sonar-pro-search",
+  "ministral-14b-latest": "mistralai/ministral-14b-2512",
+  "ministral-8b-latest": "mistralai/ministral-8b-2512",
+  "ministral-3b-latest": "mistralai/ministral-3b-2512",
+  "qwen3.5-9b": "qwen/qwen3.5-9b",
+  "qwen3.6-27b": "qwen/qwen3.6-27b",
+  "qwen3.6-35b-a3b": "qwen/qwen3.6-35b-a3b",
+  "qwen3.7-max": "qwen/qwen3.7-max",
+  "qwen3.7-plus": "qwen/qwen3.7-plus",
+  "qwen3-coder-next": "qwen/qwen3-coder-next",
+  "north-mini-code": "cohere/north-mini-code:free",
 };
 
 export const AIModels = Object.keys(AIModelToLabel) as Array<AIModel>;
@@ -292,6 +297,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gpt-5.4-mini",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.4 Mini.",
+    },
   },
   "gpt-4": {
     company: "OpenAI",
@@ -302,6 +311,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
     },
   },
   "gpt-4-turbo": {
@@ -314,6 +327,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
+    },
   },
   "gpt-4o": {
     company: "OpenAI",
@@ -324,6 +341,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
     },
   },
   "gpt-4o-mini": {
@@ -336,6 +357,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gpt-5.4-mini",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.4 Mini.",
+    },
   },
   "gpt-4.1": {
     company: "OpenAI",
@@ -346,6 +371,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
     },
   },
   "gpt-4.1-mini": {
@@ -358,6 +387,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gpt-5.4-mini",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.4 Mini.",
+    },
   },
   "gpt-4.1-nano": {
     company: "OpenAI",
@@ -368,6 +401,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "gpt-5.4-nano",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.4 Nano.",
     },
   },
   "gpt-4.5": {
@@ -380,6 +417,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Retired by OpenAI (2026-06-27) and no longer on OpenRouter. Switch to GPT-5.5.",
+    },
   },
   "gpt-5": {
     company: "OpenAI",
@@ -390,6 +431,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: true,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
     },
   },
   "gpt-5-pro": {
@@ -402,6 +447,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gpt-5.5-pro",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5 Pro.",
+    },
   },
   "gpt-5.2": {
     company: "OpenAI",
@@ -412,6 +461,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: true,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
     },
   },
   "gpt-5.2-chat": {
@@ -424,6 +477,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5.",
+    },
   },
   "gpt-5.2-pro": {
     company: "OpenAI",
@@ -434,6 +491,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: true,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.5-pro",
+      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5 Pro.",
     },
   },
   o1: {
@@ -446,6 +507,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation (native reasoning). Switch to GPT-5.5.",
+    },
   },
   "o1-mini": {
     company: "OpenAI",
@@ -456,6 +521,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.4-mini",
+      note: "Retired by OpenAI and no longer on OpenRouter. Switch to GPT-5.4 Mini.",
     },
   },
   "o1-preview": {
@@ -468,6 +537,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Retired by OpenAI and no longer on OpenRouter. Switch to GPT-5.5.",
+    },
   },
   "o3-mini": {
     company: "OpenAI",
@@ -478,6 +551,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation (native reasoning). Switch to GPT-5.5.",
     },
   },
   "o3-pro": {
@@ -490,6 +567,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gpt-5.5-pro",
+      note: "Superseded by the current GPT-5.x generation (native reasoning). Switch to GPT-5.5 Pro.",
+    },
   },
   "o4-mini": {
     company: "OpenAI",
@@ -500,6 +581,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.4-mini",
+      note: "Superseded by the current GPT-5.x generation (native reasoning). Switch to GPT-5.4 Mini.",
     },
   },
   "gpt-oss-120b": {
@@ -666,8 +751,11 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gpt-5.5",
+      note: "Superseded by the current GPT-5.x generation (native reasoning). Switch to GPT-5.5.",
+    },
   },
-
   "claude-sonnet-4.5": {
     company: "Anthropic",
     contextLength: 1000000,
@@ -677,6 +765,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "claude-sonnet-5",
+      note: "Superseded by the Sonnet 5 generation. Switch to Claude Sonnet 5.",
     },
   },
   "claude-opus-4.5": {
@@ -688,6 +780,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "claude-opus-4.8",
+      note: "Superseded by the Opus 4.8 generation. Switch to Claude Opus 4.8.",
     },
   },
   "claude-haiku-4.5": {
@@ -711,6 +807,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "claude-opus-4.8",
+      note: "Superseded by the Opus 4.8 generation. Switch to Claude Opus 4.8.",
+    },
   },
   "claude-opus-4.7": {
     company: "Anthropic",
@@ -721,6 +821,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "claude-opus-4.8",
+      note: "Superseded by the Opus 4.8 generation. Switch to Claude Opus 4.8.",
     },
   },
   "claude-opus-4.8": {
@@ -743,6 +847,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "claude-sonnet-5",
+      note: "Superseded by the Sonnet 5 generation. Switch to Claude Sonnet 5.",
     },
   },
   "claude-sonnet-5": {
@@ -767,7 +875,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
   },
-
   "grok-3": {
     company: "xAI",
     contextLength: 131072,
@@ -794,8 +901,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "grok-4.20",
-      note: "Retired by OpenRouter. Switch to Grok 4.20.",
+      replacement: "grok-4.5",
+      note: "Retired by OpenRouter. Switch to Grok 4.5.",
     },
   },
   "grok-3-beta": {
@@ -839,8 +946,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "grok-4.20",
-      note: "Retired by OpenRouter. Switch to Grok 4.20.",
+      replacement: "grok-4.5",
+      note: "Retired by OpenRouter. Switch to Grok 4.5.",
     },
   },
   "grok-4.1": {
@@ -854,8 +961,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "grok-4.3",
-      note: "Retired by OpenRouter. Switch to Grok 4.3.",
+      replacement: "grok-4.5",
+      note: "Retired by OpenRouter. Switch to Grok 4.5.",
     },
   },
   "grok-4.1-fast": {
@@ -869,8 +976,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "grok-4.20",
-      note: "Retired by OpenRouter. Switch to Grok 4.20.",
+      replacement: "grok-4.5",
+      note: "Retired by OpenRouter. Switch to Grok 4.5.",
     },
   },
   "grok-4.20": {
@@ -883,6 +990,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "grok-4.5",
+      note: "Superseded by the current Grok generation. Switch to Grok 4.5.",
+    },
   },
   "grok-4.3": {
     company: "xAI",
@@ -893,6 +1004,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "grok-4.5",
+      note: "Superseded by the current Grok generation. Switch to Grok 4.5.",
     },
   },
   "grok-4.5": {
@@ -906,7 +1021,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
   },
-
   sonar: {
     company: "Perplexity",
     contextLength: 127072,
@@ -966,7 +1080,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
   },
-
   "llama-3.1-8b-instant": {
     company: "Meta",
     contextLength: 131072,
@@ -1010,6 +1123,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "llama-4-scout",
+      note: "Superseded by the Llama 4 generation. Switch to Llama 4 Scout.",
+    },
   },
   "llama3-8b-8192": {
     company: "Meta",
@@ -1037,8 +1154,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "llama-3.3-70b-versatile",
-      note: "Retired by OpenRouter. Switch to Llama 3.3 70B Versatile.",
+      replacement: "llama-4-scout",
+      note: "Retired by OpenRouter. Switch to Llama 4 Scout.",
     },
   },
   "llama-4-scout": {
@@ -1063,7 +1180,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
   },
-
   "mistral-large-latest": {
     company: "Mistral",
     contextLength: 262144,
@@ -1127,7 +1243,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
   },
-
   "deepseek-r1-distill-llama-70b": {
     company: "DeepSeek",
     contextLength: 128000,
@@ -1149,6 +1264,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "deepseek-v4-flash",
+      note: "Superseded by the DeepSeek v4 generation. Switch to DeepSeek v4 Flash.",
+    },
   },
   "deepseek-chat-v3.1": {
     company: "DeepSeek",
@@ -1159,6 +1278,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "deepseek-v4-flash",
+      note: "Superseded by the DeepSeek v4 generation. Switch to DeepSeek v4 Flash.",
     },
   },
   "deepseek-chat-v3": {
@@ -1172,8 +1295,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "deepseek-v3.2",
-      note: "Retired by OpenRouter. Switch to DeepSeek v3.2.",
+      replacement: "deepseek-v4-flash",
+      note: "Retired by OpenRouter. Switch to DeepSeek v4 Flash.",
     },
   },
   "deepseek-coder-v2": {
@@ -1216,6 +1339,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "deepseek-v4-flash",
+      note: "Superseded by the DeepSeek v4 generation. Switch to DeepSeek v4 Flash.",
+    },
   },
   "deepseek-v4-flash": {
     company: "DeepSeek",
@@ -1249,8 +1376,11 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "deepseek-v4-pro",
+      note: "Superseded by the DeepSeek v4 generation (native reasoning). Switch to DeepSeek v4 Pro.",
+    },
   },
-
   "qwen-2.5-7b-instruct": {
     company: "Qwen",
     contextLength: 131072,
@@ -1260,6 +1390,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "qwen3.5-9b",
+      note: "Superseded by the current Qwen generation. Switch to Qwen3.5 9B.",
     },
   },
   "qwen-2.5-72b-instruct": {
@@ -1271,6 +1405,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "qwen3.6-27b",
+      note: "Superseded by the current Qwen generation. Switch to Qwen3.6 27B.",
     },
   },
   "qwen-2.5-0.5b-instruct": {
@@ -1284,8 +1422,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "qwen3-8b",
-      note: "Retired by OpenRouter. Switch to Qwen3 8B.",
+      replacement: "qwen3.5-9b",
+      note: "Retired by OpenRouter. Switch to Qwen3.5 9B.",
     },
   },
   "qwen-2.5-1.5b-instruct": {
@@ -1299,8 +1437,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "qwen3-8b",
-      note: "Retired by OpenRouter. Switch to Qwen3 8B.",
+      replacement: "qwen3.5-9b",
+      note: "Retired by OpenRouter. Switch to Qwen3.5 9B.",
     },
   },
   "qwen-2.5-3b-instruct": {
@@ -1314,8 +1452,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "qwen3-8b",
-      note: "Retired by OpenRouter. Switch to Qwen3 8B.",
+      replacement: "qwen3.5-9b",
+      note: "Retired by OpenRouter. Switch to Qwen3.5 9B.",
     },
   },
   "qwen-2.5-14b-instruct": {
@@ -1329,8 +1467,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "qwen3-14b",
-      note: "Retired by OpenRouter. Switch to Qwen3 14B.",
+      replacement: "qwen3.6-27b",
+      note: "Retired by OpenRouter. Switch to Qwen3.6 27B.",
     },
   },
   "qwen-2.5-32b-instruct": {
@@ -1344,8 +1482,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "qwen3-32b",
-      note: "Retired by OpenRouter. Switch to Qwen3 32B.",
+      replacement: "qwen3.6-27b",
+      note: "Retired by OpenRouter. Switch to Qwen3.6 27B.",
     },
   },
   "qwen3-8b": {
@@ -1358,6 +1496,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: false,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "qwen3.5-9b",
+      note: "Superseded by the current Qwen generation. Switch to Qwen3.5 9B.",
+    },
   },
   "qwen3-14b": {
     company: "Qwen",
@@ -1368,6 +1510,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "qwen3.6-27b",
+      note: "Superseded by the current Qwen generation. Switch to Qwen3.6 27B.",
     },
   },
   "qwen3-32b": {
@@ -1380,6 +1526,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "qwen3.6-27b",
+      note: "Superseded by the current Qwen generation. Switch to Qwen3.6 27B.",
+    },
   },
   "qwen3-max": {
     company: "Qwen",
@@ -1390,6 +1540,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "qwen3.7-max",
+      note: "Superseded by the current Qwen generation. Switch to Qwen3.7 Max.",
     },
   },
   "qwen3-coder": {
@@ -1403,7 +1557,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
   },
-
   "command-r": {
     company: "Cohere",
     contextLength: 128000,
@@ -1448,7 +1601,6 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
   },
-
   "gemini-2-5-pro": {
     company: "Google",
     contextLength: 1048576,
@@ -1458,6 +1610,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: true,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gemini-3.1-pro-preview",
+      note: "Superseded by the current Gemini generation. Switch to Gemini 3.1 Pro Preview.",
     },
   },
   "gemini-2-5-flash": {
@@ -1470,6 +1626,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gemini-3.5-flash",
+      note: "Superseded by the current Gemini generation. Switch to Gemini 3.5 Flash.",
+    },
   },
   "gemini-2-5-flash-lite": {
     company: "Google",
@@ -1480,6 +1640,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: true,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gemini-3.1-flash-lite",
+      note: "Superseded by the current Gemini generation. Switch to Gemini 3.1 Flash Lite.",
     },
   },
   "gemma-2-27b": {
@@ -1492,6 +1656,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gemma-4-31b-it",
+      note: "Superseded by the current Gemma generation. Switch to Gemma 4 31B.",
+    },
   },
   "gemma-3": {
     company: "Google",
@@ -1503,6 +1671,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: false,
     },
+    deprecated: {
+      replacement: "gemma-4-31b-it",
+      note: "Superseded by the current Gemma generation. Switch to Gemma 4 31B.",
+    },
   },
   "code-gemma": {
     company: "Google",
@@ -1513,6 +1685,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: false,
       structuredOutput: true,
       reasoning: false,
+    },
+    deprecated: {
+      replacement: "gemma-4-26b-a4b-it",
+      note: "Superseded by the current Gemma generation (no dedicated CodeGemma model remains). Switch to Gemma 4 26B A4B.",
     },
   },
   "gemini-3-pro-preview": {
@@ -1541,8 +1717,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: false,
     },
     deprecated: {
-      replacement: "gemma-3",
-      note: "Retired by OpenRouter. Switch to Gemma 3.",
+      replacement: "gemma-4-31b-it",
+      note: "Retired by OpenRouter. Switch to Gemma 4 31B.",
     },
   },
   "gemini-3.1-pro-preview": {
@@ -1597,6 +1773,138 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       largeContextWindow: true,
       webSearch: false,
       structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "gemma-4-26b-a4b-it": {
+    company: "Google",
+    contextLength: 262144,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "sonar-pro-search": {
+    company: "Perplexity",
+    contextLength: 200000,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: true,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "ministral-14b-latest": {
+    company: "Mistral",
+    contextLength: 262144,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: false,
+    },
+  },
+  "ministral-8b-latest": {
+    company: "Mistral",
+    contextLength: 262144,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: false,
+    },
+  },
+  "ministral-3b-latest": {
+    company: "Mistral",
+    contextLength: 131072,
+    capabilities: {
+      vision: true,
+      largeContextWindow: false,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: false,
+    },
+  },
+  "qwen3.5-9b": {
+    company: "Qwen",
+    contextLength: 262144,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "qwen3.6-27b": {
+    company: "Qwen",
+    contextLength: 262144,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "qwen3.6-35b-a3b": {
+    company: "Qwen",
+    contextLength: 262144,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "qwen3.7-max": {
+    company: "Qwen",
+    contextLength: 1000000,
+    capabilities: {
+      vision: false,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "qwen3.7-plus": {
+    company: "Qwen",
+    contextLength: 1000000,
+    capabilities: {
+      vision: true,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: true,
+    },
+  },
+  "qwen3-coder-next": {
+    company: "Qwen",
+    contextLength: 262144,
+    capabilities: {
+      vision: false,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: true,
+      reasoning: false,
+    },
+  },
+  "north-mini-code": {
+    company: "Cohere",
+    contextLength: 256000,
+    capabilities: {
+      vision: false,
+      largeContextWindow: true,
+      webSearch: false,
+      structuredOutput: false,
       reasoning: true,
     },
   },
