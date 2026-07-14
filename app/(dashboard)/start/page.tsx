@@ -9,23 +9,37 @@ export default async function Start() {
     return notFound();
   }
 
-  await prisma.organization.upsert({
-    where: {
-      id: user.id,
-    },
-    update: {},
-    create: {
-      id: user.id,
-      name: "Personal",
-      rawData: {},
-      credits: 10,
-      createdBy: {
-        connect: {
-          id: user.id,
+  try {
+    await prisma.organization.upsert({
+      where: {
+        id: user.id,
+      },
+      update: {},
+      create: {
+        id: user.id,
+        name: "Personal",
+        rawData: {},
+        credits: 10,
+        createdBy: {
+          connect: {
+            id: user.id,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    // A concurrent request (e.g. a double navigation right after sign-in)
+    // can race this upsert's create path against itself. If the org already
+    // exists by the time we get here, that's the desired end state — ignore.
+    const isUniqueConstraintError =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002";
+    if (!isUniqueConstraintError) {
+      throw error;
+    }
+  }
 
   const organizationToUser = await prisma.organizationToUser.findFirst({
     where: {

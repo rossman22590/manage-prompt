@@ -9,6 +9,12 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  // Dev-only convenience: lets local testers create an account and sign in
+  // without needing real email delivery (RESEND_API_KEY). Production stays
+  // magic-link-only.
+  emailAndPassword: {
+    enabled: process.env.NODE_ENV === "development",
+  },
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }) => {
@@ -35,9 +41,7 @@ export const auth = betterAuth({
         });
 
         if (!response.ok) {
-          throw new Error(
-            `Resend API error: ${await response.text()}`,
-          );
+          throw new Error(`Resend API error: ${await response.text()}`);
         }
       },
     }),

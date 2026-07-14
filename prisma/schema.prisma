@@ -15,7 +15,7 @@ model User {
   settings           Json?
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  emailVerified      DateTime?
+  emailVerified      Boolean              @default(false)
   image              String?
   name               String?
   organizations      Organization[]
