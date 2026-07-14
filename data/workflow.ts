@@ -448,8 +448,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "gpt-5.5-pro",
-      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5 Pro.",
+      replacement: "gpt-5.6-luna-pro",
+      note: "Superseded by the current GPT-5.6 generation. Switch to GPT-5.6 Luna Pro.",
     },
   },
   "gpt-5.2": {
@@ -493,8 +493,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "gpt-5.5-pro",
-      note: "Superseded by the current GPT-5.x generation. Switch to GPT-5.5 Pro.",
+      replacement: "gpt-5.6-luna-pro",
+      note: "Superseded by the current GPT-5.6 generation. Switch to GPT-5.6 Luna Pro.",
     },
   },
   o1: {
@@ -568,8 +568,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       reasoning: true,
     },
     deprecated: {
-      replacement: "gpt-5.5-pro",
-      note: "Superseded by the current GPT-5.x generation (native reasoning). Switch to GPT-5.5 Pro.",
+      replacement: "gpt-5.6-luna-pro",
+      note: "Superseded by the current GPT-5.6 generation (native reasoning). Switch to GPT-5.6 Luna Pro.",
     },
   },
   "o4-mini": {
@@ -652,6 +652,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       structuredOutput: true,
       reasoning: true,
     },
+    deprecated: {
+      replacement: "gpt-5.6-luna-pro",
+      note: "Superseded by the current GPT-5.6 generation. Switch to GPT-5.6 Luna Pro.",
+    },
   },
   "gpt-5.5": {
     company: "OpenAI",
@@ -673,6 +677,10 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
       webSearch: true,
       structuredOutput: true,
       reasoning: true,
+    },
+    deprecated: {
+      replacement: "gpt-5.6-luna-pro",
+      note: "Superseded by the current GPT-5.6 generation. Switch to GPT-5.6 Luna Pro.",
     },
   },
   "gpt-5.6-luna": {

@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function AgentForm({ agent, action }: Props) {
-  const [model, setModel] = useState(agent?.model ?? "gpt-4o");
+  const [model, setModel] = useState(agent?.model ?? "gpt-5.6-luna");
   const [modelSearch, setModelSearch] = useState("");
   const [showAdvancedModelParams, setShowAdvancedModelParams] = useState(false);
   const [modelSettings, setModelSettings] = useState(

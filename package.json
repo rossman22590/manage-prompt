@@ -16,6 +16,7 @@
     "@ai-sdk/react": "^2.0.213",
     "@headlessui/react": "^2.2.9",
     "@headlessui/tailwindcss": "^0.2.0",
+    "@lobehub/icons-static-svg": "^1.92.0",
     "@mozilla/readability": "^0.5.0",
     "@openrouter/ai-sdk-provider": "^1.2.0",
     "@paralleldrive/cuid2": "^2.2.2",

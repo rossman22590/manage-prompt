@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { ApiCodeSnippet } from "@/components/code/snippet";
+import { AgentApiDocs } from "@/components/console/agent/agent-api-docs";
 import { AgentChat } from "@/components/console/agent/agent-chat";
 import PageTitle from "@/components/layout/page-title";
 import { Badge } from "@/components/ui/badge";
@@ -54,8 +55,12 @@ export default async function AgentDetail(props: Props) {
           <h3 className="text-lg font-semibold mb-2">Call it via API</h3>
           <p className="text-sm text-muted-foreground mb-2">
             OpenAI-compatible — point any OpenAI client at this base URL with
-            your secret key, using this agent&apos;s ID as the model. Requires
-            the agent to be Published (see toggle above).
+            your secret key, using this agent&apos;s ID (
+            <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono">
+              {agent.shortId}
+            </code>
+            ) as the model. Requires the agent to be Published (see toggle
+            above).
           </p>
           <ApiCodeSnippet
             har={{
@@ -77,6 +82,11 @@ export default async function AgentDetail(props: Props) {
                 ),
               },
             }}
+          />
+          <AgentApiDocs
+            appUrl={appUrl}
+            modelId={agent.shortId}
+            cacheControlTtl={agent.cacheControlTtl}
           />
         </section>
       </div>

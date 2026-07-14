@@ -45,7 +45,7 @@ const techStack = [
 ];
 
 const features = [
-  { title: "Multi-Model Intelligence", desc: "GPT5, Gemini 3, Sonnet 4.5 — one unified endpoint for every major AI model.", icon: BrainIcon },
+  { title: "Multi-Model Intelligence", desc: "GPT-5.6, Gemini 3.5, Sonnet 5 — one unified endpoint for every major AI model.", icon: BrainIcon },
   { title: "Ship in Minutes",          desc: "Drop-in REST API with SDKs for every language. Go from zero to production in under 10 minutes.", icon: CodeIcon },
   { title: "Enterprise Security",      desc: "Single-use tokens, rate limiting, IP allowlists, and SOC-2 grade infrastructure from day one.", icon: ShieldCheckIcon },
   { title: "Real-time Streaming",      desc: "Token-by-token streaming responses for instant, snappy UX your users will love.", icon: Zap },
@@ -58,7 +58,7 @@ const steps = [
   { icon: Workflow, title: "Create workflow", desc: "Use the visual builder or import a template" },
   { icon: Variable, title: "Define inputs",   desc: "Set dynamic variables for flexible reuse" },
   { icon: FileText, title: "Write prompts",   desc: "Craft system + user prompts with our editor" },
-  { icon: Bot,      title: "Choose model",    desc: "Pick from GPT5, Gemini 3, Sonnet 4.5 and more" },
+  { icon: Bot,      title: "Choose model",    desc: "Pick from GPT-5.6, Gemini 3.5, Sonnet 5 and more" },
   { icon: Rocket,   title: "Deploy & call",   desc: "Hit your REST endpoint — it's live instantly" },
 ];
 
@@ -73,7 +73,7 @@ const faqs: FAQ[] = [
   },
   {
     q: "Which AI models can I use?",
-    a: "We support 50+ models across all major providers: GPT-5, GPT-4.1, and GPT-4o from OpenAI; Claude Sonnet 4.5, Opus 4.5, and Haiku from Anthropic; Gemini 2.5 Pro and Flash from Google; Grok 3 and 4.1 from xAI; Perplexity Sonar for web-grounded answers; plus open-source models like Llama 3, Mistral, DeepSeek, Qwen 2.5, and Command R+. New models are added within days of release. You can switch models on any workflow without changing your client code."
+    a: "We support 50+ models across all major providers: GPT-5.6 and GPT-5.5 from OpenAI; Claude Sonnet 5, Opus 4.8, and Haiku 4.5 from Anthropic; Gemini 3.1 Pro and Gemini 3.5 Flash from Google; Grok 4.5 from xAI; Perplexity Sonar for web-grounded answers; plus open-source models like Llama 4, Mistral, DeepSeek v4, Qwen3, and Command A. New models are added within days of release. You can switch models on any workflow without changing your client code."
   },
   {
     q: "How does pricing and billing work?",
@@ -263,7 +263,7 @@ export default function Home() {
           >
             <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-border/70 bg-card px-4 py-2 text-[12px] font-medium text-muted-foreground shadow-float">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-dot-pulse" />
-              Now supporting GPT5 &middot; Gemini 3 &middot; Sonnet 4.5
+              Now supporting GPT-5.6 &middot; Gemini 3.5 &middot; Sonnet 5
               <ChevronRight className="h-3 w-3 text-primary" />
             </div>
           </motion.div>
@@ -393,7 +393,7 @@ export default function Home() {
                   <div className="w-48 rounded-xl border border-border/60 bg-card p-4">
                     <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Active Models</p>
                     <div className="space-y-2">
-                      {["GPT5", "Gemini 3", "Sonnet 4.5"].map((m) => (
+                      {["GPT-5.6", "Gemini 3.5", "Sonnet 5"].map((m) => (
                         <div key={m} className="flex items-center gap-2">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                           <span className="text-xs text-foreground">{m}</span>
