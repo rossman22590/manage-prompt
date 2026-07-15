@@ -9,7 +9,7 @@
     <br />
     <a href="https://workflows.myapps.ai">Website</a>
     &middot;
-    <a href="https://github.com/techulus/manage-prompt/issues/new">Support</a>
+    <a href="https://github.com/techulus/manage-prompt/issues/new">Support</a> 
   </p>
 </p>
 
