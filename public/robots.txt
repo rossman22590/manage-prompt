@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://aitutor-api.vercel.app
+Host: https://workflows.myapps.ai
 
 # Sitemaps
-Sitemap: https://aitutor-api.vercel.app/sitemap.xml
+Sitemap: https://workflows.myapps.ai/sitemap.xml

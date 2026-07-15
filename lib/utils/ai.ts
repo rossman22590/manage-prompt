@@ -14,13 +14,16 @@ export const getOpenRouterHeaders = () => {
   const appUrl =
     process.env.APP_BASE_URL ||
     process.env.NEXT_PUBLIC_APP_BASE_URL ||
-    "https://manageprompt.com";
+    "https://workflows.myapps.ai";
 
   // Allow custom site name via env var
   const siteName = process.env.OPENROUTER_SITE_NAME || "AI Tutor API";
 
   const headers: Record<string, string> = {
     "HTTP-Referer": appUrl,
+    "X-OpenRouter-Title": siteName,
+    // X-Title is kept alongside the newer header name for backwards
+    // compatibility, per OpenRouter's app attribution docs.
     "X-Title": siteName,
   };
 

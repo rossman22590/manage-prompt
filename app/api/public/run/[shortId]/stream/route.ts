@@ -8,6 +8,7 @@ import {
   modelToProviderId,
   type WorkflowInput,
 } from "@/data/workflow";
+import { getOpenRouterHeaders } from "@/lib/utils/ai";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
 import { prisma } from "@/lib/utils/db";
 import { redis } from "@/lib/utils/redis";
@@ -15,21 +16,6 @@ import { checkBillingGate, reportUsage } from "@/lib/utils/stripe";
 import { translateInputs } from "@/lib/utils/workflow";
 
 export const maxDuration = 300;
-
-const getOpenRouterHeaders = () => {
-  const appUrl =
-    process.env.APP_BASE_URL ||
-    process.env.NEXT_PUBLIC_APP_BASE_URL ||
-    "https://manageprompt.com";
-
-  const siteName = process.env.OPENROUTER_SITE_NAME || "AI Tutor API";
-
-  const headers: Record<string, string> = {
-    "HTTP-Referer": appUrl,
-    "X-Title": siteName,
-  };
-  return headers;
-};
 
 export async function POST(
   req: NextRequest,

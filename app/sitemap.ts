@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getAppBaseUrl } from "@/lib/utils/url";
 
 const aiToolsRoutes = [
   "proof-reading",
@@ -10,27 +11,28 @@ const aiToolsRoutes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = getAppBaseUrl();
   return [
     {
-      url: "https://aitutor-api.vercel.app",
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://aitutor-api.vercel.app/sign-in",
+      url: `${baseUrl}/sign-in`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://aitutor-api.vercel.app/sign-up",
+      url: `${baseUrl}/sign-up`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://aitutor-api.vercel.app/ai-tools",
+      url: `${baseUrl}/ai-tools`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
@@ -48,7 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         | "never";
       priority?: number;
     }>((route: string) => ({
-      url: `https://aitutor-api.vercel.app/ai-tools/${route}`,
+      url: `${baseUrl}/ai-tools/${route}`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,

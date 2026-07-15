@@ -4,10 +4,10 @@
   <p align="center"> 
     Launch your next AI project in hours, not months. Our platform handles hosting, security, and delivery so you can focus on building.
     <br />
-    <a href="https://manageprompt.com"><strong>Learn more</strong></a>
+    <a href="https://workflows.myapps.ai"><strong>Learn more</strong></a>
     <br />
     <br />
-    <a href="https://manageprompt.com">Website</a>
+    <a href="https://workflows.myapps.ai">Website</a>
     &middot;
     <a href="https://github.com/techulus/manage-prompt/issues/new">Support</a>
   </p>

@@ -18,7 +18,7 @@ export default async function AgentDetail(props: Props) {
   if (!agent) notFound();
 
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://manageprompt.com";
+    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://workflows.myapps.ai";
 
   return (
     <>
