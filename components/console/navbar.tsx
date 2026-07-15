@@ -9,11 +9,16 @@ import logo from "../../public/images/logo.png";
 import { UserButton } from "../core/auth";
 import { ThemeToggle } from "../core/theme-toggle";
 
-type Props = { isPublicPage?: boolean; showAdminLink?: boolean };
+type Props = {
+  isPublicPage?: boolean;
+  showAdminLink?: boolean;
+  showAgentsLink?: boolean;
+};
 
 export default function NavBar({
   isPublicPage = false,
   showAdminLink = false,
+  showAgentsLink = true,
 }: Props) {
   const path = usePathname();
   const params = useParams();
@@ -77,7 +82,15 @@ export default function NavBar({
         href: "/workflows",
         current: path.startsWith("/workflows"),
       },
-      { name: "Agents", href: "/agents", current: path.startsWith("/agents") },
+      ...(showAgentsLink
+        ? [
+            {
+              name: "Agents",
+              href: "/agents",
+              current: path.startsWith("/agents"),
+            },
+          ]
+        : []),
       {
         name: "Statistics",
         href: "/statistics",
@@ -88,7 +101,7 @@ export default function NavBar({
     if (showAdminLink)
       base.push({ name: "Admin", href: "/admin", current: path === "/admin" });
     return base;
-  }, [path, params, showAdminLink]);
+  }, [path, params, showAdminLink, showAgentsLink]);
 
   return (
     <>

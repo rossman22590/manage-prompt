@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { runAgentChat } from "@/lib/utils/agent-chat";
 import { prisma } from "@/lib/utils/db";
+import { isAgentsFeatureEnabled } from "@/lib/utils/feature-flags";
 import { validateRateLimit } from "@/lib/utils/ratelimit";
 import {
   hasExceededSpendLimit,
@@ -108,6 +109,14 @@ function streamPlainText(
 }
 
 export async function POST(req: NextRequest) {
+  if (!isAgentsFeatureEnabled()) {
+    return openAIError(
+      "The Agents API is currently disabled",
+      404,
+      "invalid_request_error",
+    );
+  }
+
   const authorization = req.headers.get("authorization");
   const token = authorization?.split("Bearer ")[1];
   if (!token) {

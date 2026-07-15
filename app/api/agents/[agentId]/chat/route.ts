@@ -5,6 +5,7 @@ import type Stripe from "stripe";
 import { owner } from "@/lib/hooks/useOwner";
 import { runAgentChat } from "@/lib/utils/agent-chat";
 import { prisma } from "@/lib/utils/db";
+import { isAgentsFeatureEnabled } from "@/lib/utils/feature-flags";
 import { checkBillingGate, reportUsage } from "@/lib/utils/stripe";
 
 export const maxDuration = 300;
@@ -14,6 +15,13 @@ export async function POST(
   props: { params: Promise<{ agentId: string }> },
 ) {
   try {
+    if (!isAgentsFeatureEnabled()) {
+      return NextResponse.json(
+        { error: "The Agents feature is currently disabled" },
+        { status: 404 },
+      );
+    }
+
     const params = await props.params;
     const agentId = Number(params.agentId);
     if (!Number.isInteger(agentId)) {
