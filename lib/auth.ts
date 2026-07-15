@@ -4,16 +4,18 @@ import { nextCookies } from "better-auth/next-js";
 import { magicLink } from "better-auth/plugins";
 import { magicLinkEmail } from "@/components/emails/magic-link";
 import { prisma } from "@/lib/utils/db";
+import { isPasswordAuthEnabled } from "@/lib/utils/feature-flags";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  // Dev-only convenience: lets local testers create an account and sign in
-  // without needing real email delivery (RESEND_API_KEY). Production stays
-  // magic-link-only.
+  // Local/dev convenience only: lets local testers create an account and
+  // sign in without needing real email delivery (RESEND_API_KEY). Must never
+  // be enabled on a deployed environment -- gated by ENABLE_PASSWORD_AUTH,
+  // which is opt-in and unset by default, not tied to NODE_ENV.
   emailAndPassword: {
-    enabled: process.env.NODE_ENV === "development",
+    enabled: isPasswordAuthEnabled(),
   },
   plugins: [
     magicLink({
