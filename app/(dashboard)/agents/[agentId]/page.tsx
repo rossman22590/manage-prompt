@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ApiCodeSnippet } from "@/components/code/snippet";
 import { AgentApiDocs } from "@/components/console/agent/agent-api-docs";
@@ -17,8 +18,15 @@ export default async function AgentDetail(props: Props) {
   const agent = await getAgentById(Number(params.agentId));
   if (!agent) notFound();
 
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://workflows.myapps.ai";
+  // Derived from the actual incoming request's headers rather than
+  // NEXT_PUBLIC_APP_BASE_URL, which -- despite being read here on the
+  // server -- is still inlined to a single fixed value at build time by
+  // Next.js, so it would always show one hardcoded domain regardless of
+  // which of our domains actually served this page.
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("host");
+  const proto = requestHeaders.get("x-forwarded-proto") || "https";
+  const appUrl = host ? `${proto}://${host}` : "https://workflows.myapps.ai";
 
   return (
     <>

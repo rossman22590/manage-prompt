@@ -1,14 +1,14 @@
 "use client";
 
+import { CheckIcon, CopyIcon } from "lucide-react";
+import { useMemo, useReducer, useState } from "react";
+import { toast } from "sonner";
 import {
   modelHasInstruction,
   type WorkflowInput,
   WorkflowInputType,
 } from "@/data/workflow";
 import type { Workflow } from "@/generated/prisma-client/client";
-import { CheckIcon, CopyIcon } from "lucide-react";
-import { useMemo, useReducer, useState } from "react";
-import { toast } from "sonner";
 import { ApiCodeSnippet } from "../../code/snippet";
 import { Spinner } from "../../core/loaders";
 import StreamingText from "../../core/streaming-text";
@@ -83,11 +83,14 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
   );
 
   const streamCurlCommand = useMemo(() => {
+    // Prefer the browser's own origin (correct regardless of which of our
+    // domains is serving this page) over the build-time-baked env var,
+    // which would otherwise always show whichever single domain was set
+    // when this bundle was built.
     const baseUrl =
-      process.env.NEXT_PUBLIC_APP_BASE_URL ||
-      (typeof window !== "undefined"
+      typeof window !== "undefined"
         ? window.location.origin
-        : "http://localhost:3000");
+        : process.env.NEXT_PUBLIC_APP_BASE_URL || "http://localhost:3000";
     const tokenValue = deployToken ?? "pub_tok_xxx";
 
     return `curl --request POST \\
@@ -99,10 +102,9 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
 
   const tokenCurlCommand = useMemo(() => {
     const baseUrl =
-      process.env.NEXT_PUBLIC_APP_BASE_URL ||
-      (typeof window !== "undefined"
+      typeof window !== "undefined"
         ? window.location.origin
-        : "http://localhost:3000");
+        : process.env.NEXT_PUBLIC_APP_BASE_URL || "http://localhost:3000";
     const key = apiSecretKey ?? "api-secret-key";
 
     return `curl --request GET \\
@@ -285,12 +287,18 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                     {type === WorkflowInputType.image ? (
                       <div className="space-y-3">
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          Upload an image file or enter an image URL (.png, .jpg, .jpeg)
+                          Upload an image file or enter an image URL (.png,
+                          .jpg, .jpeg)
                         </div>
                         <Input
                           type="text"
                           placeholder="Enter image URL (e.g., https://example.com/image.png)"
-                          value={inputValues[name] && !inputValues[name].startsWith('data:') ? inputValues[name] : ""}
+                          value={
+                            inputValues[name] &&
+                            !inputValues[name].startsWith("data:")
+                              ? inputValues[name]
+                              : ""
+                          }
                           onChange={(e) => {
                             const url = e.target.value.trim();
                             if (url) {
@@ -298,10 +306,14 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                               try {
                                 const urlObj = new URL(url);
                                 const pathname = urlObj.pathname.toLowerCase();
-                                if (/\.(png|jpg|jpeg|gif|webp)$/i.test(pathname)) {
+                                if (
+                                  /\.(png|jpg|jpeg|gif|webp)$/i.test(pathname)
+                                ) {
                                   updateInput({ [name]: url });
                                 } else {
-                                  toast.error("Please enter a valid image URL (.png, .jpg, .jpeg, .gif, or .webp)");
+                                  toast.error(
+                                    "Please enter a valid image URL (.png, .jpg, .jpeg, .gif, or .webp)",
+                                  );
                                 }
                               } catch {
                                 toast.error("Please enter a valid URL");
@@ -313,10 +325,12 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                         />
                         <div className="relative">
                           <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t border-gray-300 dark:border-gray-600"></span>
+                            <span className="w-full border-t border-gray-300 dark:border-gray-600" />
                           </div>
                           <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">Or</span>
+                            <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">
+                              Or
+                            </span>
                           </div>
                         </div>
                         <Input
@@ -326,15 +340,25 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                             const file = e.target.files?.[0];
                             if (file) {
                               // Validate file type
-                              const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                              const validTypes = [
+                                "image/png",
+                                "image/jpeg",
+                                "image/jpg",
+                                "image/gif",
+                                "image/webp",
+                              ];
                               if (!validTypes.includes(file.type)) {
-                                toast.error("Please select a valid image file (.png, .jpg, .jpeg, .gif, or .webp)");
+                                toast.error(
+                                  "Please select a valid image file (.png, .jpg, .jpeg, .gif, or .webp)",
+                                );
                                 return;
                               }
                               // Convert file to base64 data URL
                               const reader = new FileReader();
                               reader.onloadend = () => {
-                                updateInput({ [name]: reader.result as string });
+                                updateInput({
+                                  [name]: reader.result as string,
+                                });
                               };
                               reader.readAsDataURL(file);
                             }
@@ -342,9 +366,9 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                         />
                         {inputValues[name] && (
                           <div className="mt-2">
-                            <img 
-                              src={inputValues[name]} 
-                              alt="Preview" 
+                            <img
+                              src={inputValues[name]}
+                              alt="Preview"
                               className="max-w-full h-auto max-h-64 rounded-lg border border-gray-300 dark:border-gray-700"
                             />
                           </div>
@@ -451,7 +475,7 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
           <ApiCodeSnippet
             har={{
               method: "POST",
-              url: `${process.env.NEXT_PUBLIC_APP_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")}/api/v1/run/${workflow.shortId}`,
+              url: `${typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_BASE_URL || "http://localhost:3000"}/api/v1/run/${workflow.shortId}`,
               queryString: [],
               headers: [
                 {
@@ -485,7 +509,11 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               Streaming uses a short-lived token from
               <span className="font-mono"> /api/v1/token</span>, then calls
-              <span className="font-mono"> /api/v1/run/{workflow.shortId}/stream</span>.
+              <span className="font-mono">
+                {" "}
+                /api/v1/run/{workflow.shortId}/stream
+              </span>
+              .
             </p>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -534,7 +562,9 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
                   size="sm"
                   variant="outline"
                   disabled={!deployToken}
-                  onClick={() => deployToken && handleCopy(deployToken, "token")}
+                  onClick={() =>
+                    deployToken && handleCopy(deployToken, "token")
+                  }
                 >
                   {isCopyingToken ? (
                     <CheckIcon className="h-4 w-4" />
@@ -643,5 +673,3 @@ export function WorkflowComposer({ workflow, apiSecretKey }: Props) {
     </div>
   );
 }
-
-

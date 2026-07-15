@@ -1,11 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/utils/db";
-import { getStreamingCompletion } from "@/lib/utils/ai";
-import { modelToProviderId } from "@/data/workflow";
-import { isSubscriptionActive, hasExceededSpendLimit } from "@/lib/utils/stripe";
+import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { modelToProviderId } from "@/data/workflow";
+import { getStreamingCompletion } from "@/lib/utils/ai";
 import { ErrorCodes, ErrorResponse } from "@/lib/utils/api";
+import { prisma } from "@/lib/utils/db";
 import { redis } from "@/lib/utils/redis";
+import {
+  hasExceededSpendLimit,
+  isSubscriptionActive,
+} from "@/lib/utils/stripe";
 
 export const maxDuration = 300;
 
@@ -77,10 +80,10 @@ export async function POST(
     const token = `pub_${crypto.randomUUID()}`;
     await redis.set(token, { shortId: params.shortId }, { ex: 60 });
 
-    const baseUrl =
-      process.env.APP_BASE_URL ||
-      process.env.NEXT_PUBLIC_APP_BASE_URL ||
-      "http://localhost:3000";
+    // Derived from the actual incoming request rather than a fixed env var,
+    // so the returned streamUrl points back at whichever of our domains the
+    // caller actually used, not always one hardcoded domain.
+    const baseUrl = req.nextUrl.origin;
 
     const streamUrl = `${baseUrl}/api/public/run/${params.shortId}/stream?token=${token}`;
 
@@ -94,4 +97,3 @@ export async function POST(
     );
   }
 }
-
