@@ -40,11 +40,14 @@ export default function NavBar({
             path === `/workflows/${params.workflowId}/branches` ||
             path === `/workflows/${params.workflowId}/branches/new`,
         },
-        {
-          name: "Tests",
-          href: `/workflows/${params.workflowId}/tests`,
-          current: path === `/workflows/${params.workflowId}/tests`,
-        },
+        // Tests tab paused pending a redesign (the current assertion-first
+        // flow forces picking an expected condition/value before you can see
+        // a real output at all, unlike Compose). Not deleted, just hidden.
+        // {
+        //   name: "Tests",
+        //   href: `/workflows/${params.workflowId}/tests`,
+        //   current: path === `/workflows/${params.workflowId}/tests`,
+        // },
         {
           name: "Executions",
           href: `/workflows/${params.workflowId}/runs`,
