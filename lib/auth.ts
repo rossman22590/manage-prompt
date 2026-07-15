@@ -49,9 +49,19 @@ export const auth = betterAuth({
     }),
     nextCookies(),
   ],
-  baseURL: process.env.APP_BASE_URL,
+  // No explicit baseURL: when unset, better-auth derives it per-request from
+  // the actual incoming origin instead of one fixed value, so magic links
+  // (and everything else it generates) correctly point back to whichever of
+  // our domains the user is actually on -- this app is deployed to more than
+  // one domain, and a hardcoded baseURL always resolved to just one of them
+  // regardless of where the request came from.
   trustedOrigins: [
     ...(process.env.APP_BASE_URL ? [process.env.APP_BASE_URL] : []),
+    ...(process.env.ADDITIONAL_TRUSTED_ORIGINS
+      ? process.env.ADDITIONAL_TRUSTED_ORIGINS.split(",")
+          .map((origin) => origin.trim())
+          .filter(Boolean)
+      : []),
     ...(process.env.NODE_ENV === "development"
       ? ["http://localhost:3000", "http://127.0.0.1:3000"]
       : []),

@@ -1,5 +1,8 @@
 ﻿export const magicLinkEmail = (url: string) => {
-  const baseUrl = process.env.APP_BASE_URL ?? "https://workflows.myapps.ai";
+  // Derived from the magic link's own origin (which better-auth already
+  // resolves per-request) rather than a fixed env var, so the email's logo
+  // matches whichever of our domains the recipient actually signed in from.
+  const baseUrl = new URL(url).origin;
   return {
     plainText: `Click here to login to AI Tutor API using Magic Link: ${url}`,
     html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html dir="ltr" lang="en"><head><meta name="viewport" content="width=device-width"/><link rel="preload" as="image" href="${baseUrl}/images/logo.png"/><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/><meta name="x-apple-disable-message-reformatting"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="x-apple-disable-message-reformatting"/><meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no"/><meta name="color-scheme" content="light"/><meta name="supported-color-schemes" content="light"/><!--$--><style>
