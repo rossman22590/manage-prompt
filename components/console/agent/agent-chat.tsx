@@ -3,6 +3,7 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isTextUIPart, type UIMessage } from "ai";
 import { useEffect, useMemo, useState } from "react";
+import MarkdownView from "@/components/markdown/markdown-view";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 
@@ -84,12 +85,17 @@ export function AgentChat({ agentId }: Props) {
                 : "self-start bg-slate-100 dark:bg-slate-800"
             }`}
           >
-            {message.parts.filter(isTextUIPart).map((part, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: text parts have no stable id and only ever append within a message
-              <p key={i} className="whitespace-pre-wrap">
-                {part.text}
-              </p>
-            ))}
+            {message.parts.filter(isTextUIPart).map((part, i) =>
+              message.role === "user" ? (
+                // biome-ignore lint/suspicious/noArrayIndexKey: text parts have no stable id and only ever append within a message
+                <p key={i} className="whitespace-pre-wrap">
+                  {part.text}
+                </p>
+              ) : (
+                // biome-ignore lint/suspicious/noArrayIndexKey: text parts have no stable id and only ever append within a message
+                <MarkdownView key={i} content={part.text} />
+              ),
+            )}
           </div>
         ))}
         {status === "streaming" && (
