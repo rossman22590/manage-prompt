@@ -63,22 +63,22 @@ const isValidImageUrl = (url: string): boolean => {
 
 // Helper to get media type from URL or data URL
 const getMediaType = (imageData: string): string => {
-  if (imageData.startsWith('data:image')) {
+  if (imageData.startsWith("data:image")) {
     const match = imageData.match(/data:image\/([^;]+)/);
-    return match ? `image/${match[1]}` : 'image/png';
+    return match ? `image/${match[1]}` : "image/png";
   }
   // For URLs, try to detect from extension
   try {
     const url = new URL(imageData);
-    const ext = url.pathname.toLowerCase().split('.').pop();
-    if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
-    if (ext === 'png') return 'image/png';
-    if (ext === 'gif') return 'image/gif';
-    if (ext === 'webp') return 'image/webp';
+    const ext = url.pathname.toLowerCase().split(".").pop();
+    if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+    if (ext === "png") return "image/png";
+    if (ext === "gif") return "image/gif";
+    if (ext === "webp") return "image/webp";
   } catch {
     // Not a valid URL, default to png
   }
-  return 'image/png';
+  return "image/png";
 };
 
 export const translateInputs = async ({
@@ -91,11 +91,16 @@ export const translateInputs = async ({
   template: string;
 }) => {
   let content = template;
-  const imageParts: Array<{ url: string; mediaType: string; isDataUrl: boolean }> = [];
-  const webpageParser = new WebpageParser();
-  
+  const imageParts: Array<{
+    url: string;
+    mediaType: string;
+    isDataUrl: boolean;
+  }> = [];
+  let webpageParser: WebpageParser | undefined;
+
   for (const input of inputs) {
     if (input.type === WorkflowInputType.url) {
+      webpageParser ??= new WebpageParser();
       const pageContent = await webpageParser.getContent(
         inputValues[input.name],
       );
@@ -104,14 +109,14 @@ export const translateInputs = async ({
       const imageData = inputValues[input.name];
       if (imageData) {
         // Check if it's a base64 data URL or a valid image URL
-        if (imageData.startsWith('data:image')) {
+        if (imageData.startsWith("data:image")) {
           // Base64 data URL from file upload
           imageParts.push({
             url: imageData,
             mediaType: getMediaType(imageData),
             isDataUrl: true,
           });
-          content = content.replaceAll(`{{${input.name}}}`, '[IMAGE]');
+          content = content.replaceAll(`{{${input.name}}}`, "[IMAGE]");
         } else if (isValidImageUrl(imageData)) {
           // Valid image URL
           imageParts.push({
@@ -119,11 +124,14 @@ export const translateInputs = async ({
             mediaType: getMediaType(imageData),
             isDataUrl: false,
           });
-          content = content.replaceAll(`{{${input.name}}}`, '[IMAGE]');
+          content = content.replaceAll(`{{${input.name}}}`, "[IMAGE]");
         }
       }
     } else {
-      content = content.replaceAll(`{{${input.name}}}`, inputValues[input.name] ?? "");
+      content = content.replaceAll(
+        `{{${input.name}}}`,
+        inputValues[input.name] ?? "",
+      );
     }
   }
   return { content, imageParts };
