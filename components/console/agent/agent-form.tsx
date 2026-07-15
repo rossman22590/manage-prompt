@@ -21,7 +21,6 @@ interface Props {
 
 export function AgentForm({ agent, action }: Props) {
   const [model, setModel] = useState(agent?.model ?? "gpt-5.6-luna");
-  const [modelSearch, setModelSearch] = useState("");
   const [showAdvancedModelParams, setShowAdvancedModelParams] = useState(false);
   const [modelSettings, setModelSettings] = useState(
     (agent?.modelSettings as ModelSettings) ?? {},
@@ -76,18 +75,7 @@ export function AgentForm({ agent, action }: Props) {
             Model
           </Label>
           <div className="mt-2 sm:col-span-2 sm:mt-0">
-            <Input
-              type="text"
-              placeholder="Search models..."
-              value={modelSearch}
-              onChange={(e) => setModelSearch(e.target.value)}
-              className="mb-2"
-            />
-            <ModelPicker
-              value={model as any}
-              onChange={updateModel}
-              search={modelSearch}
-            />
+            <ModelPicker value={model as any} onChange={updateModel} />
 
             <Button
               className="px-0 mt-2"

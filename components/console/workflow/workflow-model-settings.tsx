@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AIModel } from "@/data/workflow";
 import {
+  getMaxOutputTokens,
+  getMinOutputTokens,
   hasReasoning,
   hasStructuredOutput,
   hasWebSearch,
@@ -14,7 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../ui/card";
-import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import {
   Select,
@@ -43,6 +44,11 @@ type Props = {
   model?: AIModel;
 };
 
+// Fallback range used before a model has been selected upstream, matching
+// the previous hardcoded ceiling.
+const FALLBACK_MIN_MAX_TOKENS = 1;
+const FALLBACK_MAX_MAX_TOKENS = 8192;
+
 export function WorkflowModelSettings({
   defaultValue,
   onChange,
@@ -52,6 +58,12 @@ export function WorkflowModelSettings({
     defaultValue?.temperature ?? 1,
   );
   const [maxTokens, setMaxTokens] = useState(defaultValue?.maxTokens ?? 1024);
+  const minMaxTokens = model
+    ? getMinOutputTokens(model)
+    : FALLBACK_MIN_MAX_TOKENS;
+  const maxMaxTokens = model
+    ? getMaxOutputTokens(model)
+    : FALLBACK_MAX_MAX_TOKENS;
   const [topP, setTopP] = useState(defaultValue?.topP ?? 1);
   const [frequencyPenalty, setFrequencyPenalty] = useState(
     defaultValue?.frequencyPenalty ?? 0,
@@ -103,6 +115,14 @@ export function WorkflowModelSettings({
     ],
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-clamp when the selected model (and its derived max) changes, not on every maxTokens edit or triggerChange identity change.
+  useEffect(() => {
+    if (maxTokens > maxMaxTokens) {
+      setMaxTokens(maxMaxTokens);
+      triggerChange({ maxTokens: maxMaxTokens });
+    }
+  }, [model, maxMaxTokens]);
+
   return (
     <Card>
       <CardHeader>
@@ -129,13 +149,15 @@ export function WorkflowModelSettings({
           </div>
 
           <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="name">Max Tokens</Label>
-            <Input
-              type="number"
-              value={maxTokens}
-              onChange={(e) => {
-                setMaxTokens(+e.target.value);
-                triggerChange({ maxTokens: Math.min(+e.target.value, 8192) });
+            <Label htmlFor="name">Max Tokens ({maxTokens})</Label>
+            <Slider
+              value={[maxTokens]}
+              min={minMaxTokens}
+              max={maxMaxTokens}
+              step={1}
+              onValueChange={(val: number[]) => {
+                setMaxTokens(val[0]);
+                triggerChange({ maxTokens: val[0] });
               }}
             />
             <CardDescription>

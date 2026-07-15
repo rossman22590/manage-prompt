@@ -1,13 +1,11 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import slugify from "slugify";
 import { toast } from "sonner";
 import {
   type AIModel,
-  AIModels,
-  AIModelToLabel,
   isVisionCapable,
   modelHasInstruction,
   type WorkflowInput,
@@ -65,7 +63,7 @@ export function WorkflowForm({
   branchId,
   branchShortId,
 }: Props) {
-  const [model, setModel] = useState(workflow?.model ?? AIModels[0]);
+  const [model, setModel] = useState(workflow?.model ?? "gpt-5.6-luna");
   const [template, setTemplate] = useState(workflow?.template ?? "");
   const [instruction, setInstruction] = useState(workflow?.instruction ?? "");
   const [inputs, setInputs] = useState<WorkflowInput[]>(
@@ -74,19 +72,6 @@ export function WorkflowForm({
 
   const [showAdvancedModelParams, setShowAdvancedModelParams] = useState(false);
   const [modelSettings, setModelSettings] = useState({});
-  const [modelSearch, setModelSearch] = useState("");
-
-  const filteredModels = useMemo(() => {
-    return AIModels.filter((m) =>
-      AIModelToLabel[m].toLowerCase().includes(modelSearch.toLowerCase()),
-    );
-  }, [modelSearch]);
-
-  useEffect(() => {
-    if (filteredModels.length > 0 && modelSearch) {
-      setModel(filteredModels[0]);
-    }
-  }, [filteredModels, modelSearch]);
 
   const updateInputs = useCallback(
     (value: any) => {
@@ -152,20 +137,12 @@ export function WorkflowForm({
               Model
             </label>
             <div className="mt-2 sm:col-span-2 sm:mt-0">
-              <Input
-                type="text"
-                placeholder="Search models..."
-                value={modelSearch}
-                onChange={(e) => setModelSearch(e.target.value)}
-                className="mb-2"
-              />
               <ModelPicker
                 value={model as AIModel}
                 onChange={(val) => {
                   setModel(val);
                   updateInputs({ model: val });
                 }}
-                search={modelSearch}
               />
 
               <Button

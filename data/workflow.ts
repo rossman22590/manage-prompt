@@ -279,6 +279,8 @@ export type ModelCapabilities = {
 export type ModelMeta = {
   company: ModelCompany;
   contextLength: number;
+  minOutputTokens: number;
+  maxOutputTokens: number;
   capabilities: ModelCapabilities;
   deprecated?: {
     replacement: AIModel;
@@ -290,6 +292,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-3.5-turbo": {
     company: "OpenAI",
     contextLength: 16385,
+    minOutputTokens: 1,
+    maxOutputTokens: 4096,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -305,6 +309,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4": {
     company: "OpenAI",
     contextLength: 8191,
+    minOutputTokens: 1,
+    maxOutputTokens: 4096,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -320,6 +326,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4-turbo": {
     company: "OpenAI",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 4096,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -335,6 +343,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4o": {
     company: "OpenAI",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -350,6 +360,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4o-mini": {
     company: "OpenAI",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -365,6 +377,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4.1": {
     company: "OpenAI",
     contextLength: 1047576,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -380,6 +394,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4.1-mini": {
     company: "OpenAI",
     contextLength: 1047576,
+    minOutputTokens: 1,
+    maxOutputTokens: 32768,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -395,6 +411,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4.1-nano": {
     company: "OpenAI",
     contextLength: 1047576,
+    minOutputTokens: 1,
+    maxOutputTokens: 32768,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -410,6 +428,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-4.5": {
     company: "OpenAI",
     contextLength: 1047576,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -425,6 +445,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5": {
     company: "OpenAI",
     contextLength: 400000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -440,6 +462,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5-pro": {
     company: "OpenAI",
     contextLength: 400000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -455,6 +479,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.2": {
     company: "OpenAI",
     contextLength: 400000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -470,6 +496,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.2-chat": {
     company: "OpenAI",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -485,6 +513,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.2-pro": {
     company: "OpenAI",
     contextLength: 400000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -500,6 +530,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   o1: {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -515,6 +547,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "o1-mini": {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -530,6 +564,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "o1-preview": {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -545,6 +581,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "o3-mini": {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -560,6 +598,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "o3-pro": {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -575,6 +615,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "o4-mini": {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -590,6 +632,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-oss-120b": {
     company: "OpenAI",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 131072,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -601,6 +645,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-oss-20b": {
     company: "OpenAI",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -612,6 +658,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.4": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -623,6 +671,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.4-mini": {
     company: "OpenAI",
     contextLength: 400000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -634,6 +684,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.4-nano": {
     company: "OpenAI",
     contextLength: 400000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -645,6 +697,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.4-pro": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -660,6 +714,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.5": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -671,6 +727,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.5-pro": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -686,6 +744,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.6-luna": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -697,6 +757,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.6-luna-pro": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -708,6 +770,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.6-terra": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -719,6 +783,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.6-terra-pro": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -730,6 +796,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.6-sol": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -741,6 +809,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gpt-5.6-sol-pro": {
     company: "OpenAI",
     contextLength: 1050000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -752,6 +822,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   o3: {
     company: "OpenAI",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 100000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -767,6 +839,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-sonnet-4.5": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 64000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -782,6 +856,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-opus-4.5": {
     company: "Anthropic",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 64000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -797,6 +873,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-haiku-4.5": {
     company: "Anthropic",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 64000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -808,6 +886,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-opus-4.6": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -823,6 +903,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-opus-4.7": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -838,6 +920,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-opus-4.8": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -849,6 +933,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-sonnet-4.6": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -864,6 +950,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-sonnet-5": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -875,6 +963,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "claude-fable-5": {
     company: "Anthropic",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 128000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -886,6 +976,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-3": {
     company: "xAI",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -901,6 +993,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-3-mini": {
     company: "xAI",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -916,6 +1010,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-3-beta": {
     company: "xAI",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -931,6 +1027,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4": {
     company: "xAI",
     contextLength: 256000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -946,6 +1044,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4-fast": {
     company: "xAI",
     contextLength: 2000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -961,6 +1061,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4.1": {
     company: "xAI",
     contextLength: 2000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -976,6 +1078,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4.1-fast": {
     company: "xAI",
     contextLength: 2000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -991,6 +1095,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4.20": {
     company: "xAI",
     contextLength: 2000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1006,6 +1112,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4.3": {
     company: "xAI",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1021,6 +1129,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "grok-4.5": {
     company: "xAI",
     contextLength: 500000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1032,6 +1142,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   sonar: {
     company: "Perplexity",
     contextLength: 127072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1043,6 +1155,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "sonar-pro": {
     company: "Perplexity",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1054,6 +1168,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "sonar-reasoning-pro": {
     company: "Perplexity",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1065,6 +1181,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "sonar-reasoning": {
     company: "Perplexity",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1080,6 +1198,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "sonar-deep-research": {
     company: "Perplexity",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1091,6 +1211,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama-3.1-8b-instant": {
     company: "Meta",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1102,6 +1224,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama-3.2-1b-preview": {
     company: "Meta",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 60000,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1113,6 +1237,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama-3.2-3b-preview": {
     company: "Meta",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 131072,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1124,6 +1250,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama-3.3-70b-versatile": {
     company: "Meta",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1139,6 +1267,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama3-8b-8192": {
     company: "Meta",
     contextLength: 8192,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1154,6 +1284,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama3-70b-8192": {
     company: "Meta",
     contextLength: 8192,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1169,6 +1301,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama-4-scout": {
     company: "Meta",
     contextLength: 10000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1180,6 +1314,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "llama-4-maverick": {
     company: "Meta",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1191,6 +1327,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "mistral-large-latest": {
     company: "Mistral",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1202,6 +1340,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "mistral-small-latest": {
     company: "Mistral",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1213,6 +1353,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "mixtral-8x7b-32768": {
     company: "Mistral",
     contextLength: 32768,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1228,6 +1370,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "pixtral-12b-2409": {
     company: "Mistral",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1243,6 +1387,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "mistral-medium-3.5": {
     company: "Mistral",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1254,6 +1400,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-r1-distill-llama-70b": {
     company: "DeepSeek",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1265,6 +1413,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-chat-v3-0324": {
     company: "DeepSeek",
     contextLength: 163840,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1280,6 +1430,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-chat-v3.1": {
     company: "DeepSeek",
     contextLength: 163840,
+    minOutputTokens: 1,
+    maxOutputTokens: 32768,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1295,6 +1447,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-chat-v3": {
     company: "DeepSeek",
     contextLength: 163840,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1310,6 +1464,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-coder-v2": {
     company: "DeepSeek",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1325,6 +1481,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-coder-v2-lite": {
     company: "DeepSeek",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1340,6 +1498,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-v3.2": {
     company: "DeepSeek",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 64000,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1355,6 +1515,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-v4-flash": {
     company: "DeepSeek",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1366,6 +1528,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-v4-pro": {
     company: "DeepSeek",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 384000,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1377,6 +1541,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "deepseek-r1-0528": {
     company: "DeepSeek",
     contextLength: 163840,
+    minOutputTokens: 1,
+    maxOutputTokens: 32768,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1392,6 +1558,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-7b-instruct": {
     company: "Qwen",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 32768,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1407,6 +1575,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-72b-instruct": {
     company: "Qwen",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1422,6 +1592,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-0.5b-instruct": {
     company: "Qwen",
     contextLength: 32768,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1437,6 +1609,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-1.5b-instruct": {
     company: "Qwen",
     contextLength: 32768,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1452,6 +1626,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-3b-instruct": {
     company: "Qwen",
     contextLength: 32768,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1467,6 +1643,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-14b-instruct": {
     company: "Qwen",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1482,6 +1660,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen-2.5-32b-instruct": {
     company: "Qwen",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1497,6 +1677,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3-8b": {
     company: "Qwen",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1512,6 +1694,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3-14b": {
     company: "Qwen",
     contextLength: 131702,
+    minOutputTokens: 1,
+    maxOutputTokens: 40960,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1527,6 +1711,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3-32b": {
     company: "Qwen",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1542,6 +1728,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3-max": {
     company: "Qwen",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 32768,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1557,6 +1745,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3-coder": {
     company: "Qwen",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1568,6 +1758,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "command-r": {
     company: "Cohere",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 4000,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1579,6 +1771,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "command-r-plus": {
     company: "Cohere",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 4000,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1590,6 +1784,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "command-r7b-08-2024": {
     company: "Cohere",
     contextLength: 128000,
+    minOutputTokens: 1,
+    maxOutputTokens: 4000,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1601,6 +1797,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "command-a": {
     company: "Cohere",
     contextLength: 256000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1612,6 +1810,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-2-5-pro": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1627,6 +1827,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-2-5-flash": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65535,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1642,6 +1844,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-2-5-flash-lite": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65535,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1657,6 +1861,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemma-2-27b": {
     company: "Google",
     contextLength: 8192,
+    minOutputTokens: 1,
+    maxOutputTokens: 2048,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1672,6 +1878,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemma-3": {
     company: "Google",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1687,6 +1895,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "code-gemma": {
     company: "Google",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 16384,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1702,6 +1912,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-3-pro-preview": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1717,6 +1929,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemma-2-9b": {
     company: "Google",
     contextLength: 8192,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: false,
@@ -1732,6 +1946,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-3.1-pro-preview": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1743,6 +1959,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-3-flash-preview": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65535,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1754,6 +1972,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-3.1-flash-lite": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1765,6 +1985,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemini-3.5-flash": {
     company: "Google",
     contextLength: 1048576,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1776,6 +1998,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemma-4-31b-it": {
     company: "Google",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1787,6 +2011,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "gemma-4-26b-a4b-it": {
     company: "Google",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1798,6 +2024,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "sonar-pro-search": {
     company: "Perplexity",
     contextLength: 200000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8000,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1809,6 +2037,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "ministral-14b-latest": {
     company: "Mistral",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1820,6 +2050,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "ministral-8b-latest": {
     company: "Mistral",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1831,6 +2063,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "ministral-3b-latest": {
     company: "Mistral",
     contextLength: 131072,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: true,
       largeContextWindow: false,
@@ -1842,6 +2076,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3.5-9b": {
     company: "Qwen",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 262144,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1853,6 +2089,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3.6-27b": {
     company: "Qwen",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 131072,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1864,6 +2102,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3.6-35b-a3b": {
     company: "Qwen",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 262144,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1875,6 +2115,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3.7-max": {
     company: "Qwen",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1886,6 +2128,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3.7-plus": {
     company: "Qwen",
     contextLength: 1000000,
+    minOutputTokens: 1,
+    maxOutputTokens: 65536,
     capabilities: {
       vision: true,
       largeContextWindow: true,
@@ -1897,6 +2141,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "qwen3-coder-next": {
     company: "Qwen",
     contextLength: 262144,
+    minOutputTokens: 1,
+    maxOutputTokens: 262144,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1908,6 +2154,8 @@ export const AIModelMeta: Record<AIModel, ModelMeta> = {
   "north-mini-code": {
     company: "Cohere",
     contextLength: 256000,
+    minOutputTokens: 1,
+    maxOutputTokens: 8192,
     capabilities: {
       vision: false,
       largeContextWindow: true,
@@ -1941,6 +2189,12 @@ export const getDeprecationInfo = (model: AIModel) =>
 
 export const getModelCompany = (model: AIModel): ModelCompany =>
   AIModelMeta[model]?.company ?? "OpenAI";
+
+export const getMinOutputTokens = (model: AIModel): number =>
+  AIModelMeta[model]?.minOutputTokens ?? 1;
+
+export const getMaxOutputTokens = (model: AIModel): number =>
+  AIModelMeta[model]?.maxOutputTokens ?? 8192;
 
 // The rest of your code remains unchanged
 export const modelHasInstruction: Record<string, boolean> = {};
